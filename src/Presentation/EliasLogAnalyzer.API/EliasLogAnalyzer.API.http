@@ -1,0 +1,6 @@
+@EliasLogAnalyzer.API_HostAddress = http://localhost:5072
+
+GET {{EliasLogAnalyzer.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
