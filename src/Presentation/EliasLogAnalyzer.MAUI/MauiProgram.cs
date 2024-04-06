@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EliasLogAnalyzer.MAUI.Services;
+using EliasLogAnalyzer.MAUI.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace EliasLogAnalyzer.MAUI
 {
@@ -15,8 +17,13 @@ namespace EliasLogAnalyzer.MAUI
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<MainViewModel>();
+            builder.Services.AddTransient<ISettingsService, SettingsService>();
+
+
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
