@@ -1,7 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             x:DataType="viewModels:MainViewModel"
              x:Class="EliasLogAnalyzer.MAUI.MainPage">
 
-
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="File">
+            <MenuFlyoutItem Text="Load Logfiles"
+                             />
+        </MenuBarItem>
+        <MenuBarItem Text="View">
+            <MenuFlyoutSubItem Text="Change Theme">
+                <MenuFlyoutItem Text="Dark Mode" 
+                                Command="{Binding ChangeToDarkThemeCommand}" />
+                <MenuFlyoutItem Text="Light Mode" 
+                                Command="{Binding ChangeToLightThemeCommand}" />
+                <MenuFlyoutItem Text="System" 
+                            Command="{Binding ChangeToSystemThemeCommand}" />
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+        
+    </ContentPage.MenuBarItems>
+    
 </ContentPage>
