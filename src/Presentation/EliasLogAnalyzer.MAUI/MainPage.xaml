@@ -23,4 +23,9 @@
         
     </ContentPage.MenuBarItems>
     
+    <StackLayout>
+        <Label Text="Selected Files:" />
+        <CollectionView ItemsSource="{Binding SelectedFileNames}" />
+    </StackLayout>
+    
 </ContentPage>
