@@ -17,7 +17,7 @@
                 <MenuFlyoutItem Text="Light Mode" 
                                 Command="{Binding ChangeToLightThemeCommand}" />
                 <MenuFlyoutItem Text="System" 
-                            Command="{Binding ChangeToSystemThemeCommand}" />
+                                Command="{Binding ChangeToSystemThemeCommand}" />
             </MenuFlyoutSubItem>
         </MenuBarItem>
         
@@ -25,7 +25,13 @@
     
     <StackLayout>
         <Label Text="Selected Files:" />
-        <CollectionView ItemsSource="{Binding SelectedFileNames}" />
+        <CollectionView ItemsSource="{Binding LogFiles}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding}" TextColor="Black" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </StackLayout>
     
 </ContentPage>

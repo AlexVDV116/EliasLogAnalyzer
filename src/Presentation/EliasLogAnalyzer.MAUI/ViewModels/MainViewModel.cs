@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.MAUI.Resources;
@@ -9,18 +10,19 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         private readonly ISettingsService _settingsService;
+        private readonly ILogFileLoaderService _logFileLoaderService;
 
         public IRelayCommand ChangeToDarkThemeCommand { get; }
         public IRelayCommand ChangeToLightThemeCommand { get; }
         public IRelayCommand ChangeToSystemThemeCommand { get; }
         public IRelayCommand LoadLogfilesCommand { get; }
         
-        public ObservableCollection<string> SelectedFileNames { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> LogFiles { get; set; } = [];
 
-
-        public MainViewModel(ISettingsService settingsService)
+        public MainViewModel(ISettingsService settingsService, ILogFileLoaderService logFileLoaderService)
         {
             _settingsService = settingsService;
+            _logFileLoaderService = logFileLoaderService;
 
             ChangeToDarkThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Dark));
             ChangeToLightThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Light));
@@ -28,10 +30,10 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
             LoadLogfilesCommand = new RelayCommand(LoadLogFiles);
         }
 
-        public async Task Initialise()
-        {
-            // Add code for initialization here
-        }
+        //public async Task Initialise()
+        //{
+        //    // Add code for initialization here
+        //}
 
         private void ApplyTheme(Theme theme)
         {
@@ -44,24 +46,16 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
         
         private async void LoadLogFiles()
         {
-            var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-            {
-                { DevicePlatform.WinUI, new List<string> { ".log" } },
-                { DevicePlatform.MacCatalyst , new List<string> { "public.log" } }
-            });
-            
-            var results = await FilePicker.PickMultipleAsync(new PickOptions
-            {
-                FileTypes = customFileType
-            });
+            var results = await _logFileLoaderService.LoadLogFilesAsync();
 
-            foreach (var result in results)
+            if (results != null)
             {
-                App.Current.Dispatcher.Dispatch(() =>
+                foreach (var result in results)
                 {
-                    SelectedFileNames.Add(result.FileName);
-                });
+                    LogFiles.Add(result.FileName);
+                }
             }
+
         }
     }
 }
