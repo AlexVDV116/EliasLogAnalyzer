@@ -8,7 +8,7 @@
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="File">
             <MenuFlyoutItem Text="Load Logfiles"
-                             />
+                            Command="{Binding LoadLogfilesCommand}" />
         </MenuBarItem>
         <MenuBarItem Text="View">
             <MenuFlyoutSubItem Text="Change Theme">

@@ -12,6 +12,7 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
         public IRelayCommand ChangeToDarkThemeCommand { get; }
         public IRelayCommand ChangeToLightThemeCommand { get; }
         public IRelayCommand ChangeToSystemThemeCommand { get; }
+        public IRelayCommand LoadLogfilesCommand { get; }
 
         public MainViewModel(ISettingsService settingsService)
         {
@@ -20,6 +21,7 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
             ChangeToDarkThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Dark));
             ChangeToLightThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Light));
             ChangeToSystemThemeCommand = new RelayCommand(() => ApplyTheme(Theme.System));
+            LoadLogfilesCommand = new RelayCommand(LoadLogFiles);
         }
 
         public async Task Initialise()
@@ -34,6 +36,25 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
             {
                 App.Current.UserAppTheme = theme.AppTheme;
             });
+        }
+        
+        private async void LoadLogFiles()
+        {
+            var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+            {
+                { DevicePlatform.WinUI, new List<string> { ".log" } },
+                { DevicePlatform.MacCatalyst , new List<string> { ".log" } }
+            });
+            
+            var results = await FilePicker.PickMultipleAsync(new PickOptions
+            {
+                FileTypes = customFileType
+            });
+
+            foreach (var result in results)
+            {
+                await App.Current.MainPage.DisplayAlert("File Selected", result.FileName, "OK");
+            }
         }
     }
 }
