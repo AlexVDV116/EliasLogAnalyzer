@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EliasLogAnalyzer.MAUI.Services
+namespace EliasLogAnalyzer.MAUI.Services.Contracts
 {
     public interface ILogFileLoaderService
     {

@@ -1,4 +1,5 @@
 ﻿using EliasLogAnalyzer.MAUI.Services;
+using EliasLogAnalyzer.MAUI.Services.Contracts;
 using EliasLogAnalyzer.MAUI.ViewModels;
 using Microsoft.Extensions.Logging;
 

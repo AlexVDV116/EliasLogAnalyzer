@@ -1,9 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.MAUI.Resources;
-using EliasLogAnalyzer.MAUI.Services;
+using EliasLogAnalyzer.MAUI.Services.Contracts;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels
 {
@@ -16,7 +15,7 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
         public IRelayCommand ChangeToLightThemeCommand { get; }
         public IRelayCommand ChangeToSystemThemeCommand { get; }
         public IRelayCommand LoadLogfilesCommand { get; }
-        
+
         public ObservableCollection<string> LogFiles { get; set; } = [];
 
         public MainViewModel(ISettingsService settingsService, ILogFileLoaderService logFileLoaderService)
@@ -38,24 +37,17 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
         private void ApplyTheme(Theme theme)
         {
             _settingsService.AppTheme = theme;
-            App.Current.Dispatcher.Dispatch(() =>
-            {
-                App.Current.UserAppTheme = theme.AppTheme;
-            });
+            App.Current.Dispatcher.Dispatch(() => { App.Current.UserAppTheme = theme.AppTheme; });
         }
-        
+
         private async void LoadLogFiles()
         {
             var results = await _logFileLoaderService.LoadLogFilesAsync();
 
-            if (results != null)
+            foreach (var result in results)
             {
-                foreach (var result in results)
-                {
-                    LogFiles.Add(result.FileName);
-                }
+                LogFiles.Add(result.FileName);
             }
-
         }
     }
 }

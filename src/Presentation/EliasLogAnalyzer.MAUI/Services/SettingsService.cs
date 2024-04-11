@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using EliasLogAnalyzer.MAUI.Resources;
+using EliasLogAnalyzer.MAUI.Services.Contracts;
 
 namespace EliasLogAnalyzer.MAUI.Services
 {
