@@ -12,6 +12,8 @@ namespace EliasLogAnalyzer.MAUI.Services
                 { DevicePlatform.MacCatalyst , new List<string> { "public.log" } }
             });
 
+            // TODO: FilePicker for macCatalyst is bugged as of now 
+            // https://github.com/dotnet/maui/issues/15126
             var results = await FilePicker.PickMultipleAsync(new PickOptions
             {
                 FileTypes = customFileType
