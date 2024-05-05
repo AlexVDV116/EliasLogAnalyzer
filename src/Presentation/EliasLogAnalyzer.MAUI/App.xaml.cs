@@ -8,10 +8,10 @@ namespace EliasLogAnalyzer.MAUI
 
         public App(ISettingsService settingsService)
         {
-            InitializeComponent();
-
-            MainPage = new AppShell();
             _settingsService = settingsService;
+            
+            InitializeComponent();
+            MainPage = new AppShell(settingsService);
             SetTheme();
         }
 
