@@ -2,7 +2,7 @@
 
 namespace EliasLogAnalyzer.MAUI
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage
     {
 
         public MainPage(MainViewModel viewModel)
@@ -10,12 +10,6 @@ namespace EliasLogAnalyzer.MAUI
             InitializeComponent();
 
             BindingContext = viewModel;
-        }
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            //await viewModel.Initialise();
         }
     }
 
