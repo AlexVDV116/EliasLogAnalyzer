@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+             xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls"
+             x:DataType="viewModels:LogFilesViewModel"
+             x:Class="EliasLogAnalyzer.MAUI.Pages.LogFilesPage">
+
+    <ContentPage.Content>
+
+        <StackLayout>
+            <Label Text="Source" FontSize="Large" FontAttributes="Bold"
+                   BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                   Padding="10" />
+            <CollectionView x:Name="LogFilesListView"
+                            ItemsSource="{Binding LoadedLogFiles}">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="entities:LogFile">
+                        <StackLayout Padding="10">
+                            <Grid ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/> <!-- CheckBox -->
+                                    <ColumnDefinition Width="*"/>   <!-- FileName and Log Entries -->
+                                </Grid.ColumnDefinitions>
+                                <controls:CustomCheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                                <StackLayout Grid.Column="1" Orientation="Horizontal">
+                                    <Label Text="{Binding FileName}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}" HorizontalOptions="EndAndExpand"/>
+                                </StackLayout>
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="LightGray" Margin="0,10" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button Text="Open Selected LogFiles"
+                    Command="{Binding OpenFilesCommand}"
+                    WidthRequest="200"  
+                    HorizontalOptions="Center"  
+                    BackgroundColor="#FFF"  
+                    BorderColor="#FF02A3A4"
+                    BorderWidth="2"
+                    TextColor="#FF02A3A4"  
+                    FontAttributes="Bold"  
+                    CornerRadius="10"  
+                    Margin="0,20,0,0"  
+            />        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>
