@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace EliasLogAnalyzer.Domain.Entities
+namespace EliasLogAnalyzer.Domain.Entities;
+
+public partial class LogFile : ObservableObject
 {
-    internal class LogFile
-    {
-        // Create a domain model for a log file
-    }
+    [ObservableProperty]
+    private bool isSelected;
+    public string FileName { get; set; }
+    public IList<LogEntry> LogEntries { get; set; }
 }
