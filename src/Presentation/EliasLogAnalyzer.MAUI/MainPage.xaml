@@ -1,37 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              x:DataType="viewModels:MainViewModel"
-             x:Class="EliasLogAnalyzer.MAUI.MainPage">
+             x:Class="EliasLogAnalyzer.MAUI.MainPage"
+             Shell.NavBarIsVisible="false">
 
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="File">
             <MenuFlyoutItem Text="Load Logfiles"
                             Command="{Binding LoadLogfilesCommand}" />
         </MenuBarItem>
-        <MenuBarItem Text="View">
-            <MenuFlyoutSubItem Text="Change Theme">
-                <MenuFlyoutItem Text="Dark Mode" 
-                                Command="{Binding ChangeToDarkThemeCommand}" />
-                <MenuFlyoutItem Text="Light Mode" 
-                                Command="{Binding ChangeToLightThemeCommand}" />
-                <MenuFlyoutItem Text="System" 
-                                Command="{Binding ChangeToSystemThemeCommand}" />
-            </MenuFlyoutSubItem>
-        </MenuBarItem>
-        
     </ContentPage.MenuBarItems>
-    
-    <StackLayout>
-        <Label Text="Selected Files:" />
-        <CollectionView ItemsSource="{Binding LogFiles}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Label Text="{Binding}" TextColor="Black" />
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+
+    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+        <ImageButton Source="logo.png"
+                     Command="{Binding LoadLogfilesCommand}"
+                     WidthRequest="500"
+                     HeightRequest="500"
+                     Aspect="AspectFit"
+                     BackgroundColor="Transparent"
+                     Opacity="0.3"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center" />
+
+        <Label Text="Load logfiles..."
+               FontSize="Large"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
     </StackLayout>
-    
+
 </ContentPage>
