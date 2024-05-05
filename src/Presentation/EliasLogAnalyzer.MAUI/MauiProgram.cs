@@ -1,4 +1,6 @@
-﻿using EliasLogAnalyzer.MAUI.Services;
+﻿using CommunityToolkit.Maui;
+using EliasLogAnalyzer.MAUI.Pages;
+using EliasLogAnalyzer.MAUI.Services;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using EliasLogAnalyzer.MAUI.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -12,6 +14,7 @@ namespace EliasLogAnalyzer.MAUI
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -20,8 +23,13 @@ namespace EliasLogAnalyzer.MAUI
 
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<MainViewModel>();
-            builder.Services.AddTransient<ISettingsService, SettingsService>();
-            builder.Services.AddTransient<ILogFileLoaderService, LogFileLoaderService>();
+            builder.Services.AddTransient<LogFilesPage>();
+            builder.Services.AddTransient<LogFilesViewModel>();
+            
+            builder.Services.AddSingleton<ISettingsService, SettingsService>();
+            builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
+            builder.Services.AddSingleton<ILogFileLoaderService, LogFileLoaderService>();
+            builder.Services.AddSingleton<ILogFileParserService, LogFileParserService>();
 
 
 #if DEBUG
