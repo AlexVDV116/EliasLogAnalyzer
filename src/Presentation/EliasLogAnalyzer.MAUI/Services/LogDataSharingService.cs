@@ -8,5 +8,6 @@ public class LogDataSharingService : ILogDataSharingService
 {
     public ObservableCollection<LogFile> LogFiles { get; set; } = [];
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
+    public ObservableCollection<LogFile> SelectedLogFiles { get; set; } = [];
 
 }
