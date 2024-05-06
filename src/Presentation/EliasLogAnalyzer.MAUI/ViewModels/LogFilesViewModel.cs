@@ -36,12 +36,13 @@ public partial class LogFilesViewModel : ObservableObject
     }
     
     [RelayCommand]
-    public void OpenFiles()
+    private async void OpenFiles()
     {
         foreach (var file in SelectedLogFiles)
         {
-            Console.WriteLine($"Selected File: {file.FileName}");
+            _logDataSharingService.SelectedLogFiles.Add(file);
         }
+        await Shell.Current.GoToAsync("logentriesPage");
     }
     
 }
