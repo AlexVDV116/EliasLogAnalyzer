@@ -11,7 +11,7 @@
 
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="File">
-            <MenuFlyoutItem Text="Load Logfiles"
+            <MenuFlyoutItem Text="Open Logfiles"
                             Command="{Binding LoadLogfilesCommand}" />
         </MenuBarItem>
     </ContentPage.MenuBarItems>
