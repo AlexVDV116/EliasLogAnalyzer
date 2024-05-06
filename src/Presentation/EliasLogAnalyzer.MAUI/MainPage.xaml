@@ -17,6 +17,7 @@
     </ContentPage.MenuBarItems>
 
     <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+        
         <ImageButton Source="logo.png"
                      Command="{Binding LoadLogfilesCommand}"
                      WidthRequest="500"
@@ -27,10 +28,11 @@
                      HorizontalOptions="Center"
                      VerticalOptions="Center" />
 
-        <Label Text="Load logfiles..."
-               FontSize="Large"
+        <Label Text="{Binding LoadingMessage}"
                HorizontalOptions="Center"
                VerticalOptions="Center" />
+        
+        <ActivityIndicator IsRunning="{Binding IsLoading}" Color="DarkCyan" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
     </StackLayout>
 
 </ContentPage>
