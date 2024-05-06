@@ -6,49 +6,72 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls"
+             xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
              x:DataType="viewModels:LogFilesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogFilesPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:FileSizeFormatConverter x:Key="FileSizeFormatConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <ContentPage.Content>
 
         <StackLayout>
-            <Label Text="Source" FontSize="Large" FontAttributes="Bold"
-                   BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                   Padding="10" />
-            <CollectionView x:Name="LogFilesListView"
-                            ItemsSource="{Binding LoadedLogFiles}">
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="entities:LogFile">
-                        <StackLayout Padding="10">
-                            <Grid ColumnSpacing="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/> <!-- CheckBox -->
-                                    <ColumnDefinition Width="*"/>   <!-- FileName and Log Entries -->
-                                </Grid.ColumnDefinitions>
-                                <controls:CustomCheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                                <StackLayout Grid.Column="1" Orientation="Horizontal">
-                                    <Label Text="{Binding FileName}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}" HorizontalOptions="EndAndExpand"/>
-                                </StackLayout>
-                            </Grid>
-                            <BoxView HeightRequest="1" BackgroundColor="LightGray" Margin="0,10" />
-                        </StackLayout>
+            <!-- ListView for displaying log files -->
+            <ListView x:Name="LogFilesListView"
+                      BackgroundColor="Transparent"
+                      ItemsSource="{Binding LoadedLogFiles}"
+                      Header="{Binding .}">
+
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *, *, *, *" Padding="10">
+                            <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0"
+                                                     IsChecked="{Binding SelectAll, Mode=TwoWay}" />
+                            <Label Grid.Column="1" Text="Source" FontSize="Large" FontAttributes="Bold" />
+                            <Label Grid.Column="2" Text="Log Entries" FontSize="Large" FontAttributes="Bold"
+                                   HorizontalOptions="Start" />
+                            <Label Grid.Column="3" Text="Computer" FontSize="Large" FontAttributes="Bold"
+                                   HorizontalOptions="Start" />
+                            <Label Grid.Column="4" Text="File Size" FontSize="Large" FontAttributes="Bold"
+                                   HorizontalOptions="End" />
+                        </Grid>
                     </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                </ListView.HeaderTemplate>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="entities:LogFile">
+                        <ViewCell>
+                            <Grid ColumnDefinitions="Auto, *, *, *, *" Padding="10">
+                                <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0"
+                                                         IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                <Label Text="{Binding FileName}" Grid.Column="1" />
+                                <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}"
+                                       Grid.Column="2" HorizontalOptions="Start" />
+                                <Label Text="{Binding Computer}" Grid.Column="3" /> 
+                                <Label Text="{Binding FileSize, Converter={StaticResource FileSizeFormatConverter}}"
+                                       Grid.Column="4" HorizontalOptions="End" />
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
             <Button Text="Open Selected LogFiles"
                     Command="{Binding OpenFilesCommand}"
-                    WidthRequest="200"  
-                    HorizontalOptions="Center"  
-                    BackgroundColor="#FFF"  
+                    WidthRequest="200"
+                    HorizontalOptions="Center"
+                    BackgroundColor="#FFF"
                     BorderColor="#FF02A3A4"
                     BorderWidth="2"
-                    TextColor="#FF02A3A4"  
-                    FontAttributes="Bold"  
-                    CornerRadius="10"  
-                    Margin="0,20,0,0"  
-            />        </StackLayout>
+                    TextColor="#FF02A3A4"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    Margin="0,20,0,0" />
+        </StackLayout>
 
     </ContentPage.Content>
 </ContentPage>
