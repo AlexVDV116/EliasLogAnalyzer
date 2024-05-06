@@ -31,7 +31,7 @@ public partial class MainViewModel : ObservableObject
         _logFileParserService = logFileParserService;
         
         LoadLogfilesCommand = new RelayCommand(LoadLogFiles);
-        LoadingMessage = "Load LogFiles...";
+        LoadingMessage = "Open LogFiles...";
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class MainViewModel : ObservableObject
         var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
         
         IsLoading = true;
-        LoadingMessage = "Please wait... Parsing your LogFiles...";
+        LoadingMessage = "Please wait, parsing LogFiles...";
 
         // Create a list of tasks for parsing each log file
         var parsingTasks = fileResults.Select(fileResult => ParseLogFileAsync(fileResult)).ToList();
@@ -64,7 +64,7 @@ public partial class MainViewModel : ObservableObject
         }
         
         IsLoading = false; 
-        LoadingMessage = "Load LogFiles...";
+        LoadingMessage = "Open LogFiles...";
         await Shell.Current.GoToAsync("logfilesPage");
     }
 
