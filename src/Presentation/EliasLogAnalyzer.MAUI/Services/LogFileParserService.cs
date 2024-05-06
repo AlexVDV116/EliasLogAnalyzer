@@ -25,24 +25,34 @@ public class LogFileParserService : ILogFileParserService
     /// </summary>
     /// <param name="fileResult">The representation of a file, as a result of a pick action by the user, and its content type.</param>
     /// /// <exception cref="IOException">Thrown when the log file could not be read.</exception>
-    public async Task<List<LogEntry>> ParseLogAsync(FileResult fileResult)
+    public async Task<(List<LogEntry> Entries, long FileSize)> ParseLogAsync(FileResult fileResult)
     {
         _logger.LogInformation("Starting to parse log file: {FileName}", fileResult.FileName);
         var headers = new List<string>();  // Local headers list for each file
 
         var entries = new List<LogEntry>();
+        long fileSize = 0; 
 
         try
         {
             await using (var stream = await fileResult.OpenReadAsync())
-            using (var reader = new StreamReader(stream))
             {
-                var line = await reader.ReadLineAsync();
-                if (line != null)
+                // Checking if the stream supports seeking to obtain file size
+                if (stream.CanSeek)
                 {
-                    // Parse headers using the local list
-                    ParseHeaders(line, headers);
-                    await ParseEntries(reader, entries, headers);
+                    fileSize = stream.Length;
+                    _logger.LogInformation("File size: {FileSize} bytes", fileSize);
+                }
+
+                using (var reader = new StreamReader(stream))
+                {
+                    var line = await reader.ReadLineAsync();
+                    if (line != null)
+                    {
+                        // Parse headers using the local list
+                        ParseHeaders(line, headers);
+                        await ParseEntries(reader, entries, headers);
+                    }
                 }
             }
 
@@ -57,7 +67,7 @@ public class LogFileParserService : ILogFileParserService
             _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex.Message);
         }
 
-        return entries;
+        return (entries, fileSize);
     }
 
     /// <summary>
