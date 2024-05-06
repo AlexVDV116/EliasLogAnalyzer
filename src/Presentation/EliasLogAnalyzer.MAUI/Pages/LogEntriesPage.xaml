@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+             xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
+             xmlns:global="clr-namespace:"
+             x:DataType="viewModels:LogEntriesViewModel"
+             x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout>
+                <!-- Static Header Layout -->
+                <Grid BackgroundColor="#f0f0f0" Padding="20, 10" ColumnSpacing="10"
+                      ColumnDefinitions="90, 150, 150, 100, 100, 100, 250, 80, 80, 200, 200, *">
+                    <Label Grid.Column="0" Text="Date" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="Time" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="2" Text="SortValue" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="3" Text="Type" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="4" Text="Thread/No" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="5" Text="Source Loc." FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="6" Text="Source" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="7" Text="Category" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="8" Text="Event ID" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="9" Text="User" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="10" Text="Computer" FontSize="Medium" FontAttributes="Bold" />
+                    <Label Grid.Column="11" Text="Description" FontSize="Medium" FontAttributes="Bold" />
+                </Grid>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding LogEntries}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="entities:LogEntry">
+                            <Frame Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
+                                <toolkit:Expander Direction="Down">
+                                    <toolkit:Expander.Header>
+                                        <Grid ColumnSpacing="10"
+                                              ColumnDefinitions="90, 150, 150, 100, 100, 100, 250, 80, 80, 200, 200, *">
+                                            <Label Text="{Binding Date}" Grid.Column="0" FontSize="Small" />
+                                            <Label Text="{Binding Time}" Grid.Column="1" FontSize="Small" />
+                                            <Label Text="{Binding DateTimeSortValue}" Grid.Column="2" FontSize="Small" />
+                                            <Label Text="{Binding LogType}" 
+                                                   FontSize="Small" 
+                                                   Grid.Column="3" 
+                                                   TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
+                                            <Label Text="{Binding ThreadNameOrNumber}" Grid.Column="4" FontSize="Small" />
+                                            <Label Text="{Binding SourceLocation}" Grid.Column="5" FontSize="Small" />
+                                            <Label Text="{Binding Source}" Grid.Column="6" FontSize="Small" />
+                                            <Label Text="{Binding Category}" Grid.Column="7" FontSize="Small" />
+                                            <Label Text="{Binding EventId}" Grid.Column="8" FontSize="Small" />
+                                            <Label Text="{Binding User}" Grid.Column="9" FontSize="Small" />
+                                            <Label Text="{Binding Computer}" Grid.Column="10" FontSize="Small" />
+                                            <Label Text="{Binding Description}" Grid.Column="11" FontSize="Small" />
+                                        </Grid>
+                                    </toolkit:Expander.Header>
+                                    <toolkit:Expander.Content>
+                                        <VerticalStackLayout>
+                                            <Label Text="Data:" FontSize="Small" />
+                                            <Label Text="{Binding Data}" FontSize="Small" HorizontalOptions="FillAndExpand"
+                                                   VerticalOptions="Start" />
+                                        </VerticalStackLayout>
+                                    </toolkit:Expander.Content>
+                                </toolkit:Expander>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
