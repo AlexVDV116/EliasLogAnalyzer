@@ -4,10 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.VisualBasic;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
     private readonly ISettingsService _settingsService;
     private readonly ILogDataSharingService _logDataSharingService;
@@ -15,6 +16,9 @@ public class MainViewModel : ObservableObject
     private readonly ILogFileParserService _logFileParserService;
     
     public IRelayCommand LoadLogfilesCommand { get; }
+
+    [ObservableProperty] private bool isLoading;
+    [ObservableProperty] private string loadingMessage;
 
     public MainViewModel(
         ILogDataSharingService logDataSharingService,
@@ -27,12 +31,8 @@ public class MainViewModel : ObservableObject
         _logFileParserService = logFileParserService;
         
         LoadLogfilesCommand = new RelayCommand(LoadLogFiles);
+        LoadingMessage = "Load LogFiles...";
     }
-
-    //public async Task Initialise()
-    //{
-    //    // Add code for initialization here
-    //}
 
     /// <summary>
     /// Asynchronously loads multiple log files and parses them concurrently. 
@@ -41,7 +41,11 @@ public class MainViewModel : ObservableObject
     /// </summary>
     private async void LoadLogFiles()
     {
+        
         var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
+        
+        IsLoading = true;
+        LoadingMessage = "Please wait... Parsing your LogFiles...";
 
         // Create a list of tasks for parsing each log file
         var parsingTasks = fileResults.Select(fileResult => ParseLogFileAsync(fileResult)).ToList();
@@ -59,6 +63,8 @@ public class MainViewModel : ObservableObject
             }
         }
         
+        IsLoading = false; 
+        LoadingMessage = "Load LogFiles...";
         await Shell.Current.GoToAsync("logfilesPage");
     }
 
@@ -71,10 +77,12 @@ public class MainViewModel : ObservableObject
     /// <returns>A task that, when completed, returns a LogFile object containing all parsed entries.</returns>
     private async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
     {
-        var logEntries = await _logFileParserService.ParseLogAsync(fileResult);
+        var (logEntries, fileSize) = await _logFileParserService.ParseLogAsync(fileResult);
         return new LogFile
         {
             FileName = fileResult.FileName,
+            FileSize = fileSize,
+            Computer = logEntries.FirstOrDefault()?.Computer ?? "Unknown",
             LogEntries = logEntries
         };
     }
