@@ -6,13 +6,18 @@ using EliasLogAnalyzer.MAUI.Services.Contracts;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public class LogEntriesViewModel : ObservableObject
+public partial class LogEntriesViewModel : ObservableObject
 {
     private readonly ILogDataSharingService _logDataSharingService;
-    
+
     public ObservableCollection<LogEntry> LogEntries { get; } = [];
 
-    
+    [ObservableProperty]
+    private LogEntry _selectedLogEntry;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _selectedLogEntryData = [];
+
     public LogEntriesViewModel(
         ILogDataSharingService logDataSharingService
     )
@@ -20,7 +25,7 @@ public class LogEntriesViewModel : ObservableObject
         _logDataSharingService = logDataSharingService;
         AggregateLogEntries();
     }
-    
+
     private void AggregateLogEntries()
     {
         LogEntries.Clear();
@@ -32,5 +37,24 @@ public class LogEntriesViewModel : ObservableObject
             }
         }
     }
-    
+
+    // When the SelectedLogEntry changes, update the detail data
+    partial void OnSelectedLogEntryChanged(LogEntry value)
+    {
+        UpdateSelectedLogEntryData();
+    }
+
+    private void UpdateSelectedLogEntryData()
+    {
+
+        SelectedLogEntryData.Clear();
+
+
+        if (SelectedLogEntry != null)
+        {
+
+            SelectedLogEntryData.Add(SelectedLogEntry.Data);
+        }
+    }
+
 }
