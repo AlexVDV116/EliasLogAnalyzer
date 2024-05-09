@@ -9,7 +9,5 @@ public partial class LogEntriesPage : ContentPage
         InitializeComponent();
         
         BindingContext = viewModel;
-        
-        Shell.SetNavBarIsVisible(this, true);
     }
 }
