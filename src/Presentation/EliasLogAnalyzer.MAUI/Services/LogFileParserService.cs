@@ -13,7 +13,7 @@ public class LogFileParserService : ILogFileParserService
     private readonly ILogger<LogFileParserService> _logger;
     private readonly List<string> _headers = [];
     private const string DateFormat = "dd-MM-yyyy";
-    private const string TimeFormat = "HH:mm:ss.fffffff";
+    private const string TimeFormat = "HH:mm:ss";
 
     public LogFileParserService(ILogger<LogFileParserService> logger)
     {
@@ -187,6 +187,17 @@ public class LogFileParserService : ILogFileParserService
         }
     }
 
+    private void ParseTime(string timeString, LogEntry entry)
+    {
+        var parts = timeString.Split(' ');
+        if (parts.Length > 1)
+        {
+            var time = TimeOnly.ParseExact(parts[0], TimeFormat, CultureInfo.InvariantCulture);
+            entry.LogTimeStamp.DateTime = entry.LogTimeStamp.DateTime.Add(time.ToTimeSpan());
+            entry.LogTimeStamp.Ticks = parts[1];
+        }
+    }
+
     /// <summary>
     /// Determines the header and value of a line and populates the corresponding field in the <see cref="LogEntry"/> class.
     /// </summary>
@@ -200,13 +211,13 @@ public class LogFileParserService : ILogFileParserService
             switch (header.ToUpper())
             {
                 case "DATE":
-                    entry.Date = DateOnly.ParseExact(value, DateFormat, CultureInfo.InvariantCulture);
+                    entry.LogTimeStamp.DateTime = DateTime.ParseExact(value, DateFormat, CultureInfo.InvariantCulture);
                     break;
                 case "TIME":
-                    entry.Time = value.Replace(" ", ".");
+                    ParseTime(value, entry);
                     break;
                 case "DATETIMESORTVALUE":
-                    entry.DateTimeSortValue = value;
+                    entry.LogTimeStamp.DateTimeSortValue = value;
                     break;
                 case "LOGTYPE":
                     entry.LogType = ParseLogType(value);
@@ -236,7 +247,7 @@ public class LogFileParserService : ILogFileParserService
                     entry.Description = value;
                     break;
                 case "DATA":
-                    // Initially, set Data to empty, to be filled if there are subsequent lines
+                    // Set Data to empty initially, to be filled if there are subsequent lines by AppendToLastEntryData()
                     entry.Data = "";
                     break;
             }
