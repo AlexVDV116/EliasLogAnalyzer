@@ -5,21 +5,37 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:EliasLogAnalyzer.MAUI"
     xmlns:pages="clr-namespace:EliasLogAnalyzer.MAUI.Pages"
-    
+    xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
     Shell.FlyoutBehavior="Disabled"
-    Title="EliasLogAnalyzer.MAUI">
+    Title="EliasLogAnalyzer">
+
+    <Shell.Resources>
+        <Style x:Key="ShellStyle" TargetType="Element">
+            <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
+            <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource OffBlack}, Dark={StaticResource OffWhite}}" />
+        </Style>
+    </Shell.Resources>
 
     <ShellContent
         Title=""
         ContentTemplate="{DataTemplate local:MainPage}"
+        Style="{StaticResource ShellStyle}"
         Route="MainPage" />
     
     <ShellContent 
         Title=""
         ContentTemplate="{DataTemplate pages:LogFilesPage}"
+        Style="{StaticResource ShellStyle}"
         Route="LogFilesPage"
         />
-    
+
+    <ShellContent 
+        Title=""
+        ContentTemplate="{DataTemplate pages:LogEntriesPage}"
+        Style="{StaticResource ShellStyle}"
+        Route="LogEntriesPage"
+        />
+
     <Shell.MenuBarItems>
         <MenuBarItem Text="View" >
             <MenuFlyoutSubItem Text="Change Theme">
