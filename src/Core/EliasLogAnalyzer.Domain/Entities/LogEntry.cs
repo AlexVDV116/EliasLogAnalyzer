@@ -6,10 +6,12 @@ namespace EliasLogAnalyzer.Domain.Entities;
 public class LogEntry
 {
     public DateOnly Date { get; set; }
+    // Time consists of hours, minutes, seconds and milliseconds ticks since system has started
     public string Time { get; set; }
     public string DateTimeSortValue { get; set; }
-    public string LogType { get; set; }
+    public LogType LogType { get; set; }
     public string ThreadNameOrNumber { get; set; }
+    // Only in debug mode
     public string SourceLocation { get; set; }
     public string Source { get; set; }
     public string Category { get; set; }
