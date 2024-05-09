@@ -29,15 +29,11 @@
                 <ListView.HeaderTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="Auto, *, *, *, *" Padding="10">
-                            <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0"
-                                                     IsChecked="{Binding SelectAll, Mode=TwoWay}" />
-                            <Label Grid.Column="1" Text="Source" FontSize="Large" FontAttributes="Bold" />
-                            <Label Grid.Column="2" Text="Log Entries" FontSize="Large" FontAttributes="Bold"
-                                   HorizontalOptions="Start" />
-                            <Label Grid.Column="3" Text="Computer" FontSize="Large" FontAttributes="Bold"
-                                   HorizontalOptions="Start" />
-                            <Label Grid.Column="4" Text="File Size" FontSize="Large" FontAttributes="Bold"
-                                   HorizontalOptions="End" />
+                            <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0" IsChecked="{Binding SelectAll, Mode=TwoWay}" />
+                            <Label Grid.Column="1" Text="Source" FontAttributes="Bold" />
+                            <Label Grid.Column="2" Text="Log Entries" FontAttributes="Bold" HorizontalOptions="Start" />
+                            <Label Grid.Column="3" Text="Computer" FontAttributes="Bold" HorizontalOptions="Start" />
+                            <Label Grid.Column="4" Text="File Size" FontAttributes="Bold" HorizontalOptions="End" />
                         </Grid>
                     </DataTemplate>
                 </ListView.HeaderTemplate>
@@ -64,10 +60,10 @@
                     Command="{Binding OpenFilesCommand}"
                     WidthRequest="200"
                     HorizontalOptions="Center"
-                    BackgroundColor="#FFF"
-                    BorderColor="#FF02A3A4"
+                    BackgroundColor="{AppThemeBinding Light=#FFF, Dark={StaticResource Gray200}}"
+                    BorderColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
                     BorderWidth="2"
-                    TextColor="#FF02A3A4"
+                    TextColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
                     FontAttributes="Bold"
                     CornerRadius="10"
                     Margin="0,20,0,0" />
