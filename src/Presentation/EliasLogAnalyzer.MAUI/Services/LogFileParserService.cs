@@ -28,10 +28,10 @@ public class LogFileParserService : ILogFileParserService
     public async Task<(List<LogEntry> Entries, long FileSize)> ParseLogAsync(FileResult fileResult)
     {
         _logger.LogInformation("Starting to parse log file: {FileName}", fileResult.FileName);
-        var headers = new List<string>();  // Local headers list for each file
+        var headers = new List<string>(); // Local headers list for each file
 
         var entries = new List<LogEntry>();
-        long fileSize = 0; 
+        long fileSize = 0;
 
         try
         {
@@ -148,7 +148,6 @@ public class LogFileParserService : ILogFileParserService
     /// Creates a new <see cref="LogEntry"/> class instance and populates it with values from the new LogEntry line.
     /// </summary>
     /// <param name="line">The line that holds the values of a new LogEntry</param>
-
     private LogEntry ParseLogEntry(string line, List<string> headers)
     {
         var values = line.Split('\t');
@@ -162,6 +161,30 @@ public class LogFileParserService : ILogFileParserService
         }
 
         return entry;
+    }
+    
+    private LogType ParseLogType(string logTypeString)
+    {
+        logTypeString = logTypeString.Trim();
+
+        // Normalize case variations
+        switch (logTypeString.ToLower())
+        {
+            case "debug":
+                return LogType.Debug;
+            case "info":
+            case "information":
+                return LogType.Information;
+            case "warn":
+            case "warning":
+                return LogType.Warning;
+            case "error":
+            case "fatal":
+                return LogType.Error; 
+            default:
+                _logger.LogWarning("Unrecognized log type '{LogType}'", logTypeString);
+                return LogType.None;
+        }
     }
 
     /// <summary>
@@ -180,13 +203,13 @@ public class LogFileParserService : ILogFileParserService
                     entry.Date = DateOnly.ParseExact(value, DateFormat, CultureInfo.InvariantCulture);
                     break;
                 case "TIME":
-                       entry.Time = value.Replace(" ", ".");
+                    entry.Time = value.Replace(" ", ".");
                     break;
                 case "DATETIMESORTVALUE":
                     entry.DateTimeSortValue = value;
                     break;
                 case "LOGTYPE":
-                    entry.LogType = value;
+                    entry.LogType = ParseLogType(value);
                     break;
                 case "THREADNAME/NUMBER":
                     entry.ThreadNameOrNumber = value;
@@ -220,7 +243,8 @@ public class LogFileParserService : ILogFileParserService
         }
         catch (FormatException ex)
         {
-            _logger.LogError("Format error parsing {Header} with value {Value}: {ErrorMessage}", header, value, ex.Message);
+            _logger.LogError("Format error parsing {Header} with value {Value}: {ErrorMessage}", header, value,
+                ex.Message);
             throw;
         }
         catch (Exception ex)
