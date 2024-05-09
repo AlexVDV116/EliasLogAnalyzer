@@ -1,4 +1,5 @@
 using System.Globalization;
+using EliasLogAnalyzer.Domain.Entities;
 
 namespace EliasLogAnalyzer.MAUI.Converters
 {
@@ -6,24 +7,20 @@ namespace EliasLogAnalyzer.MAUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string logType = value as string;
+            var logType = value;
 
             switch (logType)
             {
-                case "Error":
+                case LogType.Error:
                     return Colors.Red;
-                case "Fatal":
-                    return Colors.Red;
-                case "Warning":
+                case LogType.Warning:
                     return Colors.Orange;
-                case "Warn":
-                    return Colors.Orange;
-                case "Information":
-                    return Colors.Yellow;
-                case "Info":
-                    return Colors.Yellow;
-                case "Debug":
+                case LogType.Information:
+                    return Colors.Green;
+                case LogType.Debug:
                     return Colors.Black;
+                case LogType.None:
+                    return Colors.Gray;
                 default:
                     return Colors.Gray; // Default color
             }
