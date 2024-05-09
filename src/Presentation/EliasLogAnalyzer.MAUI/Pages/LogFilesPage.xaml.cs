@@ -9,8 +9,6 @@ public partial class LogFilesPage
         InitializeComponent();
 
         BindingContext = viewModel;
-        
-        Shell.SetNavBarIsVisible(this, true);
 
     }
 }
