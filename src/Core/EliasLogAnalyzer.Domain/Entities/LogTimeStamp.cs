@@ -7,5 +7,5 @@ public class LogTimestamp
     public DateTime DateTime { get; set; }
     public string DateTimeSortValue { get; set; }
     // Ticks milliseconds since system has started
-    public string Ticks { get; set; }
+    public long Ticks { get; set; }
 }
