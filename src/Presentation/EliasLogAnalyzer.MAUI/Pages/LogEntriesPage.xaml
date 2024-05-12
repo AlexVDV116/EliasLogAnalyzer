@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
              x:DataType="viewModels:LogEntriesViewModel"
@@ -16,38 +14,44 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
-            <!-- Top Half: ListView for LogEntries -->
             <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
-                <ListView ItemsSource="{Binding LogEntries}"
-                  SelectedItem="{Binding SelectedLogEntry}"
-                  SelectionMode="Single">
-                    <ListView.Header>
-                        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}" Padding="10" ColumnSpacing="10"
-                      ColumnDefinitions="140, 150, 150, 100, 100, 100, 250, 80, 80, 200, 200, *">
-                            <Label Grid.Column="0" Text="DateTime" FontAttributes="Bold" />
-                            <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
-                            <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
-                            <Label Grid.Column="3" Text="Type" FontAttributes="Bold" />
-                            <Label Grid.Column="4" Text="Thread/No" FontAttributes="Bold" />
-                            <Label Grid.Column="5" Text="Source Loc." FontAttributes="Bold" />
-                            <Label Grid.Column="6" Text="Source" FontAttributes="Bold" />
-                            <Label Grid.Column="7" Text="Category" FontAttributes="Bold" />
-                            <Label Grid.Column="8" Text="Event ID" FontAttributes="Bold" />
-                            <Label Grid.Column="9" Text="User" FontAttributes="Bold" />
-                            <Label Grid.Column="10" Text="Computer" FontAttributes="Bold" />
-                            <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
-                        </Grid>
-                    </ListView.Header>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="entities:LogEntry">
-                            <ViewCell>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Padding="10" ColumnSpacing="10"
+                          HorizontalOptions="FillAndExpand"
+                          ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
+                          Row="0">
+                        <Label Grid.Column="0" Text="DateTime" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
+                        <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
+                        <Label Grid.Column="3" Text="Type" FontAttributes="Bold" />
+                        <Label Grid.Column="4" Text="Thread/No" FontAttributes="Bold" />
+                        <Label Grid.Column="5" Text="Source Loc." FontAttributes="Bold" />
+                        <Label Grid.Column="6" Text="Source" FontAttributes="Bold" />
+                        <Label Grid.Column="7" Text="Category" FontAttributes="Bold" />
+                        <Label Grid.Column="8" Text="Event ID" FontAttributes="Bold" />
+                        <Label Grid.Column="9" Text="User" FontAttributes="Bold" />
+                        <Label Grid.Column="10" Text="Computer" FontAttributes="Bold" />
+                        <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
+                    </Grid>
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding LogEntries}"
+                                    SelectedItem="{Binding SelectedLogEntry}"
+                                    SelectionMode="Single">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="entities:LogEntry">
                                 <Grid Padding="10" ColumnSpacing="10"
-                                          ColumnDefinitions="140, 150, 150, 100, 100, 100, 250, 80, 80, 200, 200, *">
+                                      ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
                                     <Label Text="{Binding LogTimeStamp.DateTime}" Grid.Column="0" />
-                                    <Label Text="{Binding LogTimeStamp.DateTime.Ticks}" Grid.Column="1" />
+                                    <Label Text="{Binding LogTimeStamp.Ticks}" Grid.Column="1" />
                                     <Label Text="{Binding LogTimeStamp.DateTimeSortValue}" Grid.Column="2" />
                                     <Label Text="{Binding LogType}" Grid.Column="3"
-                                               TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
+                                           TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
                                     <Label Text="{Binding ThreadNameOrNumber}" Grid.Column="4" />
                                     <Label Text="{Binding SourceLocation}" Grid.Column="5" />
                                     <Label Text="{Binding Source}" Grid.Column="6" />
@@ -57,23 +61,21 @@
                                     <Label Text="{Binding Computer}" Grid.Column="10" />
                                     <Label Text="{Binding Description}" Grid.Column="11" />
                                 </Grid>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
             </Frame>
 
             <!-- Bottom Half: ListView to display selected LogEntries Data -->
             <Frame x:Name="DataFrame" Grid.Row="1" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
-                <ListView ItemsSource="{Binding SelectedLogEntryData}">
-                    <ListView.ItemTemplate>
+                <CollectionView ItemsSource="{Binding SelectedLogEntryData}">
+                    <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <ViewCell>
-                                <Label Text="{Binding}" />
-                            </ViewCell>
+                            <Label Text="{Binding .}" />
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Frame>
         </Grid>
     </ContentPage.Content>

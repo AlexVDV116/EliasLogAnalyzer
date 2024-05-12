@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
@@ -17,46 +16,57 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-
-        <StackLayout>
-
-            <!-- ListView for displaying log files -->
-            <ListView x:Name="LogFilesListView"
-                      BackgroundColor="Transparent"
-                      ItemsSource="{Binding LoadedLogFiles}"
-                      Header="{Binding .}">
-
-                <ListView.HeaderTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="Auto, *, *, *, *" Padding="10">
-                            <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0" IsChecked="{Binding SelectAll, Mode=TwoWay}" />
-                            <Label Grid.Column="1" Text="Source" FontAttributes="Bold" />
-                            <Label Grid.Column="2" Text="Log Entries" FontAttributes="Bold" HorizontalOptions="Start" />
-                            <Label Grid.Column="3" Text="Computer" FontAttributes="Bold" HorizontalOptions="Start" />
-                            <Label Grid.Column="4" Text="File Size" FontAttributes="Bold" HorizontalOptions="End" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.HeaderTemplate>
-
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="entities:LogFile">
-                        <ViewCell>
-                            <Grid ColumnDefinitions="Auto, *, *, *, *" Padding="10">
-                                <controls:CustomCheckBox Grid.Column="0" Padding="0,0,10,0"
-                                                         IsChecked="{Binding IsSelected, Mode=TwoWay}" />
-                                <Label Text="{Binding FileName}" Grid.Column="1" />
-                                <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}"
-                                       Grid.Column="2" HorizontalOptions="Start" />
-                                <Label Text="{Binding Computer}" Grid.Column="3" /> 
-                                <Label Text="{Binding FileSize, Converter={StaticResource FileSizeFormatConverter}}"
-                                       Grid.Column="4" HorizontalOptions="End" />
+        <Grid RowDefinitions="*, 50">
+            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
+                <CollectionView x:Name="LogFilesListView"
+                                BackgroundColor="Transparent"
+                                ItemsSource="{Binding LoadedLogFiles}"
+                                Header="{Binding .}" >
+                    <CollectionView.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="Auto, *, *, *, *"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                                  Padding="10">
+                                <controls:CustomCheckBox Grid.Column="0"
+                                                         IsChecked="{Binding SelectAll, Mode=TwoWay}"
+                                                         Padding="0,0,10,0" />
+                                <Label Grid.Column="1" Text="Source" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Grid.Column="2" Text="Log Entries" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Grid.Column="3" Text="Computer" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Grid.Column="4" Text="File Size" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
                             </Grid>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                        </DataTemplate>
+                    </CollectionView.HeaderTemplate>
 
-            <Button Text="Open Selected LogFiles"
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="entities:LogFile">
+                            <Grid ColumnDefinitions="Auto, *, *, *, *"
+                                  Padding="10">
+                                <controls:CustomCheckBox Grid.Column="0"
+                                                         IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                         Padding="0,0,10,0" />
+                                <Label Text="{Binding FileName}" Grid.Column="1"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}"
+                                       Grid.Column="2"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Text="{Binding Computer}" Grid.Column="3"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Text="{Binding FileSize, Converter={StaticResource FileSizeFormatConverter}}"
+                                       Grid.Column="4"
+                                       HorizontalOptions="FillAndExpand" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Frame>
+
+            <Button Grid.Row="1"
+                    Text="Open Selected LogFiles"
                     Command="{Binding OpenFilesCommand}"
                     WidthRequest="200"
                     HorizontalOptions="Center"
@@ -67,7 +77,6 @@
                     FontAttributes="Bold"
                     CornerRadius="10"
                     Margin="0,20,0,0" />
-        </StackLayout>
-
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
