@@ -11,11 +11,10 @@ namespace EliasLogAnalyzer.MAUI.Services;
 public class LogFileParserService : ILogFileParserService
 {
     private readonly ILogger<LogFileParserService> _logger;
-    private readonly List<string> _headers = [];
     private const string DateFormat = "dd-MM-yyyy";
     private const string TimeFormat = "HH:mm:ss";
 
-    public LogFileParserService(ILogger<LogFileParserService> logger)
+    public  LogFileParserService(ILogger<LogFileParserService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -74,6 +73,7 @@ public class LogFileParserService : ILogFileParserService
     /// The first log line of a LogFile must be the header. Reads and extracts headers from the first line of the file.
     /// </summary>
     /// <param name="line">The first line of a LogFile which holds the headers.</param>
+    /// <param name="headers">The list of headers to populate.</param>
     private void ParseHeaders(string line, List<string> headers)
     {
         try
@@ -93,6 +93,7 @@ public class LogFileParserService : ILogFileParserService
     /// </summary>
     /// <param name="reader">The Streamreader.</param>
     /// <param name="entries">The list of LogEntries for this LogFile.</param>
+    /// <param name="headers">The list of headers for this LogFile.</param>
     private async Task ParseEntries(StreamReader reader, List<LogEntry> entries, List<string> headers)
     {
         while (await reader.ReadLineAsync() is { } line)
@@ -126,6 +127,7 @@ public class LogFileParserService : ILogFileParserService
     /// the headers minus Data, to determine a new log entry start.
     /// </summary>
     /// <param name="line">The line to check if it matches the new LogEntry signature.</param>
+    /// <param name="headers">The list of headers to compare the line fields with.</param>
     private bool IsLogEntryStart(string line, List<string> headers)
     {
         var splitLine = line.Split('\t');
@@ -148,6 +150,7 @@ public class LogFileParserService : ILogFileParserService
     /// Creates a new <see cref="LogEntry"/> class instance and populates it with values from the new LogEntry line.
     /// </summary>
     /// <param name="line">The line that holds the values of a new LogEntry</param>
+    /// <param name="headers">The list of headers to match the values with.</param>
     private LogEntry ParseLogEntry(string line, List<string> headers)
     {
         var values = line.Split('\t');
@@ -187,14 +190,15 @@ public class LogFileParserService : ILogFileParserService
         }
     }
 
-    private void ParseTime(string timeString, LogEntry entry)
+    private static void ParseTime(string timeString, LogEntry entry)
     {
         var parts = timeString.Split(' ');
         if (parts.Length > 1)
         {
             var time = TimeOnly.ParseExact(parts[0], TimeFormat, CultureInfo.InvariantCulture);
             entry.LogTimeStamp.DateTime = entry.LogTimeStamp.DateTime.Add(time.ToTimeSpan());
-            entry.LogTimeStamp.Ticks = parts[1];
+            var ticks = parts[1];
+            entry.LogTimeStamp.Ticks = long.Parse(ticks);
         }
     }
 
@@ -270,7 +274,7 @@ public class LogFileParserService : ILogFileParserService
     {
         foreach (var entry in entries)
         {
-            _logger.LogInformation("Log entry: {LogEntry}", entry.ToString());
+            _logger.LogInformation("Logged entry: {LogEntry}", entry.Source);
         }
     }
 }
