@@ -20,27 +20,22 @@
             <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
                 <CollectionView x:Name="LogFilesListView"
                                 BackgroundColor="Transparent"
-                                ItemsSource="{Binding LoadedLogFiles}"
-                                Header="{Binding .}" >
-                    <CollectionView.HeaderTemplate>
-                        <DataTemplate>
-                            <Grid ColumnDefinitions="Auto, *, *, *, *"
-                                  BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                                  Padding="10">
-                                <controls:CustomCheckBox Grid.Column="0"
-                                                         IsChecked="{Binding SelectAll, Mode=TwoWay}"
-                                                         Padding="0,0,10,0" />
-                                <Label Grid.Column="1" Text="Source" FontAttributes="Bold"
-                                       HorizontalOptions="FillAndExpand" />
-                                <Label Grid.Column="2" Text="Log Entries" FontAttributes="Bold"
-                                       HorizontalOptions="FillAndExpand" />
-                                <Label Grid.Column="3" Text="Computer" FontAttributes="Bold"
-                                       HorizontalOptions="FillAndExpand" />
-                                <Label Grid.Column="4" Text="File Size" FontAttributes="Bold"
-                                       HorizontalOptions="FillAndExpand" />
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.HeaderTemplate>
+                                ItemsSource="{Binding LoadedLogFiles}" >
+
+                    <CollectionView.Header>
+                        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}" Padding="10"
+                              ColumnDefinitions="Auto,*,*,*,*">
+
+                            <controls:CustomCheckBox Grid.Column="0"
+                                                   IsChecked="{Binding SelectAll, Mode=TwoWay}"
+                                                     HorizontalOptions="Start"
+                                                   Padding="0,0,10,0" />
+                            <Label Grid.Column="1" Text="Source" FontAttributes="Bold" />
+                            <Label Grid.Column="2" Text="Log Entries" FontAttributes="Bold" />
+                            <Label Grid.Column="3" Text="Computer" FontAttributes="Bold" />
+                            <Label Grid.Column="4" Text="File Size" FontAttributes="Bold"/>
+                        </Grid>
+                    </CollectionView.Header>
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="entities:LogFile">
@@ -49,16 +44,12 @@
                                 <controls:CustomCheckBox Grid.Column="0"
                                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                          Padding="0,0,10,0" />
-                                <Label Text="{Binding FileName}" Grid.Column="1"
-                                       HorizontalOptions="FillAndExpand" />
+                                <Label Text="{Binding FileName}" Grid.Column="1" />
                                 <Label Text="{Binding LogEntries.Count, StringFormat='{0} Log Entries'}"
-                                       Grid.Column="2"
-                                       HorizontalOptions="FillAndExpand" />
-                                <Label Text="{Binding Computer}" Grid.Column="3"
-                                       HorizontalOptions="FillAndExpand" />
+                                       Grid.Column="2" />
+                                <Label Text="{Binding Computer}" Grid.Column="3" />
                                 <Label Text="{Binding FileSize, Converter={StaticResource FileSizeFormatConverter}}"
-                                       Grid.Column="4"
-                                       HorizontalOptions="FillAndExpand" />
+                                       Grid.Column="4" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -75,8 +66,7 @@
                     BorderWidth="2"
                     TextColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
                     FontAttributes="Bold"
-                    CornerRadius="10"
-                    Margin="0,20,0,0" />
+                    CornerRadius="10" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

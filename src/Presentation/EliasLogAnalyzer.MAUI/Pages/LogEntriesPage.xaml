@@ -15,56 +15,50 @@
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
             <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
 
-                    <Grid Padding="10" ColumnSpacing="10"
-                          HorizontalOptions="FillAndExpand"
-                          ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *"
-                          BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
-                          Row="0">
-                        <Label Grid.Column="0" Text="DateTime" FontAttributes="Bold" />
-                        <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
-                        <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
-                        <Label Grid.Column="3" Text="Type" FontAttributes="Bold" />
-                        <Label Grid.Column="4" Text="Thread/No" FontAttributes="Bold" />
-                        <Label Grid.Column="5" Text="Source Loc." FontAttributes="Bold" />
-                        <Label Grid.Column="6" Text="Source" FontAttributes="Bold" />
-                        <Label Grid.Column="7" Text="Category" FontAttributes="Bold" />
-                        <Label Grid.Column="8" Text="Event ID" FontAttributes="Bold" />
-                        <Label Grid.Column="9" Text="User" FontAttributes="Bold" />
-                        <Label Grid.Column="10" Text="Computer" FontAttributes="Bold" />
-                        <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
-                    </Grid>
-
-                    <CollectionView Grid.Row="1" ItemsSource="{Binding LogEntries}"
+                <CollectionView Grid.Row="1" ItemsSource="{Binding LogEntries}"
                                     SelectedItem="{Binding SelectedLogEntry}"
                                     SelectionMode="Single">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="entities:LogEntry">
-                                <Grid Padding="10" ColumnSpacing="10"
+
+                    <CollectionView.Header>
+                        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}" Padding="10"
+                              ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,*,*">
+                            <Label Grid.Column="0" Text="DateTime" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
+                            <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
+                            <Label Grid.Column="3" Text="Type" FontAttributes="Bold" />
+                            <Label Grid.Column="4" Text="Thread/No" FontAttributes="Bold" />
+                            <Label Grid.Column="5" Text="Source Loc." FontAttributes="Bold" />
+                            <Label Grid.Column="6" Text="Source" FontAttributes="Bold" />
+                            <Label Grid.Column="7" Text="Category" FontAttributes="Bold" />
+                            <Label Grid.Column="8" Text="Event ID" FontAttributes="Bold" />
+                            <Label Grid.Column="9" Text="User" FontAttributes="Bold" />
+                            <Label Grid.Column="10" Text="Computer" FontAttributes="Bold" />
+                            <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
+                        </Grid>
+                    </CollectionView.Header>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="entities:LogEntry">
+                            <Grid Padding="10" ColumnSpacing="10"
                                       ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
-                                    <Label Text="{Binding LogTimeStamp.DateTime}" Grid.Column="0" />
-                                    <Label Text="{Binding LogTimeStamp.Ticks}" Grid.Column="1" />
-                                    <Label Text="{Binding LogTimeStamp.DateTimeSortValue}" Grid.Column="2" />
-                                    <Label Text="{Binding LogType}" Grid.Column="3"
+                                <Label Text="{Binding LogTimeStamp.DateTime}" Grid.Column="0" />
+                                <Label Text="{Binding LogTimeStamp.Ticks}" Grid.Column="1" />
+                                <Label Text="{Binding LogTimeStamp.DateTimeSortValue}" Grid.Column="2" />
+                                <Label Text="{Binding LogType}" Grid.Column="3"
                                            TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
-                                    <Label Text="{Binding ThreadNameOrNumber}" Grid.Column="4" />
-                                    <Label Text="{Binding SourceLocation}" Grid.Column="5" />
-                                    <Label Text="{Binding Source}" Grid.Column="6" />
-                                    <Label Text="{Binding Category}" Grid.Column="7" />
-                                    <Label Text="{Binding EventId}" Grid.Column="8" />
-                                    <Label Text="{Binding User}" Grid.Column="9" />
-                                    <Label Text="{Binding Computer}" Grid.Column="10" />
-                                    <Label Text="{Binding Description}" Grid.Column="11" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Grid>
+                                <Label Text="{Binding ThreadNameOrNumber}" Grid.Column="4" />
+                                <Label Text="{Binding SourceLocation}" Grid.Column="5" />
+                                <Label Text="{Binding Source}" Grid.Column="6" />
+                                <Label Text="{Binding Category}" Grid.Column="7" />
+                                <Label Text="{Binding EventId}" Grid.Column="8" />
+                                <Label Text="{Binding User}" Grid.Column="9" />
+                                <Label Text="{Binding Computer}" Grid.Column="10" />
+                                <Label Text="{Binding Description}" Grid.Column="11" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Frame>
 
             <!-- Bottom Half: ListView to display selected LogEntries Data -->
