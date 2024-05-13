@@ -17,7 +17,7 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*, 50">
-            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
+            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
                 <CollectionView x:Name="LogFilesListView"
                                 BackgroundColor="Transparent"
                                 ItemsSource="{Binding LoadedLogFiles}" >
@@ -54,7 +54,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </Frame>
+            </Border>
 
             <Button Grid.Row="1"
                     Text="Open Selected LogFiles"
