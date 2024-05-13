@@ -8,8 +8,11 @@ namespace EliasLogAnalyzer.MAUI.ViewModels;
 
 public partial class LogEntriesViewModel : ObservableObject
 {
+    #region Fields
     private readonly ILogDataSharingService _logDataSharingService;
+    #endregion
 
+    #region Properties
     [ObservableProperty]
     private string searchText;
 
@@ -113,7 +116,9 @@ public partial class LogEntriesViewModel : ObservableObject
     }
     
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
+    #endregion
 
+    #region Constructor
     public LogEntriesViewModel(
         ILogDataSharingService logDataSharingService
     )
@@ -123,12 +128,9 @@ public partial class LogEntriesViewModel : ObservableObject
         SortByDateTime();
         RefreshFilter();
     }
+    #endregion
 
-    partial void OnSearchTextChanged(string value)
-    {
-        RefreshFilter();
-    }
-
+    #region Commands
     // Command to refresh filter whenever search text changes
     // 
     [RelayCommand]
@@ -150,34 +152,8 @@ public partial class LogEntriesViewModel : ObservableObject
             FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
         }
     }
-
-    // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
-    private void UpdateSortTexts(string sortProperty)
-    {
-        SortDateTimeText = sortProperty == "DateTime" ? "✓ DateTime" : "DateTime";
-        SortLogTypeText = sortProperty == "LogType" ? "✓ LogType" : "LogType";
-        SortThreadText = sortProperty == "ThreadNameOrNumber" ? "✓ Thread/No" : "Thread/No";
-        SortSourceLocationText = sortProperty == "SourceLocation" ? "✓ Source Location" : "Source Location";
-        SortSourceText = sortProperty == "Source" ? "✓ Source" : "Source";
-        SortCategoryText = sortProperty == "Category" ? "✓ Category" : "Category";
-        SortEventIdText = sortProperty == "EventId" ? "✓ Event ID" : "Event ID";
-        SortUserText = sortProperty == "User" ? "✓ User" : "User";
-        SortComputerText = sortProperty == "Computer" ? "✓ Computer" : "Computer";
-        SortDescriptionText = sortProperty == "Description" ? "✓ Description" : "Description";
-
-        SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
-        SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
-        SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
-        SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
-        SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
-        SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
-        SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
-        SortDescriptionHeaderText = "Description " + (sortProperty == "Description" ? (Ascending ? "▲" : "▼") : "");
-    }
-
-    [RelayCommand]
+    
+        [RelayCommand]
     private void HeaderTapped(string propertyName)
     {
         if (CurrentSortProperty == propertyName)
@@ -264,6 +240,39 @@ public partial class LogEntriesViewModel : ObservableObject
         OnPropertyChanged(nameof(LogEntries));
         UpdateSortTexts(propertyName);
     }
+    #endregion
+    
+    #region Utility Methods
+    partial void OnSearchTextChanged(string value)
+    {
+        RefreshFilter();
+    }
+
+    // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
+    private void UpdateSortTexts(string sortProperty)
+    {
+        SortDateTimeText = sortProperty == "DateTime" ? "✓ DateTime" : "DateTime";
+        SortLogTypeText = sortProperty == "LogType" ? "✓ LogType" : "LogType";
+        SortThreadText = sortProperty == "ThreadNameOrNumber" ? "✓ Thread/No" : "Thread/No";
+        SortSourceLocationText = sortProperty == "SourceLocation" ? "✓ Source Location" : "Source Location";
+        SortSourceText = sortProperty == "Source" ? "✓ Source" : "Source";
+        SortCategoryText = sortProperty == "Category" ? "✓ Category" : "Category";
+        SortEventIdText = sortProperty == "EventId" ? "✓ Event ID" : "Event ID";
+        SortUserText = sortProperty == "User" ? "✓ User" : "User";
+        SortComputerText = sortProperty == "Computer" ? "✓ Computer" : "Computer";
+        SortDescriptionText = sortProperty == "Description" ? "✓ Description" : "Description";
+
+        SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
+        SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
+        SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
+        SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
+        SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
+        SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
+        SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
+        SortDescriptionHeaderText = "Description " + (sortProperty == "Description" ? (Ascending ? "▲" : "▼") : "");
+    }
 
 
     private void AggregateLogEntries()
@@ -295,5 +304,5 @@ public partial class LogEntriesViewModel : ObservableObject
             SelectedLogEntryData.Add(SelectedLogEntry.Data);
         }
     }
-
+    #endregion
 }
