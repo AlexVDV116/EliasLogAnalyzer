@@ -36,7 +36,7 @@ public partial class LogFilesViewModel : ObservableObject
     }
     
     [RelayCommand]
-    private async void OpenFiles()
+    private async Task OpenFiles()
     {
         foreach (var file in SelectedLogFiles)
         {
