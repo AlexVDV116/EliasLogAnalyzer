@@ -223,6 +223,7 @@ public partial class LogEntriesViewModel : ObservableObject
                 LogEntries.OrderByDescending(x => x.LogTimeStamp.DateTime)
                     .ThenByDescending(x => x.LogTimeStamp.Ticks));
         }
+        RefreshFilter();
         OnPropertyChanged(nameof(LogEntries));
         CurrentSortProperty = "DateTime";
         CurrentSortDirection = Ascending ? "Ascending" : "Descending";
@@ -251,6 +252,7 @@ public partial class LogEntriesViewModel : ObservableObject
         }
 
         LogEntries = new ObservableCollection<LogEntry>(sorted);
+        RefreshFilter();
         OnPropertyChanged(nameof(LogEntries));
         UpdateSortTexts(propertyName);
     }
