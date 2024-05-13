@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
@@ -21,6 +22,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries;
 
     [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataLeft = [];
+
     [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataRight = [];
 
     [ObservableProperty] private IList<object> _selectedLogEntries = [];
@@ -115,13 +117,22 @@ public partial class LogEntriesViewModel : ObservableObject
     {
         if (SelectedLogEntries.Count > 2)
         {
-            SelectedLogEntries.RemoveAt(0);
+            // Create a copy to avoid modifying the collection during enumeration
+            var selectedLogEntriesCopy = SelectedLogEntries.ToList();
+            while (selectedLogEntriesCopy.Count > 2)
+            {
+                selectedLogEntriesCopy.RemoveAt(0);
+            }
+
+            SelectedLogEntries = new ObservableCollection<object>(selectedLogEntriesCopy);
         }
 
+        Debug.WriteLine($"Selected {SelectedLogEntries.Count} LogEntries");
         UpdateSelectedEntryData();
     }
 
-// Command to refresh filter whenever search text changes
+
+    // Command to refresh filter whenever search text changes
     [RelayCommand]
     private void RefreshFilter()
     {
@@ -302,7 +313,6 @@ public partial class LogEntriesViewModel : ObservableObject
                 }
             }
         }
-
-        #endregion
     }
+    #endregion
 }
