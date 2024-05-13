@@ -9,7 +9,13 @@ namespace EliasLogAnalyzer.MAUI.ViewModels;
 public partial class LogEntriesViewModel : ObservableObject
 {
     private readonly ILogDataSharingService _logDataSharingService;
-    
+
+    [ObservableProperty]
+    private string searchText;
+
+    [ObservableProperty]
+    private ObservableCollection<LogEntry> filteredLogEntries;
+
     [ObservableProperty]
     private ObservableCollection<string> _selectedLogEntryData = [];
 
@@ -30,7 +36,61 @@ public partial class LogEntriesViewModel : ObservableObject
     
     [ObservableProperty]
     private string _descendingText = "Descending";
-    
+
+    [ObservableProperty]
+    private string _sortDateTimeText = "DateTime";
+
+    [ObservableProperty]
+    private string _sortLogTypeText = "LogType";
+
+    [ObservableProperty]
+    private string _sortThreadText = "Thread/No";
+
+    [ObservableProperty]
+    private string _sortSourceLocationText = "Source Location";
+
+    [ObservableProperty]
+    private string _sortSourceText = "Source";
+
+    [ObservableProperty]
+    private string _sortCategoryText = "Category";
+
+    [ObservableProperty]
+    private string _sortEventIdText = "Event ID";
+
+    [ObservableProperty]
+    private string _sortUserText = "User";
+
+    [ObservableProperty]
+    private string _sortComputerText = "Computer";
+
+    [ObservableProperty]
+    private string _sortDateTimeHeaderText = "DateTime";
+
+    [ObservableProperty]
+    private string _sortLogTypeHeaderText = "LogType";
+
+    [ObservableProperty]
+    private string _sortThreadHeaderText = "Thread/No";
+
+    [ObservableProperty]
+    private string _sortSourceLocationHeaderText = "Source Location";
+
+    [ObservableProperty]
+    private string _sortSourceHeaderText = "Source";
+
+    [ObservableProperty]
+    private string _sortCategoryHeaderText = "Category";
+
+    [ObservableProperty]
+    private string _sortEventIdHeaderText = "Event ID";
+
+    [ObservableProperty]
+    private string _sortUserHeaderText = "User";
+
+    [ObservableProperty]
+    private string _sortComputerHeaderText = "Computer";
+
     private bool _ascending = true;
     
     private bool Ascending
@@ -55,13 +115,87 @@ public partial class LogEntriesViewModel : ObservableObject
         _logDataSharingService = logDataSharingService;
         AggregateLogEntries();
         SortByDateTime();
+        RefreshFilter();
     }
-    
-    private void UpdateSortHeader()
+
+    partial void OnSearchTextChanged(string value)
     {
-        SortHeader = $"Sorting: \n{CurrentSortProperty} {(Ascending ? "Asc" : "Desc")}";
+        RefreshFilter();
     }
-    
+
+    // Command to refresh filter whenever search text changes
+    // 
+    [RelayCommand]
+    private void RefreshFilter()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredLogEntries = new ObservableCollection<LogEntry>(LogEntries);
+        }
+        else
+        {
+            var lowerCaseSearchText = SearchText.ToLower();
+            var filtered = LogEntries.Where(entry =>
+                (entry.Description?.ToLower().Contains(lowerCaseSearchText) ?? false) ||
+                (entry.User?.ToLower().Contains(lowerCaseSearchText) ?? false) ||
+                (entry.Data?.ToLower().Contains(lowerCaseSearchText) ?? false) 
+            );
+
+            FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
+        }
+    }
+
+    // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
+    private void UpdateSortTexts(string sortProperty)
+    {
+        SortDateTimeText = sortProperty == "DateTime" ? "✓ DateTime" : "DateTime";
+        SortLogTypeText = sortProperty == "LogType" ? "✓ LogType" : "LogType";
+        SortThreadText = sortProperty == "ThreadNameOrNumber" ? "✓ Thread/No" : "Thread/No";
+        SortSourceLocationText = sortProperty == "SourceLocation" ? "✓ Source Location" : "Source Location";
+        SortSourceText = sortProperty == "Source" ? "✓ Source" : "Source";
+        SortCategoryText = sortProperty == "Category" ? "✓ Category" : "Category";
+        SortEventIdText = sortProperty == "EventId" ? "✓ Event ID" : "Event ID";
+        SortUserText = sortProperty == "User" ? "✓ User" : "User";
+        SortComputerText = sortProperty == "Computer" ? "✓ Computer" : "Computer";
+
+        SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
+        SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
+        SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
+        SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
+        SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
+        SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
+        SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
+    }
+
+    [RelayCommand]
+    private void HeaderTapped(string propertyName)
+    {
+        if (CurrentSortProperty == propertyName)
+        {
+            // Toggle the sort direction if the same header is tapped again
+            Ascending = !Ascending;
+        }
+        else
+        {
+            // Change the sort property and default to ascending
+            CurrentSortProperty = propertyName;
+            Ascending = true;
+        }
+
+        if (CurrentSortProperty == "DateTime")
+        {
+            SortByDateTime();
+        }
+        else
+        {
+            SortByProperty(propertyName);
+        }
+        UpdateSortTexts(propertyName);
+    }
+
+
     [RelayCommand]
     public void SetSortOrderAscending()
     {
@@ -92,7 +226,7 @@ public partial class LogEntriesViewModel : ObservableObject
         OnPropertyChanged(nameof(LogEntries));
         CurrentSortProperty = "DateTime";
         CurrentSortDirection = Ascending ? "Ascending" : "Descending";
-        UpdateSortHeader();
+        UpdateSortTexts("DateTime");
     }
 
     [RelayCommand]
@@ -106,20 +240,21 @@ public partial class LogEntriesViewModel : ObservableObject
             return;
         }
 
+        IEnumerable<LogEntry> sorted;
         if (Ascending)
         {
-            LogEntries = new ObservableCollection<LogEntry>(LogEntries.OrderBy(x => propertyInfo.GetValue(x, null)));
+            sorted = LogEntries.OrderBy(x => propertyInfo.GetValue(x, null));
         }
         else
         {
-            LogEntries = new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => propertyInfo.GetValue(x, null)));
+            sorted = LogEntries.OrderByDescending(x => propertyInfo.GetValue(x, null));
         }
 
+        LogEntries = new ObservableCollection<LogEntry>(sorted);
         OnPropertyChanged(nameof(LogEntries));
-        CurrentSortProperty = propertyName;
-        CurrentSortDirection = Ascending ? "Ascending" : "Descending";
-        UpdateSortHeader();
+        UpdateSortTexts(propertyName);
     }
+
 
     private void AggregateLogEntries()
     {
@@ -131,6 +266,7 @@ public partial class LogEntriesViewModel : ObservableObject
                 LogEntries.Add(entry);
             }
         }
+        RefreshFilter();
     }
 
     // When the SelectedLogEntry changes, update the detail data

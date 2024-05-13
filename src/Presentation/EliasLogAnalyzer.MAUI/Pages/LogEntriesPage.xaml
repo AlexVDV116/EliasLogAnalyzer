@@ -22,30 +22,30 @@
             </MenuFlyoutSubItem>
             <MenuFlyoutSeparator />
             <MenuFlyoutSubItem Text=" Sort by">
-                <MenuFlyoutItem Text="DateTime"
+                <MenuFlyoutItem Text="{Binding SortDateTimeText}"
                                 Command="{Binding SortByDateTimeCommand}" />
-                <MenuFlyoutItem Text="LogType"
+                <MenuFlyoutItem Text="{Binding SortLogTypeText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="LogType" />
-                <MenuFlyoutItem Text="Thread/No"
+                <MenuFlyoutItem Text="{Binding SortThreadText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="ThreadNameOrNumber" />
-                <MenuFlyoutItem Text="Source Location"
+                <MenuFlyoutItem Text="{Binding SortSourceLocationText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="SourceLocation" />
-                <MenuFlyoutItem Text="Source"
+                <MenuFlyoutItem Text="{Binding SortSourceText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="Source" />
-                <MenuFlyoutItem Text="Category"
+                <MenuFlyoutItem Text="{Binding SortCategoryText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="Category" />
-                <MenuFlyoutItem Text="Event ID"
+                <MenuFlyoutItem Text="{Binding SortEventIdText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="EventId" />
-                <MenuFlyoutItem Text="User"
+                <MenuFlyoutItem Text="{Binding SortUserText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="User" />
-                <MenuFlyoutItem Text="Computer"
+                <MenuFlyoutItem Text="{Binding SortComputerText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="Computer" />
             </MenuFlyoutSubItem>
@@ -54,9 +54,15 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
-            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
+            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5" HasShadow="True">
 
-                <CollectionView Grid.Row="1" ItemsSource="{Binding LogEntries}"
+                <Grid RowDefinitions="Auto, *">
+                    <SearchBar Grid.Row="0"
+                       Placeholder="Search logs..."
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       SearchCommand="{Binding RefreshFilterCommand}" />
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredLogEntries}"
                                 SelectedItem="{Binding SelectedLogEntry}"
                                 SelectionMode="Single">
 
@@ -64,20 +70,64 @@
                         <Grid
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                             Padding="10"
-                            ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,*,*,*">
-                            <Label Grid.Column="0" Text="DateTime" FontAttributes="Bold" />
+                            ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,*,*">
+                            <Label Grid.Column="0" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                        CommandParameter="DateTime" />
+                                </Label.GestureRecognizers>
+                            </Label>
                             <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
                             <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
-                            <Label Grid.Column="3" Text="LogType" FontAttributes="Bold" />
-                            <Label Grid.Column="4" Text="Threadname/number" FontAttributes="Bold" />
-                            <Label Grid.Column="5" Text="Source Location" FontAttributes="Bold" />
-                            <Label Grid.Column="6" Text="Source" FontAttributes="Bold" />
-                            <Label Grid.Column="7" Text="Category" FontAttributes="Bold" />
-                            <Label Grid.Column="8" Text="Event ID" FontAttributes="Bold" />
-                            <Label Grid.Column="9" Text="User" FontAttributes="Bold" />
-                            <Label Grid.Column="10" Text="Computer" FontAttributes="Bold" />
+                            <Label Grid.Column="3" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
+                                <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="LogType" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="4" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="ThreadNameOrNumber" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="5" Text="{Binding SortSourceLocationHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="SourceLocation" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="6" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="Source" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="7" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="Category" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="8" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="EventId" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="9" Text="{Binding SortUserHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="User" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Column="10" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                            CommandParameter="Computer" />
+                                </Label.GestureRecognizers>
+                            </Label>
                             <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
-                            <Label Grid.Column="12" Text="{Binding SortHeader}" FontAttributes="Italic" />
 
                         </Grid>
                     </CollectionView.Header>
@@ -103,21 +153,18 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+                </Grid>
             </Frame>
 
             <!-- Bottom Half: ListView to display selected LogEntries Data -->
             <Frame x:Name="DataFrame" Grid.Row="1" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
-                <VerticalStackLayout>
                 <CollectionView ItemsSource="{Binding SelectedLogEntryData}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Label Text="{Binding .}" />
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                <Label Text="{Binding AscendingText}" />
-                <Label Text="{Binding DescendingText}" />
-                </VerticalStackLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
             </Frame>
         </Grid>
     </ContentPage.Content>
