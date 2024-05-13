@@ -63,6 +63,9 @@ public partial class LogEntriesViewModel : ObservableObject
 
     [ObservableProperty]
     private string _sortComputerText = "Computer";
+    
+    [ObservableProperty]
+    private string _sortDescriptionText = "Computer";
 
     [ObservableProperty]
     private string _sortDateTimeHeaderText = "DateTime";
@@ -90,6 +93,9 @@ public partial class LogEntriesViewModel : ObservableObject
 
     [ObservableProperty]
     private string _sortComputerHeaderText = "Computer";
+    
+    [ObservableProperty]
+    private string _sortDescriptionHeaderText = "Description";
 
     private bool _ascending = true;
     
@@ -157,6 +163,7 @@ public partial class LogEntriesViewModel : ObservableObject
         SortEventIdText = sortProperty == "EventId" ? "✓ Event ID" : "Event ID";
         SortUserText = sortProperty == "User" ? "✓ User" : "User";
         SortComputerText = sortProperty == "Computer" ? "✓ Computer" : "Computer";
+        SortDescriptionText = sortProperty == "Description" ? "✓ Description" : "Description";
 
         SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
         SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
@@ -167,6 +174,7 @@ public partial class LogEntriesViewModel : ObservableObject
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
         SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
         SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
+        SortDescriptionHeaderText = "Description " + (sortProperty == "Description" ? (Ascending ? "▲" : "▼") : "");
     }
 
     [RelayCommand]

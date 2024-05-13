@@ -3,6 +3,7 @@
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:DataType="viewModels:LogEntriesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
 
@@ -48,123 +49,142 @@
                 <MenuFlyoutItem Text="{Binding SortComputerText}"
                                 Command="{Binding SortByPropertyCommand}"
                                 CommandParameter="Computer" />
+                <MenuFlyoutItem Text="{Binding SortDescriptionText}"
+                                Command="{Binding SortByPropertyCommand}"
+                                CommandParameter="Description" />
             </MenuFlyoutSubItem>
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
-            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5" >
+            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
 
                 <Grid RowDefinitions="Auto, *">
                     <SearchBar Grid.Row="0"
-                       Placeholder="Search logs..."
-                       Text="{Binding SearchText, Mode=TwoWay}"
-                       SearchCommand="{Binding RefreshFilterCommand}" />
+                               ios:SearchBar.SearchBarStyle="Minimal"
+                               Placeholder="Search LogEntries..."
+                               Text="{Binding SearchText, Mode=TwoWay}"
+                               SearchCommand="{Binding RefreshFilterCommand}" />
 
                     <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredLogEntries}"
-                                SelectedItem="{Binding SelectedLogEntry}"
-                                SelectionMode="Single">
+                                    SelectedItem="{Binding SelectedLogEntry}"
+                                    SelectionMode="Single">
 
-                    <CollectionView.Header>
-                        <Grid
-                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                            Padding="10"
-                            ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,*,*">
-                            <Label Grid.Column="0" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                        CommandParameter="DateTime" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" />
-                            <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" />
-                            <Label Grid.Column="3" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
-                                <Label.GestureRecognizers>
+                        <CollectionView.Header>
+                            <Grid
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                                Padding="10"
+                                ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,*,*">
+                                <Label Grid.Column="0" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="LogType" />
+                                                              CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="4" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="ThreadNameOrNumber" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="5" Text="{Binding SortSourceLocationHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="SourceLocation" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="6" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="Source" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="7" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="Category" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="8" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="EventId" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="9" Text="{Binding SortUserHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="User" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="10" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold" >
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                            CommandParameter="Computer" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Grid.Column="11" Text="Description" FontAttributes="Bold" />
-
-                        </Grid>
-                    </CollectionView.Header>
-
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="entities:LogEntry">
-                            <Grid Padding="10" ColumnSpacing="10"
-                                  ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
-                                <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
-                                <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
-                                <Label Grid.Column="3" Text="{Binding LogType}"
-                                       TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
-                                <Label Grid.Column="4" Text="{Binding ThreadNameOrNumber}" />
-                                <Label Grid.Column="5" Text="{Binding SourceLocation}" />
-                                <Label Grid.Column="6" Text="{Binding Source}" />
-                                <Label Grid.Column="7" Text="{Binding Category}" />
-                                <Label Grid.Column="8" Text="{Binding EventId}" />
-                                <Label Grid.Column="9" Text="{Binding User}" />
-                                <Label Grid.Column="10" Text="{Binding Computer}" />
-                                <Label Grid.Column="11" Text="{Binding Description}" />
+                                <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="DateTime" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="DateTime" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="3" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="LogType" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="4" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="ThreadNameOrNumber" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="5" Text="{Binding SortSourceLocationHeaderText}"
+                                       FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="SourceLocation" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="6" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="Source" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="7" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="Category" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="8" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="EventId" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="9" Text="{Binding SortUserHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="User" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="10" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="Computer" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="11" Text="{Binding SortDescriptionHeaderText}" FontAttributes="Bold" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                              CommandParameter="Description" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                        </CollectionView.Header>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="entities:LogEntry">
+                                <Grid Padding="10" ColumnSpacing="10"
+                                      ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
+                                    <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
+                                    <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
+                                    <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
+                                    <Label Grid.Column="3" Text="{Binding LogType}"
+                                           TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
+                                    <Label Grid.Column="4" Text="{Binding ThreadNameOrNumber}" />
+                                    <Label Grid.Column="5" Text="{Binding SourceLocation}" />
+                                    <Label Grid.Column="6" Text="{Binding Source}" />
+                                    <Label Grid.Column="7" Text="{Binding Category}" />
+                                    <Label Grid.Column="8" Text="{Binding EventId}" />
+                                    <Label Grid.Column="9" Text="{Binding User}" />
+                                    <Label Grid.Column="10" Text="{Binding Computer}" />
+                                    <Label Grid.Column="11" Text="{Binding Description}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </Grid>
             </Frame>
 
             <!-- Bottom Half: ListView to display selected LogEntries Data -->
             <Frame x:Name="DataFrame" Grid.Row="1" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
                 <CollectionView ItemsSource="{Binding SelectedLogEntryData}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding .}" />
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding .}" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Frame>
         </Grid>
     </ContentPage.Content>
