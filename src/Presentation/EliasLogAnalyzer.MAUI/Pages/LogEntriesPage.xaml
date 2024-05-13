@@ -58,7 +58,7 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
-            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
+            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
 
                 <Grid RowDefinitions="Auto, *">
                     <SearchBar Grid.Row="0"
@@ -68,8 +68,9 @@
                                SearchCommand="{Binding RefreshFilterCommand}" />
 
                     <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredLogEntries}"
-                                    SelectedItem="{Binding SelectedLogEntry}"
-                                    SelectionMode="Single">
+                                    SelectionMode="Multiple"
+                                    SelectedItems="{Binding SelectedLogEntries}"
+                                    SelectionChangedCommand="{Binding SelectionChangedCommand}">
 
                         <CollectionView.Header>
                             <Grid
@@ -82,13 +83,13 @@
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold" >
+                                <Label Grid.Column="1" Text="Ticks" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold" >
+                                <Label Grid.Column="2" Text="SortValue" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
@@ -143,7 +144,8 @@
                                                               CommandParameter="Computer" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="11" Text="{Binding SortDescriptionHeaderText}" FontAttributes="Bold" >
+                                <Label Grid.Column="11" Text="{Binding SortDescriptionHeaderText}"
+                                       FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Description" />
@@ -174,18 +176,27 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </Grid>
-            </Frame>
+            </Border>
 
-            <!-- Bottom Half: ListView to display selected LogEntries Data -->
-            <Frame x:Name="DataFrame" Grid.Row="1" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5">
-                <CollectionView ItemsSource="{Binding SelectedLogEntryData}">
+            <!-- Bottom Half: CollectionView to display selected LogEntries Data -->
+            <Border Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
+                <Grid ColumnDefinitions="*,*">
+                    <CollectionView Grid.Column="0" ItemsSource="{Binding SelectedLogEntryDataLeft}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Label Text="{Binding .}" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Frame>
+                        </CollectionView>
+                    <CollectionView Grid.Column="1" ItemsSource="{Binding SelectedLogEntryDataRight}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

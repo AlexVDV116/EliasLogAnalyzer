@@ -9,99 +9,74 @@ namespace EliasLogAnalyzer.MAUI.ViewModels;
 public partial class LogEntriesViewModel : ObservableObject
 {
     #region Fields
+
     private readonly ILogDataSharingService _logDataSharingService;
+
     #endregion
 
     #region Properties
-    [ObservableProperty]
-    private string searchText;
 
-    [ObservableProperty]
-    private ObservableCollection<LogEntry> filteredLogEntries;
+    [ObservableProperty] private string _searchText;
 
-    [ObservableProperty]
-    private ObservableCollection<string> _selectedLogEntryData = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries;
 
-    [ObservableProperty]
-    private LogEntry _selectedLogEntry;
-    
-    [ObservableProperty]
-    private string _currentSortProperty;
-    
-    [ObservableProperty]
-    private string _sortHeader;
-    
-    [ObservableProperty]
-    private string _currentSortDirection;
-    
-    [ObservableProperty]
-    private string _ascendingText = "✓ Ascending";
-    
-    [ObservableProperty]
-    private string _descendingText = "Descending";
+    [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataLeft = [];
+    [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataRight = [];
 
-    [ObservableProperty]
-    private string _sortDateTimeText = "DateTime";
+    [ObservableProperty] private IList<object> _selectedLogEntries = [];
 
-    [ObservableProperty]
-    private string _sortLogTypeText = "LogType";
+    [ObservableProperty] private string _currentSortProperty;
 
-    [ObservableProperty]
-    private string _sortThreadText = "Thread/No";
+    [ObservableProperty] private string _sortHeader;
 
-    [ObservableProperty]
-    private string _sortSourceLocationText = "Source Location";
+    [ObservableProperty] private string _currentSortDirection;
 
-    [ObservableProperty]
-    private string _sortSourceText = "Source";
+    [ObservableProperty] private string _ascendingText = "✓ Ascending";
 
-    [ObservableProperty]
-    private string _sortCategoryText = "Category";
+    [ObservableProperty] private string _descendingText = "Descending";
 
-    [ObservableProperty]
-    private string _sortEventIdText = "Event ID";
+    [ObservableProperty] private string _sortDateTimeText = "DateTime";
 
-    [ObservableProperty]
-    private string _sortUserText = "User";
+    [ObservableProperty] private string _sortLogTypeText = "LogType";
 
-    [ObservableProperty]
-    private string _sortComputerText = "Computer";
-    
-    [ObservableProperty]
-    private string _sortDescriptionText = "Computer";
+    [ObservableProperty] private string _sortThreadText = "Thread/No";
 
-    [ObservableProperty]
-    private string _sortDateTimeHeaderText = "DateTime";
+    [ObservableProperty] private string _sortSourceLocationText = "Source Location";
 
-    [ObservableProperty]
-    private string _sortLogTypeHeaderText = "LogType";
+    [ObservableProperty] private string _sortSourceText = "Source";
 
-    [ObservableProperty]
-    private string _sortThreadHeaderText = "Thread/No";
+    [ObservableProperty] private string _sortCategoryText = "Category";
 
-    [ObservableProperty]
-    private string _sortSourceLocationHeaderText = "Source Location";
+    [ObservableProperty] private string _sortEventIdText = "Event ID";
 
-    [ObservableProperty]
-    private string _sortSourceHeaderText = "Source";
+    [ObservableProperty] private string _sortUserText = "User";
 
-    [ObservableProperty]
-    private string _sortCategoryHeaderText = "Category";
+    [ObservableProperty] private string _sortComputerText = "Computer";
 
-    [ObservableProperty]
-    private string _sortEventIdHeaderText = "Event ID";
+    [ObservableProperty] private string _sortDescriptionText = "Computer";
 
-    [ObservableProperty]
-    private string _sortUserHeaderText = "User";
+    [ObservableProperty] private string _sortDateTimeHeaderText = "DateTime";
 
-    [ObservableProperty]
-    private string _sortComputerHeaderText = "Computer";
-    
-    [ObservableProperty]
-    private string _sortDescriptionHeaderText = "Description";
+    [ObservableProperty] private string _sortLogTypeHeaderText = "LogType";
+
+    [ObservableProperty] private string _sortThreadHeaderText = "Thread/No";
+
+    [ObservableProperty] private string _sortSourceLocationHeaderText = "Source Location";
+
+    [ObservableProperty] private string _sortSourceHeaderText = "Source";
+
+    [ObservableProperty] private string _sortCategoryHeaderText = "Category";
+
+    [ObservableProperty] private string _sortEventIdHeaderText = "Event ID";
+
+    [ObservableProperty] private string _sortUserHeaderText = "User";
+
+    [ObservableProperty] private string _sortComputerHeaderText = "Computer";
+
+    [ObservableProperty] private string _sortDescriptionHeaderText = "Description";
 
     private bool _ascending = true;
-    
+
     private bool Ascending
     {
         get => _ascending;
@@ -114,11 +89,13 @@ public partial class LogEntriesViewModel : ObservableObject
             }
         }
     }
-    
+
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
+
     #endregion
 
     #region Constructor
+
     public LogEntriesViewModel(
         ILogDataSharingService logDataSharingService
     )
@@ -128,11 +105,23 @@ public partial class LogEntriesViewModel : ObservableObject
         SortByDateTime();
         RefreshFilter();
     }
+
     #endregion
 
     #region Commands
-    // Command to refresh filter whenever search text changes
-    // 
+
+    [RelayCommand]
+    private void SelectionChanged()
+    {
+        if (SelectedLogEntries.Count > 2)
+        {
+            SelectedLogEntries.RemoveAt(0);
+        }
+
+        UpdateSelectedEntryData();
+    }
+
+// Command to refresh filter whenever search text changes
     [RelayCommand]
     private void RefreshFilter()
     {
@@ -144,16 +133,16 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             var lowerCaseSearchText = SearchText.ToLower();
             var filtered = LogEntries.Where(entry =>
-                (entry.Description?.ToLower().Contains(lowerCaseSearchText) ?? false) ||
-                (entry.User?.ToLower().Contains(lowerCaseSearchText) ?? false) ||
-                (entry.Data?.ToLower().Contains(lowerCaseSearchText) ?? false) 
-            );
+                (entry.Description.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase)) ||
+                (entry.User.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase)) ||
+                (entry.Data.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
 
             FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
         }
     }
-    
-        [RelayCommand]
+
+    [RelayCommand]
     private void HeaderTapped(string propertyName)
     {
         if (CurrentSortProperty == propertyName)
@@ -176,22 +165,23 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             SortByProperty(propertyName);
         }
+
         UpdateSortTexts(propertyName);
     }
 
 
     [RelayCommand]
-    public void SetSortOrderAscending()
+    private void SetSortOrderAscending()
     {
         Ascending = true;
     }
-    
+
     [RelayCommand]
-    public void SetSortOrderDescending()
+    private void SetSortOrderDescending()
     {
         Ascending = false;
     }
-    
+
     [RelayCommand]
     private void SortByDateTime()
     {
@@ -207,6 +197,7 @@ public partial class LogEntriesViewModel : ObservableObject
                 LogEntries.OrderByDescending(x => x.LogTimeStamp.DateTime)
                     .ThenByDescending(x => x.LogTimeStamp.Ticks));
         }
+
         RefreshFilter();
         OnPropertyChanged(nameof(LogEntries));
         CurrentSortProperty = "DateTime";
@@ -240,9 +231,11 @@ public partial class LogEntriesViewModel : ObservableObject
         OnPropertyChanged(nameof(LogEntries));
         UpdateSortTexts(propertyName);
     }
+
     #endregion
-    
+
     #region Utility Methods
+
     partial void OnSearchTextChanged(string value)
     {
         RefreshFilter();
@@ -265,7 +258,8 @@ public partial class LogEntriesViewModel : ObservableObject
         SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
         SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
         SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText =
+            "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
         SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
         SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
@@ -273,7 +267,6 @@ public partial class LogEntriesViewModel : ObservableObject
         SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
         SortDescriptionHeaderText = "Description " + (sortProperty == "Description" ? (Ascending ? "▲" : "▼") : "");
     }
-
 
     private void AggregateLogEntries()
     {
@@ -285,24 +278,31 @@ public partial class LogEntriesViewModel : ObservableObject
                 LogEntries.Add(entry);
             }
         }
+
         RefreshFilter();
     }
 
-    // When the SelectedLogEntry changes, update the detail data
-    partial void OnSelectedLogEntryChanged(LogEntry value)
+    private void UpdateSelectedEntryData()
     {
-        UpdateSelectedLogEntryData();
-    }
-
-    private void UpdateSelectedLogEntryData()
-    {
-        SelectedLogEntryData.Clear();
-        
-        if (SelectedLogEntry != null)
+        if (SelectedLogEntries.Any())
         {
+            SelectedLogEntryDataLeft.Clear();
+            SelectedLogEntryDataRight.Clear();
 
-            SelectedLogEntryData.Add(SelectedLogEntry.Data);
+            if (SelectedLogEntries[0] is LogEntry firstEntry)
+            {
+                SelectedLogEntryDataLeft.Add(firstEntry.Data);
+            }
+
+            if (SelectedLogEntries.Count > 1)
+            {
+                if (SelectedLogEntries[1] is LogEntry secondEntry)
+                {
+                    SelectedLogEntryDataRight.Add(secondEntry.Data);
+                }
+            }
         }
+
+        #endregion
     }
-    #endregion
 }
