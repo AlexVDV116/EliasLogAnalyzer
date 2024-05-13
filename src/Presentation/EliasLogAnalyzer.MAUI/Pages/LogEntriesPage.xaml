@@ -54,7 +54,7 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
-            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5" HasShadow="True">
+            <Frame Grid.Row="0" Margin="10" Padding="10" BorderColor="LightGray" CornerRadius="5" >
 
                 <Grid RowDefinitions="Auto, *">
                     <SearchBar Grid.Row="0"
