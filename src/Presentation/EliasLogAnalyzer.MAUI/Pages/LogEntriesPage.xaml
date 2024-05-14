@@ -11,6 +11,31 @@
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
         </ResourceDictionary>
+        
+        <Style TargetType="Grid" x:Key="ResponsiveGrid">
+            <Style.Triggers>
+                <DataTrigger TargetType="Grid" Binding="{Binding HasTwoSelectedLogEntries}" Value="True">
+                    <Setter Property="ColumnDefinitions">
+                        <Setter.Value>
+                            <ColumnDefinitionCollection>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </ColumnDefinitionCollection>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger TargetType="Grid" Binding="{Binding HasTwoSelectedLogEntries}" Value="False">
+                    <Setter Property="ColumnDefinitions">
+                        <Setter.Value>
+                            <ColumnDefinitionCollection>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="0" />
+                            </ColumnDefinitionCollection>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
 
         <Style TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
@@ -153,24 +178,27 @@
 
             <!-- Bottom Half: CollectionView to display selected LogEntries Data -->
             <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
-                <FlexLayout Direction="Row" AlignItems="Stretch" JustifyContent="Start">
-                    <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataLeft}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding .}" />
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </StackLayout>
+                <Grid Style="{StaticResource ResponsiveGrid}">
+                    <ScrollView Grid.Column="0" Orientation="Vertical">
+                        <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataLeft}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding .}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </ScrollView>
 
-                    <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataRight}"
-                                 IsVisible="{Binding IsRightBorderVisible}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding .}" />
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </StackLayout>
-                </FlexLayout>
+                    <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsRightBorderVisible}">
+                        <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataRight}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding .}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </ScrollView>
+                </Grid>
             </Border>
         </Grid>
     </ContentPage.Content>

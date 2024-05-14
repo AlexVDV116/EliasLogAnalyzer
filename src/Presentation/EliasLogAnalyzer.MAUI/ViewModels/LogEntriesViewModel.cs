@@ -37,6 +37,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortDescriptionHeaderText = "Description";
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isRightBorderVisible;
+    [ObservableProperty] private bool _hasTwoSelectedLogEntries;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
@@ -75,6 +76,8 @@ public partial class LogEntriesViewModel : ObservableObject
 
         Debug.WriteLine($"Selected {SelectedLogEntries.Count} LogEntries");
         UpdateSelectedEntryData();
+        HasTwoSelectedLogEntries = SelectedLogEntries.Count == 2;
+
     }
 
 
