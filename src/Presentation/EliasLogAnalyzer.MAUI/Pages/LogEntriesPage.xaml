@@ -28,49 +28,6 @@
         </Style>
     </ContentPage.Resources>
 
-    <ContentPage.MenuBarItems>
-        <MenuBarItem Text="Sort" BindingContext="{Binding .}">
-            <MenuFlyoutSubItem Text="Sort Order">
-                <MenuFlyoutItem Text="{Binding AscendingText}"
-                                Command="{Binding SetSortOrderAscendingCommand}" />
-                <MenuFlyoutItem Text="{Binding DescendingText}"
-                                Command="{Binding SetSortOrderDescendingCommand}" />
-            </MenuFlyoutSubItem>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutSubItem Text=" Sort by">
-                <MenuFlyoutItem Text="{Binding SortDateTimeText}"
-                                Command="{Binding SortByDateTimeCommand}" />
-                <MenuFlyoutItem Text="{Binding SortLogTypeText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="LogType" />
-                <MenuFlyoutItem Text="{Binding SortThreadText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="ThreadNameOrNumber" />
-                <MenuFlyoutItem Text="{Binding SortSourceLocationText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="SourceLocation" />
-                <MenuFlyoutItem Text="{Binding SortSourceText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="Source" />
-                <MenuFlyoutItem Text="{Binding SortCategoryText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="Category" />
-                <MenuFlyoutItem Text="{Binding SortEventIdText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="EventId" />
-                <MenuFlyoutItem Text="{Binding SortUserText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="User" />
-                <MenuFlyoutItem Text="{Binding SortComputerText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="Computer" />
-                <MenuFlyoutItem Text="{Binding SortDescriptionText}"
-                                Command="{Binding SortByPropertyCommand}"
-                                CommandParameter="Description" />
-            </MenuFlyoutSubItem>
-        </MenuBarItem>
-    </ContentPage.MenuBarItems>
-
     <ContentPage.Content>
         <Grid RowDefinitions="*,*">
             <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
@@ -194,15 +151,19 @@
             </Border>
 
             <!-- Bottom Half: CollectionView to display selected LogEntries Data -->
-            <Border Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
-                <Grid ColumnDefinitions="*,*">
-                    <CollectionView Grid.Column="0" ItemsSource="{Binding SelectedLogEntryDataLeft}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Label Text="{Binding .}" />
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                        </CollectionView>
+            <Grid Grid.Row="1" ColumnDefinitions="*,*">
+                <Border Grid.Column="0" Margin="10" Padding="10" Stroke="LightGray"
+                        StrokeShape="RoundRectangle 5,5,5,5">
+                    <CollectionView ItemsSource="{Binding SelectedLogEntryDataLeft}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+                <Border Grid.Column="1" Margin="10" Padding="10" Stroke="LightGray"
+                        StrokeShape="RoundRectangle 5,5,5,5">
                     <CollectionView Grid.Column="1" ItemsSource="{Binding SelectedLogEntryDataRight}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
@@ -210,8 +171,8 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
-                </Grid>
-            </Border>
+                </Border>
+            </Grid>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
