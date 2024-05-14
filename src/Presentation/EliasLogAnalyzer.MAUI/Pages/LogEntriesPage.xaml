@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
         </ResourceDictionary>
+
         <Style TargetType="Grid">
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
@@ -151,28 +152,26 @@
             </Border>
 
             <!-- Bottom Half: CollectionView to display selected LogEntries Data -->
-            <Grid Grid.Row="1" ColumnDefinitions="*,*">
-                <Border Grid.Column="0" Margin="10" Padding="10" Stroke="LightGray"
-                        StrokeShape="RoundRectangle 5,5,5,5">
-                    <CollectionView ItemsSource="{Binding SelectedLogEntryDataLeft}">
-                        <CollectionView.ItemTemplate>
+            <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
+                <FlexLayout Direction="Row" AlignItems="Stretch" JustifyContent="Start">
+                    <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataLeft}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Label Text="{Binding .}" />
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Border>
-                <Border Grid.Column="1" Margin="10" Padding="10" Stroke="LightGray"
-                        StrokeShape="RoundRectangle 5,5,5,5">
-                    <CollectionView Grid.Column="1" ItemsSource="{Binding SelectedLogEntryDataRight}">
-                        <CollectionView.ItemTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+
+                    <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataRight}"
+                                 IsVisible="{Binding IsRightBorderVisible}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Label Text="{Binding .}" />
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Border>
-            </Grid>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+                </FlexLayout>
+            </Border>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

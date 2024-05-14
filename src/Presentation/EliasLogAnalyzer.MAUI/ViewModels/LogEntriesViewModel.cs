@@ -36,7 +36,8 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
     [ObservableProperty] private string _sortDescriptionHeaderText = "Description";
     [ObservableProperty] private bool _ascending = true;
-    
+    [ObservableProperty] private bool _isRightBorderVisible;
+
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
     #endregion
@@ -204,11 +205,11 @@ public partial class LogEntriesViewModel : ObservableObject
 
     private void UpdateSelectedEntryData()
     {
+        SelectedLogEntryDataLeft.Clear();
+        SelectedLogEntryDataRight.Clear();
+
         if (SelectedLogEntries.Any())
         {
-            SelectedLogEntryDataLeft.Clear();
-            SelectedLogEntryDataRight.Clear();
-
             if (SelectedLogEntries[0] is LogEntry firstEntry)
             {
                 SelectedLogEntryDataLeft.Add(firstEntry.Data);
@@ -216,11 +217,21 @@ public partial class LogEntriesViewModel : ObservableObject
 
             if (SelectedLogEntries.Count > 1)
             {
+                IsRightBorderVisible = true;
+
                 if (SelectedLogEntries[1] is LogEntry secondEntry)
                 {
                     SelectedLogEntryDataRight.Add(secondEntry.Data);
                 }
             }
+            else
+            {
+                IsRightBorderVisible = false;
+            }
+        }
+        else
+        {
+            IsRightBorderVisible = false;
         }
     }
     #endregion
