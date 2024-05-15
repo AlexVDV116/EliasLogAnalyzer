@@ -17,6 +17,8 @@ public class LogEntry
     public string Computer { get; set; }
     public string Description { get; set; }
     public string Data { get; set; }
+    
+    public LogFile LogFile { get; set; }
 
     public LogEntry()
     {

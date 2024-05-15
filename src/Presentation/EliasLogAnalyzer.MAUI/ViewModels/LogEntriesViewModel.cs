@@ -45,9 +45,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Constructor
 
-    public LogEntriesViewModel(
-        ILogDataSharingService logDataSharingService
-    )
+    public LogEntriesViewModel(ILogDataSharingService logDataSharingService)
     {
         _logDataSharingService = logDataSharingService;
         AggregateLogEntries();
@@ -195,11 +193,16 @@ public partial class LogEntriesViewModel : ObservableObject
     private void AggregateLogEntries()
     {
         LogEntries.Clear();
+        var uniqueEntries = new HashSet<LogEntry>(LogEntries);
+
         foreach (var file in _logDataSharingService.SelectedLogFiles)
         {
             foreach (var entry in file.LogEntries)
             {
-                LogEntries.Add(entry);
+                if (uniqueEntries.Add(entry))
+                {
+                    LogEntries.Add(entry);
+                }
             }
         }
 

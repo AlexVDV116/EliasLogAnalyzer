@@ -2,23 +2,22 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
-using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
-using Microsoft.VisualBasic;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly ISettingsService _settingsService;
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly ILogFileLoaderService _logFileLoaderService;
     private readonly ILogFileParserService _logFileParserService;
     
     public IRelayCommand LoadLogfilesCommand { get; }
 
-    [ObservableProperty] private bool isLoading;
-    [ObservableProperty] private string loadingMessage;
+    [ObservableProperty] private bool _isLoading;
+    [ObservableProperty] private string _loadingMessage;
+    
+    public ObservableCollection<LogFile> LogFiles => _logDataSharingService.LogFiles;
 
     public MainViewModel(
         ILogDataSharingService logDataSharingService,
@@ -41,26 +40,21 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private async void LoadLogFiles()
     {
-        
         var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
         
         IsLoading = true;
         LoadingMessage = "Please wait, parsing LogFiles...";
 
-        // Create a list of tasks for parsing each log file
-        var parsingTasks = fileResults.Select(fileResult => ParseLogFileAsync(fileResult)).ToList();
-
+        // Create a list of tasks for parsing each new log file
+        var parsingTasks = fileResults.Select(ParseLogFileAsync).ToList();
+        
         // Await all tasks to complete
         var parsedLogFiles = await Task.WhenAll(parsingTasks);
 
         // Add the parsed log files to the shared service collection
         foreach (var logFile in parsedLogFiles)
         {
-            _logDataSharingService.LogFiles.Add(logFile);
-            foreach (var logEntry in logFile.LogEntries)
-            {
-                _logDataSharingService.LogEntries.Add(logEntry);
-            }
+            _logDataSharingService.AddLogFile(logFile);
         }
         
         IsLoading = false; 
@@ -78,12 +72,20 @@ public partial class MainViewModel : ObservableObject
     private async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
     {
         var (logEntries, fileSize) = await _logFileParserService.ParseLogAsync(fileResult);
-        return new LogFile
+        var logFile = new LogFile
         {
             FileName = fileResult.FileName,
+            FullPath = fileResult.FullPath,
             FileSize = fileSize,
             Computer = logEntries.FirstOrDefault()?.Computer ?? "Unknown",
             LogEntries = logEntries
         };
+
+        foreach (var logEntry in logEntries)
+        {
+            logEntry.LogFile = logFile;
+        }
+
+        return logFile;
     }
 }

@@ -12,8 +12,7 @@ public partial class LogFilesViewModel : ObservableObject
     private bool _selectAll;
     
     public ObservableCollection<LogFile> LoadedLogFiles => _logDataSharingService.LogFiles;
-    
-    private IEnumerable<LogFile> SelectedLogFiles => LoadedLogFiles.Where(file => file.IsSelected).ToList();
+    public ObservableCollection<LogFile> SelectedLogFiles => _logDataSharingService.SelectedLogFiles;
     
     public bool SelectAll
     {
@@ -28,9 +27,7 @@ public partial class LogFilesViewModel : ObservableObject
         }
     }
     
-    public LogFilesViewModel(
-        ILogDataSharingService logDataSharingService
-    )
+    public LogFilesViewModel(ILogDataSharingService logDataSharingService)
     {
         _logDataSharingService = logDataSharingService;
     }
@@ -38,9 +35,9 @@ public partial class LogFilesViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenFiles()
     {
-        foreach (var file in SelectedLogFiles)
+        foreach (var file in LoadedLogFiles.Where(file => file.IsSelected))
         {
-            _logDataSharingService.SelectedLogFiles.Add(file);
+            _logDataSharingService.AddLogFileToSelected(file);
         }
         await Shell.Current.GoToAsync("logentriesPage");
     }
