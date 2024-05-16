@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace EliasLogAnalyzer.Domain.Entities;
+﻿namespace EliasLogAnalyzer.Domain.Entities;
 
 // LogFile is a file with multiple LogEntries
 public class LogEntry
@@ -18,10 +16,24 @@ public class LogEntry
     public string Description { get; set; }
     public string Data { get; set; }
     
+    // Many-to-one relationship with LogFile
     public LogFile LogFile { get; set; }
 
     public LogEntry()
     {
-        LogTimeStamp = new LogTimestamp(); 
+        LogTimeStamp = new LogTimestamp();
+        LogType = LogType.None;
+        ThreadNameOrNumber = string.Empty;
+        SourceLocation = string.Empty;
+        Source = string.Empty;
+        Category = string.Empty;
+        EventId = 0;
+        User = string.Empty;
+        Computer = string.Empty;
+        Description = string.Empty;
+        Data = string.Empty;
+        LogFile = new LogFile();
     }
 }
+
+// Todo: LogEntry + Logfile class private/internal
