@@ -36,4 +36,4 @@ public class LogEntry
     }
 }
 
-// Todo: LogEntry + Logfile class private/internal
+// Todo: Refactor code to make LogEntry + Logfile class private/internal, and expose only the necessary properties and methods
