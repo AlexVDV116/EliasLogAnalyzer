@@ -10,11 +10,29 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
+            
+            <!-- DataTemplate for the selected LogEntries Data columns -->
+            <DataTemplate x:Key="LogEntryTemplate" x:DataType="entities:LogEntry">
+                <VerticalStackLayout>
+                    <Grid
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                        Padding="10" Margin="5" ColumnDefinitions="100,100,*,*,*,*">
+                        <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" FontAttributes="Bold" />
+                        <Label Grid.Column="2" Text="{Binding LogType}" FontAttributes="Bold" />
+                        <Label Grid.Column="3" Text="{Binding Source}" FontAttributes="Bold" />
+                        <Label Grid.Column="4" Text="{Binding User}" FontAttributes="Bold" />
+                        <Label Grid.Column="5" Text="{Binding Computer}" FontAttributes="Bold" />
+                    </Grid>
+                    <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Data}" />
+                </VerticalStackLayout>
+            </DataTemplate>
         </ResourceDictionary>
-        
+
+        <!-- Style to make the Grid responsive based off the amount selected LogEntries -->
         <Style TargetType="Grid" x:Key="ResponsiveGrid">
             <Style.Triggers>
-                <DataTrigger TargetType="Grid" Binding="{Binding HasTwoSelectedLogEntries}" Value="True">
+                <DataTrigger TargetType="Grid" Binding="{Binding IsSecondLogEntrySelected}" Value="True">
                     <Setter Property="ColumnDefinitions">
                         <Setter.Value>
                             <ColumnDefinitionCollection>
@@ -24,7 +42,7 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
-                <DataTrigger TargetType="Grid" Binding="{Binding HasTwoSelectedLogEntries}" Value="False">
+                <DataTrigger TargetType="Grid" Binding="{Binding IsSecondLogEntrySelected}" Value="False">
                     <Setter Property="ColumnDefinitions">
                         <Setter.Value>
                             <ColumnDefinitionCollection>
@@ -34,23 +52,18 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
+                <DataTrigger TargetType="Grid" Binding="{Binding IsThirdLogEntrySelected}" Value="True">
+                    <Setter Property="ColumnDefinitions">
+                        <Setter.Value>
+                            <ColumnDefinitionCollection>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </ColumnDefinitionCollection>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
             </Style.Triggers>
-        </Style>
-
-        <Style TargetType="Grid">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor"
-                                        Value="LightGray" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
         </Style>
     </ContentPage.Resources>
 
@@ -66,6 +79,7 @@
                                SearchCommand="{Binding RefreshFilterCommand}" />
 
                     <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredLogEntries}"
+
                                     SelectionMode="Multiple"
                                     SelectedItems="{Binding SelectedLogEntries}"
                                     SelectionChangedCommand="{Binding SelectionChangedCommand}">
@@ -154,22 +168,25 @@
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="entities:LogEntry">
-                                <Grid Padding="10" ColumnSpacing="10"
-                                      ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
-                                    <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
-                                    <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
-                                    <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
-                                    <Label Grid.Column="3" Text="{Binding LogType}"
-                                           TextColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}" />
-                                    <Label Grid.Column="4" Text="{Binding ThreadNameOrNumber}" />
-                                    <Label Grid.Column="5" Text="{Binding SourceLocation}" />
-                                    <Label Grid.Column="6" Text="{Binding Source}" />
-                                    <Label Grid.Column="7" Text="{Binding Category}" />
-                                    <Label Grid.Column="8" Text="{Binding EventId}" />
-                                    <Label Grid.Column="9" Text="{Binding User}" />
-                                    <Label Grid.Column="10" Text="{Binding Computer}" />
-                                    <Label Grid.Column="11" Text="{Binding Description}" />
-                                </Grid>
+                                <VerticalStackLayout>
+                                    <Grid Padding="10" ColumnSpacing="10"
+                                          BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
+                                          ColumnDefinitions="*, *, *, *, *, *, *, *, *, *, *, *">
+                                        <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
+                                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
+                                        <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
+                                        <Label Grid.Column="3" Text="{Binding LogType}" />
+                                        <Label Grid.Column="4" Text="{Binding ThreadNameOrNumber}" />
+                                        <Label Grid.Column="5" Text="{Binding SourceLocation}" />
+                                        <Label Grid.Column="6" Text="{Binding Source}" />
+                                        <Label Grid.Column="7" Text="{Binding Category}" />
+                                        <Label Grid.Column="8" Text="{Binding EventId}" />
+                                        <Label Grid.Column="9" Text="{Binding User}" />
+                                        <Label Grid.Column="10" Text="{Binding Computer}" />
+                                        <Label Grid.Column="11" Text="{Binding Description}" />
+                                    </Grid>
+                                    <BoxView HeightRequest="1" BackgroundColor="Gray" />
+                                </VerticalStackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -180,23 +197,15 @@
             <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
                 <Grid Style="{StaticResource ResponsiveGrid}">
                     <ScrollView Grid.Column="0" Orientation="Vertical">
-                        <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataLeft}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate>
-                                    <Label Text="{Binding .}" />
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </StackLayout>
+                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
                     </ScrollView>
 
-                    <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsRightBorderVisible}">
-                        <StackLayout BindableLayout.ItemsSource="{Binding SelectedLogEntryDataRight}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate>
-                                    <Label Text="{Binding .}" />
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </StackLayout>
+                    <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsSecondLogEntrySelected}">
+                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                    </ScrollView>
+
+                    <ScrollView Grid.Column="2" Orientation="Vertical" IsVisible="{Binding IsThirdLogEntrySelected}">
+                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
                     </ScrollView>
                 </Grid>
             </Border>
