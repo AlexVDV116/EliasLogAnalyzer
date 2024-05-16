@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace EliasLogAnalyzer.MAUI.Services;
 
@@ -10,12 +11,18 @@ namespace EliasLogAnalyzer.MAUI.Services;
 /// </summary>
 public class LogDataSharingService : ILogDataSharingService
 {
+    private readonly ILogger<LogFileParserService> _logger;
     private readonly HashSet<string> _loadedLogFileIdentifiers = [];
     private readonly HashSet<string> _loadedLogEntryIdentifiers = [];
     
     public ObservableCollection<LogFile> LogFiles { get; set; } = [];
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
     public ObservableCollection<LogFile> SelectedLogFiles { get; set; } = [];
+    
+    public  LogDataSharingService(ILogger<LogFileParserService> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
     
     public void AddLogFile(LogFile logFile)
     {
@@ -26,7 +33,7 @@ public class LogDataSharingService : ILogDataSharingService
             {
                 AddLogEntry(logEntry);
             }
-            Console.WriteLine($"Added {logFile.FullPath} to _loadedLogEntryIdentifiers");
+            _logger.LogInformation("Added {logFile} to _loadedLogEntryIdentifiers.", logFile.FullPath);
         }
     }
     
@@ -37,12 +44,12 @@ public class LogDataSharingService : ILogDataSharingService
         {
             LogEntries.Add(logEntry);
         }
-        Console.WriteLine($"Added {uniqueIdentifier} to _loadedLogEntryIdentifiers");
+        _logger.LogInformation("Added {uniqueIdentifier} to _loadedLogEntryIdentifiers.", uniqueIdentifier);
     }
     
     public void AddLogFileToSelected(LogFile logFile)
     {
-        if (!SelectedLogFiles.Any(lf => lf.FullPath == logFile.FullPath))
+        if (SelectedLogFiles.All(lf => lf.FullPath != logFile.FullPath))
         {
             SelectedLogFiles.Add(logFile);
         }
