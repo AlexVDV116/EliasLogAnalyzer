@@ -17,14 +17,15 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Properties
 
-    [ObservableProperty] private string _searchText;
-    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries;
-    [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataLeft = [];
-    [ObservableProperty] private ObservableCollection<string> _selectedLogEntryDataRight = [];
+    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private IList<object> _selectedLogEntries = [];
-    [ObservableProperty] private string _currentSortProperty;
-    [ObservableProperty] private string _sortHeader;
-    [ObservableProperty] private string _currentSortDirection;
+    [ObservableProperty] private ObservableCollection<LogEntry> _firstSelectedLogEntry = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry= [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry= [];
+    [ObservableProperty] private string _currentSortProperty = "";
+    [ObservableProperty] private string _sortHeader = "";
+    [ObservableProperty] private string _currentSortDirection = "";
     [ObservableProperty] private string _sortDateTimeHeaderText = "DateTime";
     [ObservableProperty] private string _sortLogTypeHeaderText = "LogType";
     [ObservableProperty] private string _sortThreadHeaderText = "Thread/No";
@@ -36,8 +37,8 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
     [ObservableProperty] private string _sortDescriptionHeaderText = "Description";
     [ObservableProperty] private bool _ascending = true;
-    [ObservableProperty] private bool _isRightBorderVisible;
-    [ObservableProperty] private bool _hasTwoSelectedLogEntries;
+    [ObservableProperty] private bool _isSecondLogEntrySelected;
+    [ObservableProperty] private bool _isThirdLogEntrySelected;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
@@ -60,11 +61,11 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void SelectionChanged()
     {
-        if (SelectedLogEntries.Count > 2)
+        if (SelectedLogEntries.Count > 3)
         {
             // Create a copy to avoid modifying the collection during enumeration
             var selectedLogEntriesCopy = SelectedLogEntries.ToList();
-            while (selectedLogEntriesCopy.Count > 2)
+            while (selectedLogEntriesCopy.Count > 3)
             {
                 selectedLogEntriesCopy.RemoveAt(0);
             }
@@ -74,11 +75,8 @@ public partial class LogEntriesViewModel : ObservableObject
 
         Debug.WriteLine($"Selected {SelectedLogEntries.Count} LogEntries");
         UpdateSelectedEntryData();
-        HasTwoSelectedLogEntries = SelectedLogEntries.Count == 2;
-
     }
-
-
+    
     // Command to refresh filter whenever search text changes
     [RelayCommand]
     private void RefreshFilter()
@@ -208,37 +206,38 @@ public partial class LogEntriesViewModel : ObservableObject
 
         RefreshFilter();
     }
-
+    
     private void UpdateSelectedEntryData()
     {
-        SelectedLogEntryDataLeft.Clear();
-        SelectedLogEntryDataRight.Clear();
+        FirstSelectedLogEntry.Clear();
+        SecondSelectedLogEntry.Clear();
+        ThirdSelectedLogEntry.Clear();
 
-        if (SelectedLogEntries.Any())
+        if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
         {
-            if (SelectedLogEntries[0] is LogEntry firstEntry)
-            {
-                SelectedLogEntryDataLeft.Add(firstEntry.Data);
-            }
+            FirstSelectedLogEntry.Add(firstEntry);
+        }
 
-            if (SelectedLogEntries.Count > 1)
-            {
-                IsRightBorderVisible = true;
-
-                if (SelectedLogEntries[1] is LogEntry secondEntry)
-                {
-                    SelectedLogEntryDataRight.Add(secondEntry.Data);
-                }
-            }
-            else
-            {
-                IsRightBorderVisible = false;
-            }
+        if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
+        {
+            SecondSelectedLogEntry.Add(secondEntry);
+            IsSecondLogEntrySelected = true;
         }
         else
         {
-            IsRightBorderVisible = false;
+            IsSecondLogEntrySelected = false;
+        }
+
+        if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
+        {
+            ThirdSelectedLogEntry.Add(thirdEntry);
+            IsThirdLogEntrySelected = true;
+        }
+        else
+        {
+            IsThirdLogEntrySelected = false;
         }
     }
+    
     #endregion
 }
