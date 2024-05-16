@@ -7,27 +7,57 @@
              x:DataType="viewModels:LogEntriesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
 
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="Filter">
+            <MenuFlyoutSubItem Text="LogType">
+                <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
+                <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
+                <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
+                <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
+
     <ContentPage.Resources>
+
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
-            
+
             <!-- DataTemplate for the selected LogEntries Data columns -->
             <DataTemplate x:Key="LogEntryTemplate" x:DataType="entities:LogEntry">
                 <VerticalStackLayout>
                     <Grid
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                        Padding="10" Margin="5" ColumnDefinitions="100,100,*,*,*,*">
-                        <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" FontAttributes="Bold" />
-                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" FontAttributes="Bold" />
-                        <Label Grid.Column="2" Text="{Binding LogType}" FontAttributes="Bold" />
-                        <Label Grid.Column="3" Text="{Binding Source}" FontAttributes="Bold" />
-                        <Label Grid.Column="4" Text="{Binding User}" FontAttributes="Bold" />
-                        <Label Grid.Column="5" Text="{Binding Computer}" FontAttributes="Bold" />
+                        Padding="10" Margin="5" ColumnDefinitions="140,80,80,*,*,*">
+                        <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
+                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
+                        <Label Grid.Column="2" Text="{Binding LogType}" />
+                        <Label Grid.Column="3" Text="{Binding Source}" />
+                        <Label Grid.Column="4" Text="{Binding User}" />
+                        <Label Grid.Column="5" Text="{Binding Computer}" />
                     </Grid>
+                    <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Description}" />
                     <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Data}" />
                 </VerticalStackLayout>
             </DataTemplate>
         </ResourceDictionary>
+        
+        <!-- Style to make selected element in a collectionView highlighted -->
+        <Style TargetType="VerticalStackLayout">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="LightGray" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
 
         <!-- Style to make the Grid responsive based off the amount selected LogEntries -->
         <Style TargetType="Grid" x:Key="ResponsiveGrid">
@@ -64,23 +94,6 @@
                     </Setter>
                 </DataTrigger>
             </Style.Triggers>
-        </Style>
-        
-        <!-- Style to change the background color of the selected CollectionView Item (Windows) -->
-        <Style TargetType="Grid">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor"
-                                        Value="LightGray" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
         </Style>
     </ContentPage.Resources>
 
@@ -173,13 +186,6 @@
                                                               CommandParameter="Computer" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="11" Text="{Binding SortDescriptionHeaderText}"
-                                       FontAttributes="Bold">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
-                                                              CommandParameter="Description" />
-                                    </Label.GestureRecognizers>
-                                </Label>
                             </Grid>
                         </CollectionView.Header>
 
@@ -200,7 +206,6 @@
                                         <Label Grid.Column="8" Text="{Binding EventId}" />
                                         <Label Grid.Column="9" Text="{Binding User}" />
                                         <Label Grid.Column="10" Text="{Binding Computer}" />
-                                        <Label Grid.Column="11" Text="{Binding Description}" />
                                     </Grid>
                                     <BoxView HeightRequest="1" BackgroundColor="Gray" />
                                 </VerticalStackLayout>
@@ -218,11 +223,11 @@
                     </ScrollView>
 
                     <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsSecondLogEntrySelected}">
-                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                        <StackLayout BindableLayout.ItemsSource="{Binding SecondSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
                     </ScrollView>
 
                     <ScrollView Grid.Column="2" Orientation="Vertical" IsVisible="{Binding IsThirdLogEntrySelected}">
-                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                        <StackLayout BindableLayout.ItemsSource="{Binding ThirdSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
                     </ScrollView>
                 </Grid>
             </Border>

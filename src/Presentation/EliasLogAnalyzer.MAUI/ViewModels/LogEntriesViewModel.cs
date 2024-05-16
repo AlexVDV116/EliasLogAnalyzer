@@ -17,12 +17,17 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Properties
 
-    [ObservableProperty] private string _searchText = string.Empty;
-    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private IList<object> _selectedLogEntries = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
+    [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
     [ObservableProperty] private ObservableCollection<LogEntry> _firstSelectedLogEntry = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry= [];
     [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry= [];
+    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] private string _debugLogTypeText = "Debug";
+    [ObservableProperty] private string _informationLogTypeText = "Information";
+    [ObservableProperty] private string _warningLogTypeText = "Warning";
+    [ObservableProperty] private string _errorLogTypeText = "✓ Error";
     [ObservableProperty] private string _currentSortProperty = "";
     [ObservableProperty] private string _sortHeader = "";
     [ObservableProperty] private string _currentSortDirection = "";
@@ -35,7 +40,6 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortEventIdHeaderText = "Event ID";
     [ObservableProperty] private string _sortUserHeaderText = "User";
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
-    [ObservableProperty] private string _sortDescriptionHeaderText = "Description";
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
@@ -76,25 +80,21 @@ public partial class LogEntriesViewModel : ObservableObject
         Debug.WriteLine($"Selected {SelectedLogEntries.Count} LogEntries");
         UpdateSelectedEntryData();
     }
-    
-    // Command to refresh filter whenever search text changes
+
+    // Command to refresh filter whenever search text or selected log types change
     [RelayCommand]
     private void RefreshFilter()
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
-        {
-            FilteredLogEntries = new ObservableCollection<LogEntry>(LogEntries);
-        }
-        else
-        {
-            var lowerCaseSearchText = SearchText.ToLower();
-            var filtered = LogEntries.Where(entry =>
-                entry.Description.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase) ||
-                entry.User.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase) ||
-                entry.Data.Contains(lowerCaseSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        var filtered = LogEntries.Where(entry =>
+            SelectedLogTypes.Contains(entry.LogType) &&
+            (string.IsNullOrWhiteSpace(SearchText) ||
+             entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+             entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+             entry.Data.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+        ).ToList();
 
-            FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
-        }
+        FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
+        Debug.WriteLine($"Filtered LogEntries: {FilteredLogEntries.Count}");
     }
 
     [RelayCommand]
@@ -164,9 +164,33 @@ public partial class LogEntriesViewModel : ObservableObject
         UpdateSortTexts(propertyName);
     }
 
+    [RelayCommand]
+    private void ChangeLogType(LogType logType)
+    {
+        if (SelectedLogTypes.Contains(logType))
+        {
+            SelectedLogTypes.Remove(logType);
+        }
+        else
+        {
+            SelectedLogTypes.Add(logType);
+        }
+        UpdateLogTypeTexts();
+        RefreshFilter();
+    }
+
+
     #endregion
 
     #region Utility Methods
+
+    private void UpdateLogTypeTexts()
+    {
+        DebugLogTypeText = SelectedLogTypes.Contains(LogType.Debug) ? "✓ Debug" : "Debug";
+        InformationLogTypeText = SelectedLogTypes.Contains(LogType.Information) ? "✓ Information" : "Information";
+        WarningLogTypeText = SelectedLogTypes.Contains(LogType.Warning) ? "✓ Warning" : "Warning";
+        ErrorLogTypeText = SelectedLogTypes.Contains(LogType.Error) ? "✓ Error" : "Error";
+    }
 
     partial void OnSearchTextChanged(string value)
     {
@@ -185,7 +209,6 @@ public partial class LogEntriesViewModel : ObservableObject
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
         SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
         SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
-        SortDescriptionHeaderText = "Description " + (sortProperty == "Description" ? (Ascending ? "▲" : "▼") : "");
     }
 
     private void AggregateLogEntries()
