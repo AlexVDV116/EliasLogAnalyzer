@@ -26,7 +26,6 @@ public class LogFileParserService : ILogFileParserService
     /// /// <exception cref="IOException">Thrown when the log file could not be read.</exception>
     public async Task<(List<LogEntry> Entries, long FileSize)> ParseLogAsync(FileResult fileResult)
     {
-        _logger.LogInformation("Starting to parse log file: {FileName}", fileResult.FileName);
         var headers = new List<string>(); // Local headers list for each file
 
         var entries = new List<LogEntry>();
@@ -34,28 +33,21 @@ public class LogFileParserService : ILogFileParserService
 
         try
         {
-            await using (var stream = await fileResult.OpenReadAsync())
+            await using var stream = await fileResult.OpenReadAsync();
+            // Checking if the stream supports seeking to obtain file size
+            if (stream.CanSeek)
             {
-                // Checking if the stream supports seeking to obtain file size
-                if (stream.CanSeek)
-                {
-                    fileSize = stream.Length;
-                    _logger.LogInformation("File size: {FileSize} bytes", fileSize);
-                }
-
-                using (var reader = new StreamReader(stream))
-                {
-                    var line = await reader.ReadLineAsync();
-                    if (line != null)
-                    {
-                        // Parse headers using the local list
-                        ParseHeaders(line, headers);
-                        await ParseEntries(reader, entries, headers);
-                    }
-                }
+                fileSize = stream.Length;
             }
 
-            LogEntries(entries);
+            using var reader = new StreamReader(stream);
+            var line = await reader.ReadLineAsync();
+            if (line != null)
+            {
+                // Parse headers using the local list
+                ParseHeaders(line, headers);
+                await ParseEntries(reader, entries, headers);
+            }
         }
         catch (IOException ex)
         {
@@ -79,7 +71,6 @@ public class LogFileParserService : ILogFileParserService
         try
         {
             headers.AddRange(line.Split('\t'));
-            _logger.LogInformation("Headers read from file: {Headers}", string.Join(", ", headers));
         }
         catch (Exception ex)
         {
@@ -128,7 +119,7 @@ public class LogFileParserService : ILogFileParserService
     /// </summary>
     /// <param name="line">The line to check if it matches the new LogEntry signature.</param>
     /// <param name="headers">The list of headers to compare the line fields with.</param>
-    private bool IsLogEntryStart(string line, List<string> headers)
+    private static bool IsLogEntryStart(string line, List<string> headers)
     {
         var splitLine = line.Split('\t');
         return DateTime.TryParseExact(splitLine[0], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None,
@@ -138,7 +129,7 @@ public class LogFileParserService : ILogFileParserService
     /// <summary>
     /// Appends a line to the Data field of the last log entry in the list.
     /// </summary>
-    private void AppendToLastEntryData(List<LogEntry> entries, string line)
+    private static void AppendToLastEntryData(List<LogEntry> entries, string line)
     {
         if (entries.Count > 0)
         {
@@ -266,15 +257,6 @@ public class LogFileParserService : ILogFileParserService
         {
             _logger.LogError("Error populating {Header} for log entry: {ErrorMessage}", header, ex.Message);
             throw;
-        }
-    }
-
-    // Used during development to log the parsed entries to the console
-    private void LogEntries(List<LogEntry> entries)
-    {
-        foreach (var entry in entries)
-        {
-            _logger.LogInformation("Logged entry: {LogEntry}", entry.Source);
         }
     }
 }
