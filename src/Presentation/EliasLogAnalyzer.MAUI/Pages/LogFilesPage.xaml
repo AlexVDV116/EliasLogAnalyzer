@@ -16,7 +16,7 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*, 100">
-            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
+            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray">
                 <CollectionView x:Name="LogFilesListView"
                                 BackgroundColor="Transparent"
                                 ItemsSource="{Binding LoadedLogFiles}" >
@@ -63,17 +63,17 @@
             </Border>
 
             <Button Grid.Row="1"
-                    Text="Open selected log files"
+                    Text="Open Log Files"
                     Command="{Binding OpenFilesCommand}"
-                    WidthRequest="200"
+                    WidthRequest="140"
                     HorizontalOptions="End"
                     Margin="20"
-                    BackgroundColor="{AppThemeBinding Light=#FFF, Dark={StaticResource Gray200}}"
-                    BorderColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
-                    BorderWidth="2"
-                    TextColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
+                    BackgroundColor="{AppThemeBinding Light=#FFF, Dark={StaticResource Gray300}}"
+                    BorderColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource Black}}"
+                    BorderWidth="1"
+                    TextColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource Black}}"
                     FontAttributes="Bold"
-                    CornerRadius="10" />
+                    CornerRadius="0" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

@@ -34,10 +34,10 @@ public class CustomCheckBox : ContentView
         {
             WidthRequest = 20,
             HeightRequest = 20,
-            CornerRadius = 2,
+            CornerRadius = 0,
             BorderColor = Color.FromArgb("FF02A3A4"),
             Content = checkBox,
-            Padding = 2
+            Padding = 0
         };
 
         Content = frame;

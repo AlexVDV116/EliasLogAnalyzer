@@ -100,7 +100,7 @@
 
     <ContentPage.Content>
         <Grid RowDefinitions="*, *">
-            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
+            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray">
 
                 <Grid RowDefinitions="Auto,*">
                     
@@ -234,7 +234,7 @@
             </Border>
 
             <!-- Bottom Half: StackLayout to display selected LogEntries Data -->
-            <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
+            <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
                 <Grid Style="{StaticResource ResponsiveGrid}">
                     <ScrollView Grid.Column="0" Orientation="Vertical">
                         <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
