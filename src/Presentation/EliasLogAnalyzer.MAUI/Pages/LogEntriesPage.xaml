@@ -10,10 +10,10 @@
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="Filter">
             <MenuFlyoutSubItem Text="LogType">
-                <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
-                <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
-                <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
-                <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
+                <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
+                <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
+                <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
+                <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
             </MenuFlyoutSubItem>
         </MenuBarItem>
     </ContentPage.MenuBarItems>
@@ -27,19 +27,19 @@
             <!-- DataTemplate for the selected LogEntries Data columns -->
             <DataTemplate x:Key="LogEntryTemplate" x:DataType="entities:LogEntry">
                 <VerticalStackLayout>
-                    <Grid
+                        <Grid
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                         Padding="10" Margin="5" ColumnDefinitions="140,80,80,*,*,*">
-                        <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
-                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
-                        <Label Grid.Column="2" Text="{Binding LogType}" />
-                        <Label Grid.Column="3" Text="{Binding Source}" />
-                        <Label Grid.Column="4" Text="{Binding User}" />
-                        <Label Grid.Column="5" Text="{Binding Computer}" />
-                    </Grid>
-                    <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Description}" />
-                    <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Data}" />
-                </VerticalStackLayout>
+                            <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
+                            <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
+                            <Label Grid.Column="2" Text="{Binding LogType}" />
+                            <Label Grid.Column="3" Text="{Binding Source}" />
+                            <Label Grid.Column="4" Text="{Binding User}" />
+                            <Label Grid.Column="5" Text="{Binding Computer}" />
+                        </Grid>
+                        <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Description}" />
+                        <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Data}" />
+                    </VerticalStackLayout>
             </DataTemplate>
         </ResourceDictionary>
         
@@ -99,14 +99,14 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="*,*">
+        <Grid RowDefinitions="*, *">
             <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
 
                 <Grid RowDefinitions="Auto,*">
                     
                     <SearchBar Grid.Row="0"
                                ios:SearchBar.SearchBarStyle="Minimal"
-                               Placeholder="Search LogEntries..."
+                               Placeholder="Search log entries..."
                                Text="{Binding SearchText, Mode=TwoWay}"
                                SearchCommand="{Binding RefreshFilterCommand}" />
 
@@ -115,13 +115,19 @@
                                     SelectionMode="Multiple"
                                     SelectedItems="{Binding SelectedLogEntries}"
                                     SelectionChangedCommand="{Binding SelectionChangedCommand}">
-                        
+
+                        <CollectionView.EmptyView>
+                            <ContentView>
+                                <Label Text="No search results..." Margin="10, 50" FontAttributes="Italic" />
+                            </ContentView>
+                        </CollectionView.EmptyView>
+
                         <!-- Headers for the Filtered LogEntries-->
                         <CollectionView.Header>
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
-                                ColumnDefinitions="30,*,*,*,*,*,*,*,*,*,*,*,*">
+                                ColumnDefinitions="30, *, *, *, *, *, *, *, *, *, *, *, *">
                                 <Label Grid.Column="0" Text="📌" />
                                 <Label Grid.Column="1" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
@@ -199,7 +205,7 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="30,*,*,*,*,*,*,*,*,*,*,*,*">
+                                          ColumnDefinitions="30, *, *, *, *, *, *, *, *, *, *, *, *">
                                         <Label Grid.Column="0" Text="📌" IsVisible="{Binding IsPinned}" />
                                         <Label Grid.Column="1" Text="{Binding LogTimeStamp.DateTime}" />
                                         <Label Grid.Column="2" Text="{Binding LogTimeStamp.Ticks}" />

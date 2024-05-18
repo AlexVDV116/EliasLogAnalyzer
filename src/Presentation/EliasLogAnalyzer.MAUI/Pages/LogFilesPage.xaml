@@ -15,15 +15,22 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="*, 50">
+        <Grid RowDefinitions="*, 100">
             <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray" StrokeShape="RoundRectangle 5,5,5,5">
                 <CollectionView x:Name="LogFilesListView"
                                 BackgroundColor="Transparent"
                                 ItemsSource="{Binding LoadedLogFiles}" >
+                    
+                    <CollectionView.EmptyView>
+                        <ContentView>
+                            <Label Text="No LogFiles loaded, please select LogFiles to load." Margin="10, 50" FontAttributes="Italic" />
+                        </ContentView>
+                    </CollectionView.EmptyView>
+
 
                     <CollectionView.Header>
                         <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}" Padding="10"
-                              ColumnDefinitions="Auto,*,*,*,*">
+                              ColumnDefinitions="Auto, *, *, *, *">
 
                             <controls:CustomCheckBox Grid.Column="0"
                                                    IsChecked="{Binding SelectAll, Mode=TwoWay}"
@@ -56,10 +63,11 @@
             </Border>
 
             <Button Grid.Row="1"
-                    Text="Open Selected LogFiles"
+                    Text="Open selected log files"
                     Command="{Binding OpenFilesCommand}"
                     WidthRequest="200"
-                    HorizontalOptions="Center"
+                    HorizontalOptions="End"
+                    Margin="20"
                     BackgroundColor="{AppThemeBinding Light=#FFF, Dark={StaticResource Gray200}}"
                     BorderColor="{AppThemeBinding Light=#FF02A3A4, Dark={StaticResource OffBlack}}"
                     BorderWidth="2"

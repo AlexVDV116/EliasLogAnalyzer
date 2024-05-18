@@ -28,7 +28,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _informationLogTypeText = "Information";
     [ObservableProperty] private string _warningLogTypeText = "Warning";
     [ObservableProperty] private string _errorLogTypeText = "✓ Error";
-    [ObservableProperty] private string _currentSortProperty = "";
+    [ObservableProperty] private string _currentSortProperty = "DateTime";
     [ObservableProperty] private string _sortHeader = "";
     [ObservableProperty] private string _currentSortDirection = "";
     [ObservableProperty] private string _sortDateTimeHeaderText = "DateTime";
@@ -155,7 +155,7 @@ public partial class LogEntriesViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ChangeLogType(LogType logType)
+    private void ChangeSelectedLogType(LogType logType)
     {
         if (SelectedLogTypes.Contains(logType))
         {
@@ -175,6 +175,7 @@ public partial class LogEntriesViewModel : ObservableObject
     {
         logEntry.IsPinned = !logEntry.IsPinned;
         AnyLogEntriesPinned = LogEntries.Any(x => x.IsPinned);
+        SortByProperty(CurrentSortProperty);
     }
 
     #endregion
