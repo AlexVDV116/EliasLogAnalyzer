@@ -1,7 +1,10 @@
-﻿namespace EliasLogAnalyzer.Domain.Entities;
+﻿using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace EliasLogAnalyzer.Domain.Entities;
 
 // LogFile is a file with multiple LogEntries
-public class LogEntry
+public partial class LogEntry : ObservableObject
 {
     public LogTimestamp LogTimeStamp { get; set; }
     public LogType LogType { get; set; }
@@ -15,6 +18,8 @@ public class LogEntry
     public string Computer { get; set; }
     public string Description { get; set; }
     public string Data { get; set; }
+    
+    [ObservableProperty] private bool isPinned;
     
     // Many-to-one relationship with LogFile
     public LogFile LogFile { get; set; }
@@ -33,6 +38,7 @@ public class LogEntry
         Description = string.Empty;
         Data = string.Empty;
         LogFile = new LogFile();
+        IsPinned = false;
     }
 }
 

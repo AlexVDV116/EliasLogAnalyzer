@@ -21,8 +21,8 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
     [ObservableProperty] private ObservableCollection<LogEntry> _firstSelectedLogEntry = [];
-    [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry= [];
-    [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry= [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry = [];
     [ObservableProperty] private string _searchText = string.Empty;
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
@@ -43,6 +43,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
+    [ObservableProperty] private bool _anyLogEntriesPinned;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
@@ -54,7 +55,7 @@ public partial class LogEntriesViewModel : ObservableObject
     {
         _logDataSharingService = logDataSharingService;
         AggregateLogEntries();
-        SortByDateTime();
+        SortByProperty("DateTime");
         RefreshFilter();
     }
 
@@ -77,7 +78,6 @@ public partial class LogEntriesViewModel : ObservableObject
             SelectedLogEntries = new ObservableCollection<object>(selectedLogEntriesCopy);
         }
 
-        Debug.WriteLine($"Selected {SelectedLogEntries.Count} LogEntries");
         UpdateSelectedEntryData();
     }
 
@@ -94,7 +94,6 @@ public partial class LogEntriesViewModel : ObservableObject
         ).ToList();
 
         FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
-        Debug.WriteLine($"Filtered LogEntries: {FilteredLogEntries.Count}");
     }
 
     [RelayCommand]
@@ -112,15 +111,7 @@ public partial class LogEntriesViewModel : ObservableObject
             Ascending = true;
         }
 
-        if (CurrentSortProperty == "DateTime")
-        {
-            SortByDateTime();
-        }
-        else
-        {
-            SortByProperty(propertyName);
-        }
-
+        SortByProperty(propertyName);
         UpdateSortTexts(propertyName);
     }
 
@@ -132,36 +123,35 @@ public partial class LogEntriesViewModel : ObservableObject
     private void SetSortOrderDescending() => Ascending = false;
 
     [RelayCommand]
-    private void SortByDateTime()
-    {
-        LogEntries = Ascending
-            ? new ObservableCollection<LogEntry>(LogEntries.OrderBy(x => x.LogTimeStamp.DateTime).ThenBy(x => x.LogTimeStamp.Ticks))
-            : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.LogTimeStamp.DateTime).ThenByDescending(x => x.LogTimeStamp.Ticks));
-
-        RefreshFilter();
-        OnPropertyChanged(nameof(LogEntries));
-        CurrentSortProperty = "DateTime";
-        CurrentSortDirection = Ascending ? "Ascending" : "Descending";
-        UpdateSortTexts("DateTime");
-    }
-
-    [RelayCommand]
     private void SortByProperty(string propertyName)
     {
-        var propertyInfo = typeof(LogEntry).GetProperty(propertyName);
-        if (propertyInfo == null)
+        if (propertyName == "DateTime")
         {
-            Console.WriteLine($"Property not found: {propertyName}");
-            return;
+            LogEntries = Ascending
+                ? new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
+                    .ThenBy(x => x.LogTimeStamp.DateTime).ThenBy(x => x.LogTimeStamp.Ticks))
+                : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
+                    .ThenByDescending(x => x.LogTimeStamp.DateTime).ThenByDescending(x => x.LogTimeStamp.Ticks));
         }
+        else
+        {
+            var propertyInfo = typeof(LogEntry).GetProperty(propertyName);
+            if (propertyInfo == null)
+            {
+                Console.WriteLine($"Property not found: {propertyName}");
+                return;
+            }
 
-        LogEntries = Ascending
-            ? new ObservableCollection<LogEntry>(LogEntries.OrderBy(x => propertyInfo.GetValue(x, null)))
-            : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => propertyInfo.GetValue(x, null)));
+            LogEntries = Ascending
+                ? new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
+                    .ThenBy(x => propertyInfo.GetValue(x, null)))
+                : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
+                    .ThenByDescending(x => propertyInfo.GetValue(x, null)));
+        }
 
         RefreshFilter();
         OnPropertyChanged(nameof(LogEntries));
-        UpdateSortTexts(propertyName);
+        UpdateSortOrder(propertyName);
     }
 
     [RelayCommand]
@@ -175,10 +165,17 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             SelectedLogTypes.Add(logType);
         }
+
         UpdateLogTypeTexts();
         RefreshFilter();
     }
 
+    [RelayCommand]
+    private void PinLogEntry(LogEntry logEntry)
+    {
+        logEntry.IsPinned = !logEntry.IsPinned;
+        AnyLogEntriesPinned = LogEntries.Any(x => x.IsPinned);
+    }
 
     #endregion
 
@@ -197,13 +194,22 @@ public partial class LogEntriesViewModel : ObservableObject
         RefreshFilter();
     }
 
+    private void UpdateSortOrder(string propertyName)
+    {
+        CurrentSortProperty = propertyName;
+        CurrentSortDirection = Ascending ? "Ascending" : "Descending";
+        UpdateSortTexts(propertyName);
+    }
+
+
     // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
     private void UpdateSortTexts(string sortProperty)
     {
         SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
         SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
         SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText =
+            "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
         SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
         SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
@@ -229,7 +235,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
         RefreshFilter();
     }
-    
+
     private void UpdateSelectedEntryData()
     {
         FirstSelectedLogEntry.Clear();
@@ -261,6 +267,6 @@ public partial class LogEntriesViewModel : ObservableObject
             IsThirdLogEntrySelected = false;
         }
     }
-    
+
     #endregion
 }
