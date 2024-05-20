@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.WindowsAppSDK.Runtime.Packages;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -221,18 +223,22 @@ public partial class LogEntriesViewModel : ObservableObject
         var computerString = logEntry.Computer;
         var descriptionString = logEntry.Description;
 
-        return $"""
+        return $@"
                 <html>
                 <head>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <style>
+                        body {{ margin: 0; padding: 0; }}
+                        pre {{ white-space: pre-wrap; word-wrap: break-word; }}
+                    </style>
                 </head>
                 <body>
-                    <h4><b>{System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></h4>
+                    <h4><pre><b>{System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
                     <pre><b>{System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
                     <pre>{System.Net.WebUtility.HtmlEncode(logEntry.Data)}</pre>
                 </body>
                 </html>
-                """;
+                ";
     }
 
     private void UpdateLogTypeTexts()

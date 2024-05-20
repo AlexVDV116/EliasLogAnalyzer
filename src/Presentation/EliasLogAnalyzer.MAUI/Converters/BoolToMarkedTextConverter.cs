@@ -8,10 +8,10 @@ public class BoolToMarkedTextConverter : IValueConverter
     {
         if (value is bool isMarked)
         {
-            return isMarked ? "\u2b50 Unmark" : "\u2b50 Mark";
+            return isMarked ? "\u2705 Unmark" : "\u2705 Mark";
         }
 
-        return "\u2b50 Mark";
+        return "\u2705 Mark";
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -110,7 +110,7 @@
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
                                 ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label Grid.Column="0" Text="⭐" />
+                                <Label Grid.Column="0" Text="✅" />
                                 <Label Grid.Column="1" Text="📌" />
                                 <Label Grid.Column="2" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
@@ -189,7 +189,7 @@
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
                                           ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                        <Label Grid.Column="0" Text="⭐" IsVisible="{Binding IsMarked}" />
+                                        <Label Grid.Column="0" Text="✅" IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
                                         <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" />
                                         <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" />
@@ -222,29 +222,24 @@
             <!-- Bottom Half: StackLayout to display selected LogEntries Data -->
             <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
                 <Grid Style="{StaticResource ResponsiveGrid}">
-                    <ScrollView Grid.Column="0" Orientation="Vertical">
-                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
-                            <WebView.Source>
-                                <HtmlWebViewSource Html="{Binding FirstDataHtml}" />
-                            </WebView.Source>
-                        </WebView>
-                    </ScrollView>
 
-                    <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsSecondLogEntrySelected}">
-                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
-                            <WebView.Source>
-                                <HtmlWebViewSource Html="{Binding SecondDataHtml}" />
-                            </WebView.Source>
-                        </WebView>
-                    </ScrollView>
+                    <WebView HorizontalOptions="FillAndExpand" Grid.Column="0">
+                        <WebView.Source>
+                            <HtmlWebViewSource Html="{Binding FirstDataHtml}" />
+                        </WebView.Source>
+                    </WebView>
 
-                    <ScrollView Grid.Column="2" Orientation="Vertical" IsVisible="{Binding IsThirdLogEntrySelected}">
-                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
-                            <WebView.Source>
-                                <HtmlWebViewSource Html="{Binding ThirdDataHtml}" />
-                            </WebView.Source>
-                        </WebView>
-                    </ScrollView>
+                    <WebView HorizontalOptions="FillAndExpand" Grid.Column="1" IsVisible="{Binding IsSecondLogEntrySelected}">
+                        <WebView.Source>
+                            <HtmlWebViewSource Html="{Binding SecondDataHtml}" />
+                        </WebView.Source>
+                    </WebView>
+
+                    <WebView HorizontalOptions="FillAndExpand" Grid.Column="2" IsVisible="{Binding IsThirdLogEntrySelected}">
+                        <WebView.Source>
+                            <HtmlWebViewSource Html="{Binding ThirdDataHtml}" />
+                        </WebView.Source>
+                    </WebView>
                 </Grid>
             </Border>
         </Grid>
