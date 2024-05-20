@@ -32,6 +32,7 @@ namespace EliasLogAnalyzer.MAUI
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
             builder.Services.AddSingleton<ILogFileLoaderService, LogFileLoaderService>();
             builder.Services.AddSingleton<ILogFileParserService, LogFileParserService>();
+            builder.Services.AddSingleton<ILogEntryAnalysisService, LogEntryAnalysisService>();
 
 #if WINDOWS
             // Hide CollectionView checkboxes when SelectionMode is Multiple
