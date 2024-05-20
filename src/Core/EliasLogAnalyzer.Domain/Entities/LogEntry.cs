@@ -19,7 +19,8 @@ public partial class LogEntry : ObservableObject
     public string Description { get; set; }
     public string Data { get; set; }
     
-    [ObservableProperty] private bool isPinned;
+    [ObservableProperty] private bool _isPinned;
+    [ObservableProperty] private bool _isMarked;
     
     // Many-to-one relationship with LogFile
     public LogFile LogFile { get; set; }
@@ -39,6 +40,7 @@ public partial class LogEntry : ObservableObject
         Data = string.Empty;
         LogFile = new LogFile();
         IsPinned = false;
+        IsMarked = false;
     }
 }
 
