@@ -1,12 +1,8 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.WindowsAppSDK.Runtime.Packages;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -51,9 +47,9 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
     [ObservableProperty] private LogEntry? _markedLogEntry;
-    [ObservableProperty] private string _firstDataHtml;
-    [ObservableProperty] private string _secondDataHtml;
-    [ObservableProperty] private string _thirdDataHtml;
+    [ObservableProperty] private string _firstDataHtml = string.Empty;
+    [ObservableProperty] private string _secondDataHtml = string.Empty;
+    [ObservableProperty] private string _thirdDataHtml = string.Empty;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
