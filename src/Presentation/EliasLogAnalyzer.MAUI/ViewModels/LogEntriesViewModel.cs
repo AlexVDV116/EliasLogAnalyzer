@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -12,6 +13,7 @@ public partial class LogEntriesViewModel : ObservableObject
     #region Fields
 
     private readonly ILogDataSharingService _logDataSharingService;
+    private readonly ILogEntryAnalysisService _logEntryAnalysisService;
 
     #endregion
 
@@ -23,6 +25,9 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<LogEntry> _firstSelectedLogEntry = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry = [];
+    [ObservableProperty] private string _firstSelectedLogEntryHtml = string.Empty;
+    [ObservableProperty] private string _secondSelectedLogEntryHtml = string.Empty;
+    [ObservableProperty] private string _thirdSelectedLogEntryHtml = string.Empty;
     [ObservableProperty] private string _searchText = string.Empty;
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
@@ -43,7 +48,10 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
-    [ObservableProperty] private bool _anyLogEntriesPinned;
+    [ObservableProperty] private LogEntry? _markedLogEntry;
+    [ObservableProperty] private string _firstDataHtml;
+    [ObservableProperty] private string _secondDataHtml;
+    [ObservableProperty] private string _thirdDataHtml;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
@@ -51,9 +59,11 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Constructor
 
-    public LogEntriesViewModel(ILogDataSharingService logDataSharingService)
+    public LogEntriesViewModel(ILogDataSharingService logDataSharingService,
+        ILogEntryAnalysisService logEntryAnalysisService)
     {
         _logDataSharingService = logDataSharingService;
+        _logEntryAnalysisService = logEntryAnalysisService;
         AggregateLogEntries();
         SortByProperty("DateTime");
         RefreshFilter();
@@ -174,13 +184,56 @@ public partial class LogEntriesViewModel : ObservableObject
     private void PinLogEntry(LogEntry logEntry)
     {
         logEntry.IsPinned = !logEntry.IsPinned;
-        AnyLogEntriesPinned = LogEntries.Any(x => x.IsPinned);
         SortByProperty(CurrentSortProperty);
+    }
+
+    [RelayCommand]
+    private void MarkAsMainLogEntry(LogEntry logEntry)
+    {
+        if (MarkedLogEntry != logEntry)
+        {
+            if (MarkedLogEntry != null)
+            {
+                MarkedLogEntry.IsMarked = false;
+            }
+
+            MarkedLogEntry = logEntry;
+            MarkedLogEntry.IsMarked = true;
+        }
+        else
+        {
+            // Toggle the marked state if the same entry is clicked again
+            MarkedLogEntry.IsMarked = !MarkedLogEntry.IsMarked;
+            MarkedLogEntry = MarkedLogEntry.IsMarked ? MarkedLogEntry : null;
+        }
     }
 
     #endregion
 
     #region Utility Methods
+
+    private static string ConvertToHtml(LogEntry logEntry)
+    {
+        var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        var logTypeString = logEntry.LogType.ToString();
+        var sourceString = logEntry.Source;
+        var userString = logEntry.User;
+        var computerString = logEntry.Computer;
+        var descriptionString = logEntry.Description;
+
+        return $"""
+                <html>
+                <head>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                </head>
+                <body>
+                    <h4><b>{System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></h4>
+                    <pre><b>{System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
+                    <pre>{System.Net.WebUtility.HtmlEncode(logEntry.Data)}</pre>
+                </body>
+                </html>
+                """;
+    }
 
     private void UpdateLogTypeTexts()
     {
@@ -246,11 +299,13 @@ public partial class LogEntriesViewModel : ObservableObject
         if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
         {
             FirstSelectedLogEntry.Add(firstEntry);
+            FirstDataHtml = ConvertToHtml(firstEntry);
         }
 
         if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
         {
             SecondSelectedLogEntry.Add(secondEntry);
+            SecondDataHtml = ConvertToHtml(secondEntry);
             IsSecondLogEntrySelected = true;
         }
         else
@@ -261,6 +316,7 @@ public partial class LogEntriesViewModel : ObservableObject
         if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
         {
             ThirdSelectedLogEntry.Add(thirdEntry);
+            ThirdDataHtml = ConvertToHtml(thirdEntry);
             IsThirdLogEntrySelected = true;
         }
         else

@@ -22,25 +22,7 @@
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
             <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
-
-
-            <!-- DataTemplate for the selected LogEntries Data columns -->
-            <DataTemplate x:Key="LogEntryTemplate" x:DataType="entities:LogEntry">
-                <VerticalStackLayout>
-                        <Grid
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                        Padding="10" Margin="5" ColumnDefinitions="140,80,80,*,*,*">
-                            <Label Grid.Column="0" Text="{Binding LogTimeStamp.DateTime}" />
-                            <Label Grid.Column="1" Text="{Binding LogTimeStamp.Ticks}" />
-                            <Label Grid.Column="2" Text="{Binding LogType}" />
-                            <Label Grid.Column="3" Text="{Binding Source}" />
-                            <Label Grid.Column="4" Text="{Binding User}" />
-                            <Label Grid.Column="5" Text="{Binding Computer}" />
-                        </Grid>
-                        <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Description}" />
-                        <Editor IsSpellCheckEnabled="False" IsReadOnly="True" Text="{Binding Data}" />
-                    </VerticalStackLayout>
-            </DataTemplate>
+            <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
         </ResourceDictionary>
         
         <!-- Style to make selected element in a collectionView highlighted -->
@@ -127,70 +109,71 @@
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
-                                ColumnDefinitions="30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label Grid.Column="0" Text="📌" />
-                                <Label Grid.Column="1" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
+                                ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
+                                <Label Grid.Column="0" Text="⭐" />
+                                <Label Grid.Column="1" Text="📌" />
+                                <Label Grid.Column="2" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="2" Text="Ticks" FontAttributes="Bold">
+                                <Label Grid.Column="3" Text="Ticks" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="3" Text="SortValue" FontAttributes="Bold">
+                                <Label Grid.Column="4" Text="SortValue" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="4" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="5" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="LogType" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="5" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="6" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="ThreadNameOrNumber" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="6" Text="{Binding SortSourceLocationHeaderText}"
+                                <Label Grid.Column="7" Text="{Binding SortSourceLocationHeaderText}"
                                        FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="SourceLocation" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="7" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="8" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Source" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="8" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="9" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Category" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="9" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="10" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="EventId" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="10" Text="{Binding SortUserHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="11" Text="{Binding SortUserHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="User" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="11" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="12" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Computer" />
@@ -205,23 +188,26 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                        <Label Grid.Column="0" Text="📌" IsVisible="{Binding IsPinned}" />
-                                        <Label Grid.Column="1" Text="{Binding LogTimeStamp.DateTime}" />
-                                        <Label Grid.Column="2" Text="{Binding LogTimeStamp.Ticks}" />
-                                        <Label Grid.Column="3" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
-                                        <Label Grid.Column="4" Text="{Binding LogType}" />
-                                        <Label Grid.Column="5" Text="{Binding ThreadNameOrNumber}" />
-                                        <Label Grid.Column="6" Text="{Binding SourceLocation}" />
-                                        <Label Grid.Column="7" Text="{Binding Source}" />
-                                        <Label Grid.Column="8" Text="{Binding Category}" />
-                                        <Label Grid.Column="9" Text="{Binding EventId}" />
-                                        <Label Grid.Column="10" Text="{Binding User}" />
-                                        <Label Grid.Column="11" Text="{Binding Computer}" />
+                                          ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
+                                        <Label Grid.Column="0" Text="⭐" IsVisible="{Binding IsMarked}" />
+                                        <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
+                                        <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" />
+                                        <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" />
+                                        <Label Grid.Column="4" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
+                                        <Label Grid.Column="5" Text="{Binding LogType}" />
+                                        <Label Grid.Column="6" Text="{Binding ThreadNameOrNumber}" />
+                                        <Label Grid.Column="7" Text="{Binding SourceLocation}" />
+                                        <Label Grid.Column="8" Text="{Binding Source}" />
+                                        <Label Grid.Column="9" Text="{Binding Category}" />
+                                        <Label Grid.Column="10" Text="{Binding EventId}" />
+                                        <Label Grid.Column="11" Text="{Binding User}" />
+                                        <Label Grid.Column="12" Text="{Binding Computer}" />
                                         <FlyoutBase.ContextFlyout>
                                             <MenuFlyout x:DataType="entities:LogEntry">
                                                 <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
                                                                 Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
+                                                <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=MarkAsMainLogEntryCommand}" CommandParameter="{Binding .}"
+                                                                Text="{Binding IsPinned, Converter={StaticResource BoolToMarkedTextConverter}}" />
                                             </MenuFlyout>
                                         </FlyoutBase.ContextFlyout>
                                     </Grid>
@@ -237,15 +223,27 @@
             <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
                 <Grid Style="{StaticResource ResponsiveGrid}">
                     <ScrollView Grid.Column="0" Orientation="Vertical">
-                        <StackLayout BindableLayout.ItemsSource="{Binding FirstSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
+                            <WebView.Source>
+                                <HtmlWebViewSource Html="{Binding FirstDataHtml}" />
+                            </WebView.Source>
+                        </WebView>
                     </ScrollView>
 
                     <ScrollView Grid.Column="1" Orientation="Vertical" IsVisible="{Binding IsSecondLogEntrySelected}">
-                        <StackLayout BindableLayout.ItemsSource="{Binding SecondSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
+                            <WebView.Source>
+                                <HtmlWebViewSource Html="{Binding SecondDataHtml}" />
+                            </WebView.Source>
+                        </WebView>
                     </ScrollView>
 
                     <ScrollView Grid.Column="2" Orientation="Vertical" IsVisible="{Binding IsThirdLogEntrySelected}">
-                        <StackLayout BindableLayout.ItemsSource="{Binding ThirdSelectedLogEntry}" BindableLayout.ItemTemplate="{StaticResource LogEntryTemplate}" />
+                        <WebView HorizontalOptions="Fill"   VerticalOptions="Fill" >
+                            <WebView.Source>
+                                <HtmlWebViewSource Html="{Binding ThirdDataHtml}" />
+                            </WebView.Source>
+                        </WebView>
                     </ScrollView>
                 </Grid>
             </Border>
