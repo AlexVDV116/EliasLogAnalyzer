@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
@@ -74,20 +75,21 @@ public partial class LogEntriesViewModel : ObservableObject
             SelectedLogEntries.Insert(0, MarkedLogEntry);
         }
 
-        // Ensure only up to three log entries are selected, with priority given to the main marked log entry
+        // Ensure only up to three log entries are selected, prioritizing the main marked log entry
         if (SelectedLogEntries.Count > 3)
         {
-            var selectedEntriesCopy = SelectedLogEntries.Except(new[] { MarkedLogEntry }).ToList();
-            while (selectedEntriesCopy.Count >= 3)
-            {
-                selectedEntriesCopy.RemoveAt(0); // Remove the oldest non-marked entry
-            }
+            // Create a copy of selected entries excluding the main marked log entry
+            var selectedEntriesCopy = SelectedLogEntries.Where(e => e != MarkedLogEntry).ToList();
 
-            SelectedLogEntries.Clear();
-            if (MarkedLogEntry != null) SelectedLogEntries.Add(MarkedLogEntry);
-            foreach (var entry in selectedEntriesCopy)
+            // Remove excess entries if any, ensuring we do not exceed three entries
+            while (SelectedLogEntries.Count + selectedEntriesCopy.Count > 3)
             {
-                SelectedLogEntries.Add(entry);
+                var itemToRemove = selectedEntriesCopy.FirstOrDefault();
+                if (itemToRemove != null)
+                {
+                    SelectedLogEntries.Remove(itemToRemove);
+                    selectedEntriesCopy.Remove(itemToRemove);
+                }
             }
         }
 
@@ -138,29 +140,24 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void SortByProperty(string propertyName)
     {
-        if (propertyName == "DateTime")
+        PropertyInfo? propertyInfo = null;
+        if (propertyName != "DateTime")  // Check if the sorting is based on a property other than DateTime
         {
-            LogEntries = Ascending
-                ? new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
-                    .ThenBy(x => x.LogTimeStamp.DateTime).ThenBy(x => x.LogTimeStamp.Ticks))
-                : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
-                    .ThenByDescending(x => x.LogTimeStamp.DateTime).ThenByDescending(x => x.LogTimeStamp.Ticks));
-        }
-        else
-        {
-            var propertyInfo = typeof(LogEntry).GetProperty(propertyName);
+            propertyInfo = typeof(LogEntry).GetProperty(propertyName);
             if (propertyInfo == null)
             {
                 Console.WriteLine($"Property not found: {propertyName}");
                 return;
             }
-
-            LogEntries = Ascending
-                ? new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
-                    .ThenBy(x => propertyInfo.GetValue(x, null)))
-                : new ObservableCollection<LogEntry>(LogEntries.OrderByDescending(x => x.IsPinned)
-                    .ThenByDescending(x => propertyInfo.GetValue(x, null)));
         }
+
+        LogEntries = new ObservableCollection<LogEntry>(
+            LogEntries.OrderByDescending(x => x == MarkedLogEntry)  // Marked entry first
+                      .ThenByDescending(x => x.IsPinned)            // Then all pinned entries
+                      .ThenByDescending(x => !Ascending)            // Sort direction control
+                      .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
+                      .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
+        );
 
         RefreshFilter();
         OnPropertyChanged(nameof(LogEntries));
@@ -193,29 +190,23 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void MarkAsMainLogEntry(LogEntry logEntry)
     {
-        // First handle the case where the same entry might be toggled
-        if (MarkedLogEntry == logEntry)
+        if (MarkedLogEntry == logEntry && logEntry.IsMarked)
         {
-            // Toggle the mark state off if it's currently marked
-            if (logEntry.IsMarked)
-            {
-                logEntry.IsMarked = false;
-                SelectedLogEntries.Remove(logEntry);  // Remove it from selected entries
-                MarkedLogEntry = null;  // Clear the marked entry
-            }
+            // Unmark the currently marked entry
+            logEntry.IsMarked = false;
+            MarkedLogEntry = null;
         }
         else
         {
-            // Unmark the previous marked entry if it exists
+            // Unmark the previous marked entry
             if (MarkedLogEntry != null)
             {
                 MarkedLogEntry.IsMarked = false;
-                SelectedLogEntries.Remove(MarkedLogEntry);  // Remove the previously marked entry from selections
+                SelectedLogEntries.Remove(MarkedLogEntry);
             }
 
-            // Mark the new log entry
             logEntry.IsMarked = true;
-            MarkedLogEntry = logEntry;  // Set as the new marked entry
+            MarkedLogEntry = logEntry; 
 
             // Add the new main log entry to the selected entries if not already included
             if (!SelectedLogEntries.Contains(logEntry))
@@ -223,12 +214,13 @@ public partial class LogEntriesViewModel : ObservableObject
                 SelectedLogEntries.Add(logEntry);
             }
 
-            // Ensure that no more than three log entries are selected, managing the collection accordingly
             ManageSelectedEntries();
         }
 
         OnPropertyChanged(nameof(SelectedLogEntries));
+        OnPropertyChanged(nameof(MarkedLogEntry));
         UpdateSelectedEntryData();
+        SortByProperty(CurrentSortProperty);
     }
 
 
@@ -237,12 +229,13 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Utility Methods
 
+    // Ensure that no more than three log entries are selected, managing the collection accordingly
     private void ManageSelectedEntries()
     {
         while (SelectedLogEntries.Count > 3)
         {
             var oldestEntry = SelectedLogEntries
-                .Where(e => e != MarkedLogEntry)  // Exclude the currently marked entry from removal
+                .Where(e => e != MarkedLogEntry)
                 .FirstOrDefault();
 
             if (oldestEntry != null)
@@ -252,15 +245,19 @@ public partial class LogEntriesViewModel : ObservableObject
         }
     }
 
-    private static string ConvertToHtml(LogEntry logEntry)
+    private string ConvertToHtml(LogEntry logEntry, bool compareWithMarked = false)
     {
-        var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        var logTypeString = logEntry.LogType.ToString();
-        var sourceString = logEntry.Source;
-        var userString = logEntry.User;
-        var computerString = logEntry.Computer;
-        var descriptionString = logEntry.Description;
-        var markedAsMainText = logEntry.IsMarked ? "✅" : string.Empty;
+            var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            var logTypeString = logEntry.LogType.ToString();
+            var sourceString = logEntry.Source;
+            var userString = logEntry.User;
+            var computerString = logEntry.Computer;
+            var descriptionString = logEntry.Description;
+            var markedAsMainText = logEntry.IsMarked ? "✅" : string.Empty;
+
+        string dataString = compareWithMarked && MarkedLogEntry != null && MarkedLogEntry != logEntry
+            ? _logEntryAnalysisService.GenerateDiff(MarkedLogEntry.Data, logEntry.Data) 
+            : System.Net.WebUtility.HtmlEncode(logEntry.Data);
 
 
         return $@"
@@ -275,10 +272,11 @@ public partial class LogEntriesViewModel : ObservableObject
                 <body>
                     <h4><pre><b>{markedAsMainText} {System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
                     <pre><b>{System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
-                    <pre>{System.Net.WebUtility.HtmlEncode(logEntry.Data)}</pre>
+                    <pre>{dataString}</pre>
                 </body>
                 </html>
                 ";
+        
     }
 
     private void UpdateLogTypeTexts()
@@ -338,6 +336,9 @@ public partial class LogEntriesViewModel : ObservableObject
 
     private void UpdateSelectedEntryData()
     {
+        // Check if there is a marked log entry to enable comparison
+        var compareWithMarked = MarkedLogEntry != null;
+
         if (SelectedLogEntries.Count == 0)
         {
             FirstLogEntryDataHtml = string.Empty;
@@ -355,7 +356,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
         if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
         {
-            SecondLogEntryDataHtml = ConvertToHtml(secondEntry);
+            SecondLogEntryDataHtml = ConvertToHtml(secondEntry, compareWithMarked);
             IsSecondLogEntrySelected = true;
         }
         else
@@ -365,7 +366,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
         if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
         {
-            ThirdLogEntryDataHtml = ConvertToHtml(thirdEntry);
+            ThirdLogEntryDataHtml = ConvertToHtml(thirdEntry, compareWithMarked);
             IsThirdLogEntrySelected = true;
         }
         else

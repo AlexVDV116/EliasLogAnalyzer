@@ -70,7 +70,17 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
         return tickScore; // Return normalized score as a percentage 
 
     }
-    
+
+    /// <summary>
+    /// Generates a visual HTML representation of differences between two text strings using the DiffPlex library.
+    /// This method highlights inserted, deleted, unchanged, and modified lines with different colors:
+    /// green for inserted lines, red for deleted lines, and blue for modified lines. Unchanged lines
+    /// are presented without color. This allows for easy visual comparison of text changes.
+    /// </summary>
+    /// <param name="before">The original text string.</param>
+    /// <param name="after">The modified text string to compare against the original.</param>
+    /// <returns>A string containing HTML-formatted differences between the two text inputs.</returns>
+
     public string GenerateDiff(string before, string after)
     {
         var diffBuilder = new InlineDiffBuilder(new Differ());
