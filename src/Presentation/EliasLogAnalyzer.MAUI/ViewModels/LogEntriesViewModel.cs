@@ -20,12 +20,10 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private IList<object> _selectedLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
-    [ObservableProperty] private ObservableCollection<LogEntry> _firstSelectedLogEntry = [];
-    [ObservableProperty] private ObservableCollection<LogEntry> _secondSelectedLogEntry = [];
-    [ObservableProperty] private ObservableCollection<LogEntry> _thirdSelectedLogEntry = [];
-    [ObservableProperty] private string _firstSelectedLogEntryHtml = string.Empty;
-    [ObservableProperty] private string _secondSelectedLogEntryHtml = string.Empty;
-    [ObservableProperty] private string _thirdSelectedLogEntryHtml = string.Empty;
+    [ObservableProperty] private LogEntry? _markedLogEntry;
+    [ObservableProperty] private string _firstLogEntryDataHtml = string.Empty;
+    [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
+    [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _searchText = string.Empty;
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
@@ -46,10 +44,6 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
-    [ObservableProperty] private LogEntry? _markedLogEntry;
-    [ObservableProperty] private string _firstDataHtml = string.Empty;
-    [ObservableProperty] private string _secondDataHtml = string.Empty;
-    [ObservableProperty] private string _thirdDataHtml = string.Empty;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
@@ -74,19 +68,30 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void SelectionChanged()
     {
-        if (SelectedLogEntries.Count > 3)
+        // Add the main marked logEntry if it's not in the selected entries
+        if (MarkedLogEntry != null && !SelectedLogEntries.Contains(MarkedLogEntry))
         {
-            // Create a copy to avoid modifying the collection during enumeration
-            var selectedLogEntriesCopy = SelectedLogEntries.ToList();
-            while (selectedLogEntriesCopy.Count > 3)
-            {
-                selectedLogEntriesCopy.RemoveAt(0);
-            }
-
-            SelectedLogEntries = new ObservableCollection<object>(selectedLogEntriesCopy);
+            SelectedLogEntries.Insert(0, MarkedLogEntry);
         }
 
-        UpdateSelectedEntryData();
+        // Ensure only up to three log entries are selected, with priority given to the main marked log entry
+        if (SelectedLogEntries.Count > 3)
+        {
+            var selectedEntriesCopy = SelectedLogEntries.Except(new[] { MarkedLogEntry }).ToList();
+            while (selectedEntriesCopy.Count >= 3)
+            {
+                selectedEntriesCopy.RemoveAt(0); // Remove the oldest non-marked entry
+            }
+
+            SelectedLogEntries.Clear();
+            if (MarkedLogEntry != null) SelectedLogEntries.Add(MarkedLogEntry);
+            foreach (var entry in selectedEntriesCopy)
+            {
+                SelectedLogEntries.Add(entry);
+            }
+        }
+
+        UpdateSelectedEntryData(); 
     }
 
     // Command to refresh filter whenever search text or selected log types change
@@ -188,27 +193,64 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void MarkAsMainLogEntry(LogEntry logEntry)
     {
-        if (MarkedLogEntry != logEntry)
+        // First handle the case where the same entry might be toggled
+        if (MarkedLogEntry == logEntry)
         {
-            if (MarkedLogEntry != null)
+            // Toggle the mark state off if it's currently marked
+            if (logEntry.IsMarked)
             {
-                MarkedLogEntry.IsMarked = false;
+                logEntry.IsMarked = false;
+                SelectedLogEntries.Remove(logEntry);  // Remove it from selected entries
+                MarkedLogEntry = null;  // Clear the marked entry
             }
-
-            MarkedLogEntry = logEntry;
-            MarkedLogEntry.IsMarked = true;
         }
         else
         {
-            // Toggle the marked state if the same entry is clicked again
-            MarkedLogEntry.IsMarked = !MarkedLogEntry.IsMarked;
-            MarkedLogEntry = MarkedLogEntry.IsMarked ? MarkedLogEntry : null;
+            // Unmark the previous marked entry if it exists
+            if (MarkedLogEntry != null)
+            {
+                MarkedLogEntry.IsMarked = false;
+                SelectedLogEntries.Remove(MarkedLogEntry);  // Remove the previously marked entry from selections
+            }
+
+            // Mark the new log entry
+            logEntry.IsMarked = true;
+            MarkedLogEntry = logEntry;  // Set as the new marked entry
+
+            // Add the new main log entry to the selected entries if not already included
+            if (!SelectedLogEntries.Contains(logEntry))
+            {
+                SelectedLogEntries.Add(logEntry);
+            }
+
+            // Ensure that no more than three log entries are selected, managing the collection accordingly
+            ManageSelectedEntries();
         }
+
+        OnPropertyChanged(nameof(SelectedLogEntries));
+        UpdateSelectedEntryData();
     }
+
+
 
     #endregion
 
     #region Utility Methods
+
+    private void ManageSelectedEntries()
+    {
+        while (SelectedLogEntries.Count > 3)
+        {
+            var oldestEntry = SelectedLogEntries
+                .Where(e => e != MarkedLogEntry)  // Exclude the currently marked entry from removal
+                .FirstOrDefault();
+
+            if (oldestEntry != null)
+            {
+                SelectedLogEntries.Remove(oldestEntry);
+            }
+        }
+    }
 
     private static string ConvertToHtml(LogEntry logEntry)
     {
@@ -218,6 +260,8 @@ public partial class LogEntriesViewModel : ObservableObject
         var userString = logEntry.User;
         var computerString = logEntry.Computer;
         var descriptionString = logEntry.Description;
+        var markedAsMainText = logEntry.IsMarked ? "✅" : string.Empty;
+
 
         return $@"
                 <html>
@@ -229,7 +273,7 @@ public partial class LogEntriesViewModel : ObservableObject
                     </style>
                 </head>
                 <body>
-                    <h4><pre><b>{System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
+                    <h4><pre><b>{markedAsMainText} {System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
                     <pre><b>{System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
                     <pre>{System.Net.WebUtility.HtmlEncode(logEntry.Data)}</pre>
                 </body>
@@ -294,20 +338,24 @@ public partial class LogEntriesViewModel : ObservableObject
 
     private void UpdateSelectedEntryData()
     {
-        FirstSelectedLogEntry.Clear();
-        SecondSelectedLogEntry.Clear();
-        ThirdSelectedLogEntry.Clear();
+        if (SelectedLogEntries.Count == 0)
+        {
+            FirstLogEntryDataHtml = string.Empty;
+            SecondLogEntryDataHtml = string.Empty;
+            ThirdLogEntryDataHtml = string.Empty;
+            IsSecondLogEntrySelected = false;
+            IsThirdLogEntrySelected = false;
+            return;
+        }
 
         if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
         {
-            FirstSelectedLogEntry.Add(firstEntry);
-            FirstDataHtml = ConvertToHtml(firstEntry);
+            FirstLogEntryDataHtml = ConvertToHtml(firstEntry);
         }
 
         if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
         {
-            SecondSelectedLogEntry.Add(secondEntry);
-            SecondDataHtml = ConvertToHtml(secondEntry);
+            SecondLogEntryDataHtml = ConvertToHtml(secondEntry);
             IsSecondLogEntrySelected = true;
         }
         else
@@ -317,8 +365,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
         if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
         {
-            ThirdSelectedLogEntry.Add(thirdEntry);
-            ThirdDataHtml = ConvertToHtml(thirdEntry);
+            ThirdLogEntryDataHtml = ConvertToHtml(thirdEntry);
             IsThirdLogEntrySelected = true;
         }
         else

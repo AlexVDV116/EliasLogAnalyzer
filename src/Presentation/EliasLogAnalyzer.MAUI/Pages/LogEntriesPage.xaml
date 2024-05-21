@@ -225,19 +225,19 @@
 
                     <WebView HorizontalOptions="FillAndExpand" Grid.Column="0">
                         <WebView.Source>
-                            <HtmlWebViewSource Html="{Binding FirstDataHtml}" />
+                            <HtmlWebViewSource Html="{Binding FirstLogEntryDataHtml}" />
                         </WebView.Source>
                     </WebView>
 
                     <WebView HorizontalOptions="FillAndExpand" Grid.Column="1" IsVisible="{Binding IsSecondLogEntrySelected}">
                         <WebView.Source>
-                            <HtmlWebViewSource Html="{Binding SecondDataHtml}" />
+                            <HtmlWebViewSource Html="{Binding SecondLogEntryDataHtml}" />
                         </WebView.Source>
                     </WebView>
 
                     <WebView HorizontalOptions="FillAndExpand" Grid.Column="2" IsVisible="{Binding IsThirdLogEntrySelected}">
                         <WebView.Source>
-                            <HtmlWebViewSource Html="{Binding ThirdDataHtml}" />
+                            <HtmlWebViewSource Html="{Binding ThirdLogEntryDataHtml}" />
                         </WebView.Source>
                     </WebView>
                 </Grid>
