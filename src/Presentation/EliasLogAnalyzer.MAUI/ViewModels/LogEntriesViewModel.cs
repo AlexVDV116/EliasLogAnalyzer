@@ -320,7 +320,7 @@ public partial class LogEntriesViewModel : ObservableObject
         LogEntries.Clear();
         var uniqueEntries = new HashSet<LogEntry>(LogEntries);
 
-        foreach (var file in _logDataSharingService.SelectedLogFiles)
+        foreach (var file in _logDataSharingService.LogFiles)
         {
             foreach (var entry in file.LogEntries)
             {

@@ -21,13 +21,6 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Style="{StaticResource ShellStyle}"
         Route="MainPage" />
-    
-    <ShellContent 
-        Title=""
-        ContentTemplate="{DataTemplate pages:LogFilesPage}"
-        Style="{StaticResource ShellStyle}"
-        Route="LogFilesPage"
-        />
 
     <ShellContent 
         Title=""

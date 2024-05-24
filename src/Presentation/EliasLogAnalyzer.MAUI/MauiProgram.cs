@@ -23,8 +23,6 @@ namespace EliasLogAnalyzer.MAUI
 
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<MainViewModel>();
-            builder.Services.AddTransient<LogFilesPage>();
-            builder.Services.AddTransient<LogFilesViewModel>();
             builder.Services.AddTransient<LogEntriesPage>();
             builder.Services.AddTransient<LogEntriesViewModel>();
             

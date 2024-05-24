@@ -59,7 +59,7 @@ public partial class MainViewModel : ObservableObject
         
         IsLoading = false; 
         LoadingMessage = "Open LogFiles...";
-        await Shell.Current.GoToAsync("logfilesPage");
+        await Shell.Current.GoToAsync("logentriesPage");
     }
 
     /// <summary>

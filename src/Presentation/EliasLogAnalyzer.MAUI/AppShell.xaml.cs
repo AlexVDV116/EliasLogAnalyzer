@@ -19,7 +19,6 @@ namespace EliasLogAnalyzer.MAUI
             
             InitializeComponent();
             Routing.RegisterRoute("mainPage", typeof(MainPage));
-            Routing.RegisterRoute("logfilesPage", typeof(LogFilesPage));
             Routing.RegisterRoute("logentriesPage", typeof(LogEntriesPage));
             
             ChangeToDarkThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Dark));
