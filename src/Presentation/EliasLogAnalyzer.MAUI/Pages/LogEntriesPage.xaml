@@ -85,12 +85,15 @@
             <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray">
 
                 <Grid RowDefinitions="Auto,*">
-                    
-                    <SearchBar Grid.Row="0"
-                               ios:SearchBar.SearchBarStyle="Minimal"
-                               Placeholder="Search log entries..."
-                               Text="{Binding SearchText, Mode=TwoWay}"
-                               SearchCommand="{Binding RefreshFilterCommand}" />
+                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" >
+                        <HorizontalStackLayout>
+                            <Label Text="{Binding SearchResultText}" VerticalTextAlignment="Center" />
+                            <SearchBar ios:SearchBar.SearchBarStyle="Minimal"
+                                       Placeholder="Search log entries..."
+                                       Text="{Binding SearchText, Mode=TwoWay}"
+                                       SearchCommand="{Binding RefreshFilterCommand}" />
+                        </HorizontalStackLayout>
+                    </Grid>
 
                     <!-- CollectionView with Filtered LogEntries -->
                     <CollectionView Grid.Row="1" ItemsSource="{Binding FilteredLogEntries}"

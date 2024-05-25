@@ -26,6 +26,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] private string _searchResultText = string.Empty;
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
     [ObservableProperty] private string _warningLogTypeText = "Warning";
@@ -109,6 +110,7 @@ public partial class LogEntriesViewModel : ObservableObject
         ).ToList();
 
         FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
+        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count}";
     }
 
     [RelayCommand]
@@ -154,7 +156,7 @@ public partial class LogEntriesViewModel : ObservableObject
         LogEntries = new ObservableCollection<LogEntry>(
             LogEntries.OrderByDescending(x => x == MarkedLogEntry)  // Marked entry first
                       .ThenByDescending(x => x.IsPinned)            // Then all pinned entries
-                      .ThenByDescending(x => !Ascending)            // Sort direction control
+                      .ThenByDescending(_ => !Ascending)            // Sort direction control
                       .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
                       .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
         );
@@ -194,6 +196,7 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             // Unmark the currently marked entry
             logEntry.IsMarked = false;
+            logEntry.IsPinned = false;
             MarkedLogEntry = null;
         }
         else
@@ -206,6 +209,7 @@ public partial class LogEntriesViewModel : ObservableObject
             }
 
             logEntry.IsMarked = true;
+            logEntry.IsPinned = true;
             MarkedLogEntry = logEntry; 
 
             // Add the new main log entry to the selected entries if not already included
@@ -229,14 +233,13 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Utility Methods
 
-    // Ensure that no more than three log entries are selected, managing the collection accordingly
+    // Ensure that no more than three log entries are selected
     private void ManageSelectedEntries()
     {
         while (SelectedLogEntries.Count > 3)
         {
             var oldestEntry = SelectedLogEntries
-                .Where(e => e != MarkedLogEntry)
-                .FirstOrDefault();
+                .FirstOrDefault(e => e != MarkedLogEntry);
 
             if (oldestEntry != null)
             {
