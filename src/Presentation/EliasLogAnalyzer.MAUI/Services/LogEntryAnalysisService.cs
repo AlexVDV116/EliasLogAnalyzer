@@ -17,7 +17,7 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
         {
             var similarityScore = CalculateSimilarity(mainEntry.Data, entry.Data);
             var timeScore = CalculateTimeProximity(mainEntry.LogTimeStamp, entry.LogTimeStamp); 
-            var finalScore = (similarityScore * 0.7) + (timeScore * 0.3); 
+            var finalScore = (similarityScore * 0.3) + (timeScore * 0.7); 
             scores.Add(finalScore);
         }
 
