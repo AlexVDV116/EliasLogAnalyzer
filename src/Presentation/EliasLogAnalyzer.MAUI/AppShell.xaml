@@ -16,30 +16,11 @@
         </Style>
     </Shell.Resources>
 
-    <ShellContent
-        Title=""
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Style="{StaticResource ShellStyle}"
-        Route="MainPage" />
-
     <ShellContent 
         Title=""
         ContentTemplate="{DataTemplate pages:LogEntriesPage}"
         Style="{StaticResource ShellStyle}"
         Route="LogEntriesPage"
         />
-
-    <Shell.MenuBarItems>
-        <MenuBarItem Text="View" >
-            <MenuFlyoutSubItem Text="Change Theme">
-                <MenuFlyoutItem Text="Dark Mode"
-                                Command="{Binding ChangeToDarkThemeCommand}" />
-                <MenuFlyoutItem Text="Light Mode"
-                                Command="{Binding ChangeToLightThemeCommand}" />
-                <MenuFlyoutItem Text="System"
-                                Command="{Binding ChangeToSystemThemeCommand}" />
-            </MenuFlyoutSubItem>
-        </MenuBarItem>
-    </Shell.MenuBarItems>
 
 </Shell>

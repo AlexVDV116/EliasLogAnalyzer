@@ -66,7 +66,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Core\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
+		<ProjectReference Include="..\..\Core\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -11,6 +14,10 @@ public partial class LogEntriesViewModel : ObservableObject
 {
     #region Fields
 
+    private readonly ILogger<LogEntriesViewModel> _logger;
+    private readonly ISettingsService _settingsService;
+    private readonly ILogFileLoaderService _logFileLoaderService;
+    private readonly ILogFileParserService _logFileParserService;
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly ILogEntryAnalysisService _logEntryAnalysisService;
 
@@ -48,19 +55,37 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _isThirdLogEntrySelected;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
+    public IRelayCommand LoadLogfilesCommand { get; }
+    public IRelayCommand ChangeToDarkThemeCommand { get; }
+    public IRelayCommand ChangeToLightThemeCommand { get; }
+    public IRelayCommand ChangeToSystemThemeCommand { get; }
+
 
     #endregion
 
     #region Constructor
 
-    public LogEntriesViewModel(ILogDataSharingService logDataSharingService,
-        ILogEntryAnalysisService logEntryAnalysisService)
+    public LogEntriesViewModel(
+        ILogger<LogEntriesViewModel> logger,
+        ISettingsService settingsService,
+        ILogFileLoaderService logFileLoaderService,
+        ILogFileParserService logFileParserService,
+        ILogDataSharingService logDataSharingService,
+        ILogEntryAnalysisService logEntryAnalysisService
+        )
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _settingsService = settingsService;
+        _logFileLoaderService = logFileLoaderService;
+        _logFileParserService = logFileParserService;
         _logDataSharingService = logDataSharingService;
         _logEntryAnalysisService = logEntryAnalysisService;
-        AggregateLogEntries();
-        SortByProperty("DateTime");
-        RefreshFilter();
+
+        LoadLogfilesCommand = new AsyncRelayCommand(LoadLogFiles);
+
+        ChangeToDarkThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Dark));
+        ChangeToLightThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Light));
+        ChangeToSystemThemeCommand = new RelayCommand(() => ApplyTheme(Theme.System));
     }
 
     #endregion
@@ -70,31 +95,41 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void SelectionChanged()
     {
-        // Add the main marked logEntry if it's not in the selected entries
+        // First, ensure the marked log entry is always the first in the collection if it exists
         if (MarkedLogEntry != null && !SelectedLogEntries.Contains(MarkedLogEntry))
         {
             SelectedLogEntries.Insert(0, MarkedLogEntry);
         }
-
-        // Ensure only up to three log entries are selected, prioritizing the main marked log entry
-        if (SelectedLogEntries.Count > 3)
+        else if (MarkedLogEntry != null && SelectedLogEntries.IndexOf(MarkedLogEntry) != 0)
         {
-            // Create a copy of selected entries excluding the main marked log entry
-            var selectedEntriesCopy = SelectedLogEntries.Where(e => e != MarkedLogEntry).ToList();
-
-            // Remove excess entries if any, ensuring we do not exceed three entries
-            while (SelectedLogEntries.Count + selectedEntriesCopy.Count > 3)
-            {
-                var itemToRemove = selectedEntriesCopy.FirstOrDefault();
-                if (itemToRemove != null)
-                {
-                    SelectedLogEntries.Remove(itemToRemove);
-                    selectedEntriesCopy.Remove(itemToRemove);
-                }
-            }
+            // Move the marked log entry to the first position if it's not already there
+            SelectedLogEntries.Remove(MarkedLogEntry);
+            SelectedLogEntries.Insert(0, MarkedLogEntry);
         }
 
-        UpdateSelectedEntryData(); 
+        // Then, manage selections to ensure only three entries are selected
+        ManageSelections();
+
+        UpdateSelectedEntryData(); // Update UI to reflect changes
+    }
+
+    private void ManageSelections()
+    {
+        // Allow for 3 entries max, including the marked log entry if it exists
+        while (SelectedLogEntries.Count > 3)
+        {
+            // If the first entry is the marked log entry, remove the second entry to make room
+            if (MarkedLogEntry != null && SelectedLogEntries[0] == MarkedLogEntry)
+            {
+                // Remove the second entry, as the first one is marked
+                SelectedLogEntries.RemoveAt(1);
+            }
+            else
+            {
+                // If the first entry is not marked, remove it to make room for others
+                SelectedLogEntries.RemoveAt(0);
+            }
+        }
     }
 
     // Command to refresh filter whenever search text or selected log types change
@@ -110,7 +145,7 @@ public partial class LogEntriesViewModel : ObservableObject
         ).ToList();
 
         FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
-        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count}";
+        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count} 🔎";
     }
 
     [RelayCommand]
@@ -194,14 +229,15 @@ public partial class LogEntriesViewModel : ObservableObject
     {
         if (MarkedLogEntry == logEntry && logEntry.IsMarked)
         {
-            // Unmark the currently marked entry
+            // Unmark the currently marked entry if entry is already marked
             logEntry.IsMarked = false;
             logEntry.IsPinned = false;
             MarkedLogEntry = null;
+            SelectedLogEntries.Clear();
         }
         else
         {
-            // Unmark the previous marked entry
+            // Unmark the previous marked entry if a new entry is marked
             if (MarkedLogEntry != null)
             {
                 MarkedLogEntry.IsMarked = false;
@@ -210,19 +246,11 @@ public partial class LogEntriesViewModel : ObservableObject
 
             logEntry.IsMarked = true;
             logEntry.IsPinned = true;
-            MarkedLogEntry = logEntry; 
-
-            // Add the new main log entry to the selected entries if not already included
-            if (!SelectedLogEntries.Contains(logEntry))
-            {
-                SelectedLogEntries.Add(logEntry);
-            }
-
-            ManageSelectedEntries();
+            MarkedLogEntry = logEntry;
+            SelectedLogEntries.Clear();
+            SelectedLogEntries.Insert(0, logEntry);
         }
 
-        OnPropertyChanged(nameof(SelectedLogEntries));
-        OnPropertyChanged(nameof(MarkedLogEntry));
         UpdateSelectedEntryData();
         SortByProperty(CurrentSortProperty);
     }
@@ -233,33 +261,18 @@ public partial class LogEntriesViewModel : ObservableObject
 
     #region Utility Methods
 
-    // Ensure that no more than three log entries are selected
-    private void ManageSelectedEntries()
-    {
-        while (SelectedLogEntries.Count > 3)
-        {
-            var oldestEntry = SelectedLogEntries
-                .FirstOrDefault(e => e != MarkedLogEntry);
-
-            if (oldestEntry != null)
-            {
-                SelectedLogEntries.Remove(oldestEntry);
-            }
-        }
-    }
-
     private string ConvertToHtml(LogEntry logEntry, bool compareWithMarked = false)
     {
-            var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-            var logTypeString = logEntry.LogType.ToString();
-            var sourceString = logEntry.Source;
-            var userString = logEntry.User;
-            var computerString = logEntry.Computer;
-            var descriptionString = logEntry.Description;
-            var markedAsMainText = logEntry.IsMarked ? "✅" : string.Empty;
+        var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        var logTypeString = logEntry.LogType.ToString();
+        var sourceString = logEntry.Source;
+        var userString = logEntry.User;
+        var computerString = logEntry.Computer;
+        var descriptionString = logEntry.Description;
+        var markedAsMainText = logEntry.IsMarked ? "\u2B50" : string.Empty;
 
         string dataString = compareWithMarked && MarkedLogEntry != null && MarkedLogEntry != logEntry
-            ? _logEntryAnalysisService.GenerateDiff(MarkedLogEntry.Data, logEntry.Data) 
+            ? _logEntryAnalysisService.GenerateDiff(MarkedLogEntry.Data, logEntry.Data)
             : System.Net.WebUtility.HtmlEncode(logEntry.Data);
 
 
@@ -279,7 +292,7 @@ public partial class LogEntriesViewModel : ObservableObject
                 </body>
                 </html>
                 ";
-        
+
     }
 
     private void UpdateLogTypeTexts()
@@ -376,6 +389,71 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             IsThirdLogEntrySelected = false;
         }
+    }
+
+    /// <summary>
+    /// Asynchronously loads multiple log files and parses them concurrently. 
+    /// Each parsing operation is performed in its own task, ensuring that the parsing process is concurrent
+    /// and efficient. 
+    /// </summary>
+    private async Task LoadLogFiles()
+    {
+        try
+        {
+            var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
+
+            // Create a list of tasks for parsing each new log file
+            var parsingTasks = fileResults.Select(ParseLogFileAsync).ToList();
+
+            // Await all tasks to complete
+            var parsedLogFiles = await Task.WhenAll(parsingTasks);
+
+            // Add the parsed log files to the shared service collection
+            foreach (var logFile in parsedLogFiles)
+            {
+                _logDataSharingService.AddLogFile(logFile);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading files.");
+        }
+        AggregateLogEntries();
+        SortByProperty("DateTime");
+        RefreshFilter();
+    }
+
+    /// <summary>
+    /// Asynchronously parses a single log file from a provided FileResult object. This method is designed
+    /// to be called concurrently for multiple files, as each invocation operates independently, ensuring
+    /// thread safety.
+    /// </summary>
+    /// <param name="fileResult">The file result from which the log file will be parsed.</param>
+    /// <returns>A task that, when completed, returns a LogFile object containing all parsed entries.</returns>
+    private async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
+    {
+        var (logEntries, fileSize) = await _logFileParserService.ParseLogAsync(fileResult);
+        var logFile = new LogFile
+        {
+            FileName = fileResult.FileName,
+            FullPath = fileResult.FullPath,
+            FileSize = fileSize,
+            Computer = logEntries.FirstOrDefault()?.Computer ?? "Unknown",
+            LogEntries = logEntries
+        };
+
+        foreach (var logEntry in logEntries)
+        {
+            logEntry.LogFile = logFile;
+        }
+
+        return logFile;
+    }
+
+    private void ApplyTheme(Theme theme)
+    {
+        _settingsService.AppTheme = theme;
+        Application.Current?.Dispatcher.Dispatch(() => { Application.Current.UserAppTheme = theme.AppTheme; });
     }
 
     #endregion

@@ -8,12 +8,26 @@
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
 
     <ContentPage.MenuBarItems>
+        <MenuBarItem Text="File">
+            <MenuFlyoutItem Text="Open Logfiles"
+                            Command="{Binding LoadLogfilesCommand}" />
+        </MenuBarItem>
         <MenuBarItem Text="Filter">
             <MenuFlyoutSubItem Text="LogType">
                 <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
                 <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
                 <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
                 <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+        <MenuBarItem Text="View" >
+            <MenuFlyoutSubItem Text="Change Theme">
+                <MenuFlyoutItem Text="Dark Mode"
+                                Command="{Binding ChangeToDarkThemeCommand}" />
+                <MenuFlyoutItem Text="Light Mode"
+                                Command="{Binding ChangeToLightThemeCommand}" />
+                <MenuFlyoutItem Text="System"
+                                Command="{Binding ChangeToSystemThemeCommand}" />
             </MenuFlyoutSubItem>
         </MenuBarItem>
     </ContentPage.MenuBarItems>
@@ -24,7 +38,7 @@
             <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
             <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
         </ResourceDictionary>
-        
+
         <!-- Style to make selected element in a collectionView highlighted -->
         <Style TargetType="VerticalStackLayout">
             <Setter Property="VisualStateManager.VisualStateGroups">
@@ -34,7 +48,7 @@
                         <VisualState x:Name="Selected">
                             <VisualState.Setters>
                                 <Setter Property="BackgroundColor"
-                                        Value="LightGray" />
+                                 Value="LightGray" />
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
@@ -83,9 +97,9 @@
     <ContentPage.Content>
         <Grid RowDefinitions="*, *">
             <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray">
-
+                <!-- SearchResultsLabel and Searchbar -->
                 <Grid RowDefinitions="Auto,*">
-                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" >
+                    <Grid Grid.Row="0" ColumnDefinitions="*, *" >
                         <HorizontalStackLayout>
                             <Label Text="{Binding SearchResultText}" VerticalTextAlignment="Center" />
                             <SearchBar ios:SearchBar.SearchBarStyle="Minimal"
@@ -113,7 +127,7 @@
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
                                 ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label Grid.Column="0" Text="✅" />
+                                <Label FontFamily="Segoe UI Emoji" Text='⭐' />
                                 <Label Grid.Column="1" Text="📌" />
                                 <Label Grid.Column="2" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
@@ -191,8 +205,8 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                        <Label Grid.Column="0" Text="✅" IsVisible="{Binding IsMarked}" />
+                                          ColumnDefinitions="20, 30, *, *, *, *, *, *, *, *, *, *, *, *">
+                                        <Label Grid.Column="0" FontFamily='Segoe UI Emoji' Text='⭐' IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
                                         <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" />
                                         <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" />
@@ -210,7 +224,7 @@
                                                 <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
                                                                 Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
                                                 <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=MarkAsMainLogEntryCommand}" CommandParameter="{Binding .}"
-                                                                Text="{Binding IsPinned, Converter={StaticResource BoolToMarkedTextConverter}}" />
+                                                                Text="{Binding IsMarked, Converter={StaticResource BoolToMarkedTextConverter}}" />
                                             </MenuFlyout>
                                         </FlyoutBase.ContextFlyout>
                                     </Grid>
