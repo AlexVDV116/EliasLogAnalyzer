@@ -21,16 +21,20 @@ namespace EliasLogAnalyzer.MAUI
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            // UI components and their corresponding ViewModels
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<LogEntriesPage>();
             builder.Services.AddTransient<LogEntriesViewModel>();
             
+            // Shared service across multiple components
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
-            builder.Services.AddSingleton<ILogFileLoaderService, LogFileLoaderService>();
-            builder.Services.AddSingleton<ILogFileParserService, LogFileParserService>();
-            builder.Services.AddSingleton<ILogEntryAnalysisService, LogEntryAnalysisService>();
+            
+            // Services used within a single ViewModel
+            builder.Services.AddTransient<ILogFileLoaderService, LogFileLoaderService>();
+            builder.Services.AddTransient<ILogFileParserService, LogFileParserService>();
+            builder.Services.AddTransient<ILogEntryAnalysisService, LogEntryAnalysisService>();
 
 #if WINDOWS
             // Hide CollectionView checkboxes when SelectionMode is Multiple
