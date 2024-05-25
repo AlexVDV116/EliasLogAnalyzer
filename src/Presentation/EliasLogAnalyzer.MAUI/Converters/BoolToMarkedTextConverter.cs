@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace EliasLogAnalyzer.MAUI.Converters;
 
@@ -8,10 +8,10 @@ public class BoolToMarkedTextConverter : IValueConverter
     {
         if (value is bool isMarked)
         {
-            return isMarked ? "\u2705 Unmark" : "\u2705 Mark";
+            return isMarked ? "Unmark" : "Mark";
         }
 
-        return "\u2705 Mark";
+        return "Mark";
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

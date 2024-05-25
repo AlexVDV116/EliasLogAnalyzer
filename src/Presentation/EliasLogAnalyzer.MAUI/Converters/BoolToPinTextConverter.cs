@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 
 namespace EliasLogAnalyzer.MAUI.Converters;
@@ -9,10 +9,10 @@ public class BoolToPinTextConverter : IValueConverter
     {
         if (value is bool isPinned)
         {
-            return isPinned ? "\U0001F4CC Unpin" : "\U0001F4CC Pin";
+            return isPinned ? "Unpin" : "Pin";
         }
 
-        return "\U0001F4CC Pin";
+        return "Pin";
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
