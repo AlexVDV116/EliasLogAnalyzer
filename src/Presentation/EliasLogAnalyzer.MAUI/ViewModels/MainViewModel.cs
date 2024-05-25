@@ -2,12 +2,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.MAUI.Services;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    private readonly ILogger<MainViewModel> _logger;
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly ILogFileLoaderService _logFileLoaderService;
     private readonly ILogFileParserService _logFileParserService;
@@ -20,16 +23,18 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<LogFile> LogFiles => _logDataSharingService.LogFiles;
 
     public MainViewModel(
+        ILogger<MainViewModel> logger,
         ILogDataSharingService logDataSharingService,
         ILogFileLoaderService logFileLoaderService,
         ILogFileParserService logFileParserService
     )
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _logDataSharingService = logDataSharingService;
         _logFileLoaderService = logFileLoaderService;
         _logFileParserService = logFileParserService;
         
-        LoadLogfilesCommand = new RelayCommand(LoadLogFiles);
+        LoadLogfilesCommand = new AsyncRelayCommand(LoadLogFiles);
         LoadingMessage = "Open LogFiles...";
     }
 
@@ -38,28 +43,40 @@ public partial class MainViewModel : ObservableObject
     /// Each parsing operation is performed in its own task, ensuring that the parsing process is concurrent
     /// and efficient. 
     /// </summary>
-    private async void LoadLogFiles()
+    private async Task LoadLogFiles()
     {
-        var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
-        
-        IsLoading = true;
-        LoadingMessage = "Please wait, parsing LogFiles...";
-
-        // Create a list of tasks for parsing each new log file
-        var parsingTasks = fileResults.Select(ParseLogFileAsync).ToList();
-        
-        // Await all tasks to complete
-        var parsedLogFiles = await Task.WhenAll(parsingTasks);
-
-        // Add the parsed log files to the shared service collection
-        foreach (var logFile in parsedLogFiles)
+        try
         {
-            _logDataSharingService.AddLogFile(logFile);
-        }
+            var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
+            
+            IsLoading = true;
+            LoadingMessage = "Please wait, parsing LogFiles...";
+
+            // Create a list of tasks for parsing each new log file
+            var parsingTasks = fileResults.Select(ParseLogFileAsync).ToList();
         
-        IsLoading = false; 
-        LoadingMessage = "Open LogFiles...";
-        await Shell.Current.GoToAsync("logentriesPage");
+            // Await all tasks to complete
+            var parsedLogFiles = await Task.WhenAll(parsingTasks);
+
+            // Add the parsed log files to the shared service collection
+            foreach (var logFile in parsedLogFiles)
+            {
+                _logDataSharingService.AddLogFile(logFile);
+            }
+        
+            IsLoading = false; 
+            LoadingMessage = "Open LogFiles...";
+            await Shell.Current.GoToAsync("logentriesPage");
+        }
+        catch (Exception ex)
+        {
+            LoadingMessage = "Failed to load files. Please try again.";
+            _logger.LogError(ex, "Error loading files.");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     /// <summary>
