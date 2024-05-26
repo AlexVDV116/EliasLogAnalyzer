@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -189,8 +188,7 @@ public partial class LogEntriesViewModel : ObservableObject
         }
 
         LogEntries = new ObservableCollection<LogEntry>(
-            LogEntries.OrderByDescending(x => x == MarkedLogEntry)  // Marked entry first
-                      .ThenByDescending(x => x.IsPinned)            // Then all pinned entries
+            LogEntries.OrderByDescending(x => x.IsPinned)   // Pinned entry first
                       .ThenByDescending(_ => !Ascending)            // Sort direction control
                       .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
                       .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
@@ -231,9 +229,9 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             // Unmark the currently marked entry if entry is already marked
             logEntry.IsMarked = false;
-            logEntry.IsPinned = false;
             MarkedLogEntry = null;
             SelectedLogEntries.Clear();
+            ResetDiffTicks();
         }
         else
         {
@@ -242,13 +240,16 @@ public partial class LogEntriesViewModel : ObservableObject
             {
                 MarkedLogEntry.IsMarked = false;
                 SelectedLogEntries.Remove(MarkedLogEntry);
+                ResetDiffTicks(); 
             }
 
             logEntry.IsMarked = true;
-            logEntry.IsPinned = true;
             MarkedLogEntry = logEntry;
             SelectedLogEntries.Clear();
             SelectedLogEntries.Insert(0, logEntry);
+            
+            // Calculate DiffTicks based on the new marked entry
+            _logEntryAnalysisService.CalcDiffTicks(logEntry, LogEntries);
         }
 
         UpdateSelectedEntryData();
@@ -260,6 +261,14 @@ public partial class LogEntriesViewModel : ObservableObject
     #endregion
 
     #region Utility Methods
+    
+    private void ResetDiffTicks()
+    {
+        foreach (var entry in LogEntries)
+        {
+            entry.TimeDelta = null;
+        }
+    }
 
     private string ConvertToHtml(LogEntry logEntry, bool compareWithMarked = false)
     {

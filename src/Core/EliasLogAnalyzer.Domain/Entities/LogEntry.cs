@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace EliasLogAnalyzer.Domain.Entities;
 
@@ -21,6 +20,7 @@ public partial class LogEntry : ObservableObject
     
     [ObservableProperty] private bool _isPinned;
     [ObservableProperty] private bool _isMarked;
+    [ObservableProperty] private int? _timeDelta;
     
     // Many-to-one relationship with LogFile
     public LogFile LogFile { get; set; }
@@ -41,6 +41,7 @@ public partial class LogEntry : ObservableObject
         LogFile = new LogFile();
         IsPinned = false;
         IsMarked = false;
+        TimeDelta = null;
     }
 }
 

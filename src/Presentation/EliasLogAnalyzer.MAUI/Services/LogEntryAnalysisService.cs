@@ -80,7 +80,6 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
     /// <param name="before">The original text string.</param>
     /// <param name="after">The modified text string to compare against the original.</param>
     /// <returns>A string containing HTML-formatted differences between the two text inputs.</returns>
-
     public string GenerateDiff(string before, string after)
     {
         var diffBuilder = new InlineDiffBuilder(new Differ());
@@ -106,5 +105,29 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
             }
         }
         return sb.ToString();
+    }
+    
+    /// <summary>
+    /// Calculates the Time Delta for a collection of log entries based on the difference with a marked entry.
+    /// </summary>
+    /// <param name="markedEntry">The log entry marked for comparison.</param>
+    /// <param name="entries">The list of all entries to compare against the marked entry.</param>
+    public void CalcDiffTicks(LogEntry markedEntry, IEnumerable<LogEntry> entries)
+    {
+        foreach (var entry in entries)
+        {
+            if (entry != markedEntry)
+            {
+                var timeDiff = (entry.LogTimeStamp.DateTime - markedEntry.LogTimeStamp.DateTime).TotalMilliseconds;
+                var ticksDiff = Math.Abs(entry.LogTimeStamp.Ticks - markedEntry.LogTimeStamp.Ticks);
+
+                // Use ticks difference when time difference is zero
+                entry.TimeDelta = timeDiff == 0 ? (int)ticksDiff : (int)timeDiff;
+            }
+            else
+            {
+                entry.TimeDelta = 0;
+            }
+        }
     }
 }

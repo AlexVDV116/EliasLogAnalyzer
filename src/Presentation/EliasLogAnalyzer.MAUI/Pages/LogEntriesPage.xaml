@@ -126,71 +126,72 @@
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
-                                ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label FontFamily="Segoe UI Emoji" Text='⭐' />
+                                ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                <Label FontFamily="Segoe UI Emoji" Text="⭐" />
                                 <Label Grid.Column="1" Text="📌" />
-                                <Label Grid.Column="2" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="2" Text="Time Delta" />
+                                <Label Grid.Column="3" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="3" Text="Ticks" FontAttributes="Bold">
+                                <Label Grid.Column="4" Text="Ticks" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="4" Text="SortValue" FontAttributes="Bold">
+                                <Label Grid.Column="5" Text="SortValue" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="DateTime" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="5" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="6" Text="{Binding SortLogTypeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="LogType" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="6" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="7" Text="{Binding SortThreadHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="ThreadNameOrNumber" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="7" Text="{Binding SortSourceLocationHeaderText}"
+                                <Label Grid.Column="8" Text="{Binding SortSourceLocationHeaderText}"
                                        FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="SourceLocation" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="8" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="9" Text="{Binding SortSourceHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Source" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="9" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="10" Text="{Binding SortCategoryHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Category" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="10" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="11" Text="{Binding SortEventIdHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="EventId" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="11" Text="{Binding SortUserHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="12" Text="{Binding SortUserHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="User" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Column="12" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold">
+                                <Label Grid.Column="13" Text="{Binding SortComputerHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
                                                               CommandParameter="Computer" />
@@ -205,20 +206,21 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="20, 30, *, *, *, *, *, *, *, *, *, *, *, *">
-                                        <Label Grid.Column="0" FontFamily='Segoe UI Emoji' Text='⭐' IsVisible="{Binding IsMarked}" />
+                                          ColumnDefinitions="20, 30, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                        <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
-                                        <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" />
-                                        <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" />
-                                        <Label Grid.Column="4" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
-                                        <Label Grid.Column="5" Text="{Binding LogType}" />
-                                        <Label Grid.Column="6" Text="{Binding ThreadNameOrNumber}" />
-                                        <Label Grid.Column="7" Text="{Binding SourceLocation}" />
-                                        <Label Grid.Column="8" Text="{Binding Source}" />
-                                        <Label Grid.Column="9" Text="{Binding Category}" />
-                                        <Label Grid.Column="10" Text="{Binding EventId}" />
-                                        <Label Grid.Column="11" Text="{Binding User}" />
-                                        <Label Grid.Column="12" Text="{Binding Computer}" />
+                                        <Label Grid.Column="2" Text="{Binding DiffTicks}" />
+                                        <Label Grid.Column="3" Text="{Binding LogTimeStamp.DateTime}" />
+                                        <Label Grid.Column="4" Text="{Binding LogTimeStamp.Ticks}" />
+                                        <Label Grid.Column="5" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
+                                        <Label Grid.Column="6" Text="{Binding LogType}" />
+                                        <Label Grid.Column="7" Text="{Binding ThreadNameOrNumber}" />
+                                        <Label Grid.Column="8" Text="{Binding SourceLocation}" />
+                                        <Label Grid.Column="9" Text="{Binding Source}" />
+                                        <Label Grid.Column="10" Text="{Binding Category}" />
+                                        <Label Grid.Column="11" Text="{Binding EventId}" />
+                                        <Label Grid.Column="12" Text="{Binding User}" />
+                                        <Label Grid.Column="13" Text="{Binding Computer}" />
                                         <FlyoutBase.ContextFlyout>
                                             <MenuFlyout x:DataType="entities:LogEntry">
                                                 <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"

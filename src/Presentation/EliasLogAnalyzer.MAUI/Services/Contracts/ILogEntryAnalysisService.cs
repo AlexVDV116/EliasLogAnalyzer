@@ -15,4 +15,5 @@ public interface ILogEntryAnalysisService
 
     string GenerateDiff(string oldText, string newText);
 
+    void CalcDiffTicks(LogEntry markedEntry, IEnumerable<LogEntry> entries);
 }
