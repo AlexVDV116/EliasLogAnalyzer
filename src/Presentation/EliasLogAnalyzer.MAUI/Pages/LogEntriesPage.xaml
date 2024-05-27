@@ -3,40 +3,18 @@
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
+             xmlns:icons="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
+             xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:DataType="viewModels:LogEntriesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
-
-    <ContentPage.MenuBarItems>
-        <MenuBarItem Text="File">
-            <MenuFlyoutItem Text="Open Logfiles"
-                            Command="{Binding LoadLogfilesCommand}" />
-        </MenuBarItem>
-        <MenuBarItem Text="Filter">
-            <MenuFlyoutSubItem Text="LogType">
-                <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
-                <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
-                <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
-                <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
-            </MenuFlyoutSubItem>
-        </MenuBarItem>
-        <MenuBarItem Text="View" >
-            <MenuFlyoutSubItem Text="Change Theme">
-                <MenuFlyoutItem Text="Dark Mode"
-                                Command="{Binding ChangeToDarkThemeCommand}" />
-                <MenuFlyoutItem Text="Light Mode"
-                                Command="{Binding ChangeToLightThemeCommand}" />
-                <MenuFlyoutItem Text="System"
-                                Command="{Binding ChangeToSystemThemeCommand}" />
-            </MenuFlyoutSubItem>
-        </MenuBarItem>
-    </ContentPage.MenuBarItems>
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
             <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
             <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
+            <converters:TimeDeltaToStringConverter x:Key="TimeDeltaToStringConverter" />
         </ResourceDictionary>
 
         <!-- Style to make selected element in a collectionView highlighted -->
@@ -95,8 +73,14 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="*, *">
-            <Border Grid.Row="0" Margin="10" Padding="10" Stroke="LightGray">
+        <Grid ColumnDefinitions="Auto, *" RowDefinitions="*,*">
+
+            <!-- SideMenu -->
+            <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                <controls:SideMenuControl VerticalOptions="FillAndExpand" HorizontalOptions="Start" />
+            </Grid>
+
+            <Border Grid.Row="0" Grid.Column="1" Margin="10, 0, 10, 0" Padding="10" Stroke="Lightgray">
                 <!-- SearchResultsLabel and Searchbar -->
                 <Grid RowDefinitions="Auto,*">
                     <Grid Grid.Row="0" ColumnDefinitions="*, *" >
@@ -126,10 +110,10 @@
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10"
-                                ColumnDefinitions="30, 30, *, *, *, *, *, *, *, *, *, *, *, *, *">
-                                <Label FontFamily="Segoe UI Emoji" Text="⭐" />
+                                ColumnDefinitions="40, 40, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
                                 <Label Grid.Column="1" Text="📌" />
-                                <Label Grid.Column="2" Text="Time Delta" />
+                                <Label Grid.Column="2" Text="Time Delta" FontAttributes="Bold"/>
                                 <Label Grid.Column="3" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
@@ -206,10 +190,10 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="20, 30, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                          ColumnDefinitions="30, 40, *, *, *, *, *, *, *, *, *, *, *, *, *">
                                         <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
-                                        <Label Grid.Column="2" Text="{Binding DiffTicks}" />
+                                        <Label Grid.Column="2" Text="{Binding TimeDelta, Converter={StaticResource TimeDeltaToStringConverter}}" />
                                         <Label Grid.Column="3" Text="{Binding LogTimeStamp.DateTime}" />
                                         <Label Grid.Column="4" Text="{Binding LogTimeStamp.Ticks}" />
                                         <Label Grid.Column="5" Text="{Binding LogTimeStamp.DateTimeSortValue}" />
@@ -239,7 +223,7 @@
             </Border>
 
             <!-- Bottom Half: StackLayout to display selected LogEntries Data -->
-            <Border BackgroundColor="Transparent" Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
+            <Border Grid.Row="1" Grid.Column="1" BackgroundColor="Transparent" Margin="10, 10, 10, 10" Padding="10" Stroke="LightGray">
                 <Grid Style="{StaticResource ResponsiveGrid}">
 
                     <WebView HorizontalOptions="FillAndExpand" Grid.Column="0">

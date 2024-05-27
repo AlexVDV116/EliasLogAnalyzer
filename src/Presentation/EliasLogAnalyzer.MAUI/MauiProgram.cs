@@ -22,12 +22,24 @@ namespace EliasLogAnalyzer.MAUI
                 });
 
             // UI components and their corresponding ViewModels
-            builder.Services.AddTransient<LogEntriesPage>();
-            builder.Services.AddTransient<LogEntriesViewModel>();
+            builder.Services.AddSingleton<LogEntriesPage>();
+            builder.Services.AddSingleton<LogEntriesViewModel>();
+            builder.Services.AddTransient<TimelinePage>();
+            builder.Services.AddTransient<TimelineViewModel>();
+            builder.Services.AddTransient<SummarizePage>();
+            builder.Services.AddTransient<SummarizeViewModel>();
+            builder.Services.AddTransient<DatabasePage>();
+            builder.Services.AddTransient<DatabaseViewModel>();
+            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<SettingsViewModel>();
 
             // Shared service across multiple components
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
+            builder.Services.AddSingleton<SideMenuViewModel>();
+            builder.Services.AddSingleton<AppShellViewModel>();
+
 
             // Services used within a single ViewModel
             builder.Services.AddTransient<ILogFileLoaderService, LogFileLoaderService>();

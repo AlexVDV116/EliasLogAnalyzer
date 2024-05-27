@@ -74,13 +74,32 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiImage Remove="Resources\Images\database.png" />
+	  <MauiImage Remove="Resources\Images\list.png" />
 	  <MauiImage Remove="Resources\Images\logo.png" />
+	  <MauiImage Remove="Resources\Images\settings.png" />
+	  <MauiImage Remove="Resources\Images\summarize.png" />
+	  <MauiImage Remove="Resources\Images\timeline.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Fonts\MaterialSymbolsOutlined.ttf" />
+	  <None Remove="Resources\Images\database.png" />
+	  <None Remove="Resources\Images\list.png" />
+	  <None Remove="Resources\Images\settings.png" />
+	  <None Remove="Resources\Images\summarize.png" />
+	  <None Remove="Resources\Images\timeline.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\Images\database.png" />
+	  <Content Include="Resources\Images\list.png" />
 	  <Content Include="Resources\Images\logo.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="Resources\Images\settings.png" />
+	  <Content Include="Resources\Images\summarize.png" />
+	  <Content Include="Resources\Images\timeline.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -94,6 +113,27 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Core\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Pages\TimeLinePage.xaml.cs">
+	    <DependentUpon>TimelinePage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Pages\DatabasePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\SettingsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\SummarizePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\TimelinePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -2,31 +2,32 @@
 using EliasLogAnalyzer.MAUI.Pages;
 using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
+using EliasLogAnalyzer.MAUI.ViewModels;
 
 namespace EliasLogAnalyzer.MAUI
 {
     public partial class AppShell : Shell
     {
-        private readonly ISettingsService _settingsService;
+        private readonly LogEntriesViewModel _logEntriesViewModel;
+        private readonly AppShellViewModel _appShellViewModel;
 
-        public IRelayCommand ChangeToDarkThemeCommand { get; }
-        public IRelayCommand ChangeToLightThemeCommand { get; }
-        public IRelayCommand ChangeToSystemThemeCommand { get; }
-
-        public AppShell(ISettingsService settingsService)
+        public AppShell(AppShellViewModel appShellViewModel, LogEntriesViewModel logEntriesViewModel)
         {
-            _settingsService = settingsService;
-
             InitializeComponent();
-            Routing.RegisterRoute("logentriesPage", typeof(LogEntriesPage));
-
-            this.BindingContext = this;
+            _appShellViewModel = appShellViewModel;
+            _logEntriesViewModel = logEntriesViewModel;
+            BindingContext = _appShellViewModel;
         }
 
-        private void ApplyTheme(Theme theme)
+        // Reset binding context after page change due to https://github.com/dotnet/maui/issues/13848
+        protected override void OnAppearing()
         {
-            _settingsService.AppTheme = theme;
-            Application.Current?.Dispatcher.Dispatch(() => { Application.Current.UserAppTheme = theme.AppTheme; });
+            base.OnAppearing();
+
+            // Set BindingContext for specific MenuBarItems
+            FileMenuBarItem.BindingContext = _logEntriesViewModel;
+            FilterMenuBarItem.BindingContext = _logEntriesViewModel;
+            ViewMenuBarItem.BindingContext = _appShellViewModel;
         }
     }
 }

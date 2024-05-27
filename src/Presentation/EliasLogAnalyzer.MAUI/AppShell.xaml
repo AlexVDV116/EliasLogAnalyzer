@@ -6,8 +6,33 @@
     xmlns:local="clr-namespace:EliasLogAnalyzer.MAUI"
     xmlns:pages="clr-namespace:EliasLogAnalyzer.MAUI.Pages"
     xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+    xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
+    xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+    x:DataType="viewModels:AppShellViewModel"
     Shell.FlyoutBehavior="Disabled"
     Title="EliasLogAnalyzer">
+
+    <Shell.MenuBarItems>
+        <MenuBarItem x:Name="FileMenuBarItem" x:DataType="viewModels:LogEntriesViewModel" Text="File">
+            <MenuFlyoutItem Text="Open Logfiles"
+                            Command="{Binding LoadLogFilesCommand}" />
+        </MenuBarItem>
+        <MenuBarItem x:Name="FilterMenuBarItem" x:DataType="viewModels:LogEntriesViewModel" Text="Filter">
+            <MenuFlyoutSubItem Text="LogType">
+                <MenuFlyoutItem Text="{Binding DebugLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Debug}" />
+                <MenuFlyoutItem Text="{Binding InformationLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Information}" />
+                <MenuFlyoutItem Text="{Binding WarningLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Warning}" />
+                <MenuFlyoutItem Text="{Binding ErrorLogTypeText}" Command="{Binding ChangeSelectedLogTypeCommand}" CommandParameter="{x:Static entities:LogType.Error}" />
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+        <MenuBarItem x:Name="ViewMenuBarItem" x:DataType="viewModels:AppShellViewModel" Text="View">
+            <MenuFlyoutSubItem Text="Change Theme">
+                <MenuFlyoutItem Text="Dark Mode" Command="{Binding ApplyThemeCommand}" CommandParameter="{x:Static resources:Theme.Dark}" />
+                <MenuFlyoutItem Text="Light Mode" Command="{Binding ApplyThemeCommand}" CommandParameter="{x:Static resources:Theme.Light}" />
+                <MenuFlyoutItem Text="System" Command="{Binding ApplyThemeCommand}" CommandParameter="{x:Static resources:Theme.System}" />
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+    </Shell.MenuBarItems>
 
     <Shell.Resources>
         <Style x:Key="ShellStyle" TargetType="Element">
@@ -21,6 +46,34 @@
         ContentTemplate="{DataTemplate pages:LogEntriesPage}"
         Style="{StaticResource ShellStyle}"
         Route="LogEntriesPage"
+        />
+
+    <ShellContent 
+        Title=""
+        ContentTemplate="{DataTemplate pages:TimelinePage}"
+        Style="{StaticResource ShellStyle}"
+        Route="TimeLinePage"
+        />
+
+    <ShellContent 
+        Title=""
+        ContentTemplate="{DataTemplate pages:SummarizePage}"
+        Style="{StaticResource ShellStyle}"
+        Route="SummarizePage"
+        />
+
+    <ShellContent 
+        Title=""
+        ContentTemplate="{DataTemplate pages:DatabasePage}"
+        Style="{StaticResource ShellStyle}"
+        Route="DatabasePage"
+        />
+
+    <ShellContent 
+        Title=""
+        ContentTemplate="{DataTemplate pages:SettingsPage}"
+        Style="{StaticResource ShellStyle}"
+        Route="SettingsPage"
         />
 
 </Shell>

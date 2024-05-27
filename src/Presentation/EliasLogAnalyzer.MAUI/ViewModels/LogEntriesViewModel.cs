@@ -54,11 +54,6 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _isThirdLogEntrySelected;
 
     public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
-    public IRelayCommand LoadLogfilesCommand { get; }
-    public IRelayCommand ChangeToDarkThemeCommand { get; }
-    public IRelayCommand ChangeToLightThemeCommand { get; }
-    public IRelayCommand ChangeToSystemThemeCommand { get; }
-
 
     #endregion
 
@@ -79,12 +74,6 @@ public partial class LogEntriesViewModel : ObservableObject
         _logFileParserService = logFileParserService;
         _logDataSharingService = logDataSharingService;
         _logEntryAnalysisService = logEntryAnalysisService;
-
-        LoadLogfilesCommand = new AsyncRelayCommand(LoadLogFiles);
-
-        ChangeToDarkThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Dark));
-        ChangeToLightThemeCommand = new RelayCommand(() => ApplyTheme(Theme.Light));
-        ChangeToSystemThemeCommand = new RelayCommand(() => ApplyTheme(Theme.System));
     }
 
     #endregion
@@ -240,14 +229,14 @@ public partial class LogEntriesViewModel : ObservableObject
             {
                 MarkedLogEntry.IsMarked = false;
                 SelectedLogEntries.Remove(MarkedLogEntry);
-                ResetDiffTicks(); 
+                ResetDiffTicks();
             }
 
             logEntry.IsMarked = true;
             MarkedLogEntry = logEntry;
             SelectedLogEntries.Clear();
             SelectedLogEntries.Insert(0, logEntry);
-            
+
             // Calculate DiffTicks based on the new marked entry
             _logEntryAnalysisService.CalcDiffTicks(logEntry, LogEntries);
         }
@@ -261,7 +250,7 @@ public partial class LogEntriesViewModel : ObservableObject
     #endregion
 
     #region Utility Methods
-    
+
     private void ResetDiffTicks()
     {
         foreach (var entry in LogEntries)
@@ -284,24 +273,23 @@ public partial class LogEntriesViewModel : ObservableObject
             ? _logEntryAnalysisService.GenerateDiff(MarkedLogEntry.Data, logEntry.Data)
             : System.Net.WebUtility.HtmlEncode(logEntry.Data);
 
-
         return $@"
-                <html>
-                <head>
-                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    <style>
-                        body {{ margin: 0; padding: 0; }}
-                        pre {{ white-space: pre-wrap; word-wrap: break-word; }}
-                    </style>
-                </head>
-                <body>
-                    <h4><pre><b>{markedAsMainText} {System.Net.WebUtility.HtmlEncode(dateTimeString)}   -   {System.Net.WebUtility.HtmlEncode(logTypeString)}   -   {System.Net.WebUtility.HtmlEncode(sourceString)}   -   {System.Net.WebUtility.HtmlEncode(userString)}   -   {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
-                    <pre><b>{System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
-                    <pre>{dataString}</pre>
-                </body>
-                </html>
-                ";
-
+            <html>
+            <head>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <style>
+                    body {{ margin: 0; padding: 0; font-family: 'Consolas', 'Courier New', monospace; background-color: #f9f9f9 ; color: #333; }}
+                    pre {{ margin: 0; padding: 10px 20px; white-space: pre-wrap; word-wrap: break-word; }}
+                    h4 {{ margin: 0; padding: 10px 20px; background-color: #e9e9e9; color: #333; border-bottom: 1px solid #ddd; }}
+                </style>
+            </head>
+            <body>
+                <h4><pre><b>{markedAsMainText} {System.Net.WebUtility.HtmlEncode(dateTimeString)}  -  {System.Net.WebUtility.HtmlEncode(logTypeString)}  -  {System.Net.WebUtility.HtmlEncode(sourceString)}  -  {System.Net.WebUtility.HtmlEncode(userString)}  -  {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
+                <pre><b>Description: {System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
+                <pre>Data: {dataString}</pre>
+            </body>
+            </html>
+            ";
     }
 
     private void UpdateLogTypeTexts()
@@ -405,6 +393,7 @@ public partial class LogEntriesViewModel : ObservableObject
     /// Each parsing operation is performed in its own task, ensuring that the parsing process is concurrent
     /// and efficient. 
     /// </summary>
+    [RelayCommand]
     private async Task LoadLogFiles()
     {
         try
@@ -457,12 +446,6 @@ public partial class LogEntriesViewModel : ObservableObject
         }
 
         return logFile;
-    }
-
-    private void ApplyTheme(Theme theme)
-    {
-        _settingsService.AppTheme = theme;
-        Application.Current?.Dispatcher.Dispatch(() => { Application.Current.UserAppTheme = theme.AppTheme; });
     }
 
     #endregion

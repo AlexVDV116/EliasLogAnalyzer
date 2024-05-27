@@ -11,13 +11,13 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
 {
     public List<double> CalculateRelationshipScores(LogEntry mainEntry, List<LogEntry> otherEntries)
     {
-        var scores = new List<double>(); 
+        var scores = new List<double>();
 
-        foreach (var entry in otherEntries) 
+        foreach (var entry in otherEntries)
         {
             var similarityScore = CalculateSimilarity(mainEntry.Data, entry.Data);
-            var timeScore = CalculateTimeProximity(mainEntry.LogTimeStamp, entry.LogTimeStamp); 
-            var finalScore = (similarityScore * 0.3) + (timeScore * 0.7); 
+            var timeScore = CalculateTimeProximity(mainEntry.LogTimeStamp, entry.LogTimeStamp);
+            var finalScore = (similarityScore * 0.3) + (timeScore * 0.7);
             scores.Add(finalScore);
         }
 
@@ -63,9 +63,9 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
         // Check if the entries are within the same second
         if (mainTimestamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss") !=
             compareTimestamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss")) return 0;
-        
+
         // Compare the Ticks for exact timing within the second
-        var tickDifference = Math.Abs(mainTimestamp.Ticks - compareTimestamp.Ticks); 
+        var tickDifference = Math.Abs(mainTimestamp.Ticks - compareTimestamp.Ticks);
         var tickScore = Math.Max(0, 1000 - tickDifference) / 10.0; // Normalize tick difference (0 to 100 scale)
         return tickScore; // Return normalized score as a percentage 
 
@@ -106,7 +106,7 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
         }
         return sb.ToString();
     }
-    
+
     /// <summary>
     /// Calculates the Time Delta for a collection of log entries based on the difference with a marked entry.
     /// </summary>
@@ -119,7 +119,7 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
             if (entry != markedEntry)
             {
                 var timeDiff = (entry.LogTimeStamp.DateTime - markedEntry.LogTimeStamp.DateTime).TotalMilliseconds;
-                var ticksDiff = Math.Abs(entry.LogTimeStamp.Ticks - markedEntry.LogTimeStamp.Ticks);
+                var ticksDiff = entry.LogTimeStamp.Ticks - markedEntry.LogTimeStamp.Ticks;
 
                 // Use ticks difference when time difference is zero
                 entry.TimeDelta = timeDiff == 0 ? (int)ticksDiff : (int)timeDiff;
