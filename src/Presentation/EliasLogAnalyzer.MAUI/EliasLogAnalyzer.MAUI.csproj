@@ -75,15 +75,9 @@
 
 
 	<ItemGroup>
-		<Content Include="Resources\Images\database.png" />
-		<Content Include="Resources\Images\list.png" />
 		<Content Include="Resources\Images\logo.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Resources\Images\menu.png" />
-		<Content Include="Resources\Images\settings.png" />
-		<Content Include="Resources\Images\summarize.png" />
-		<Content Include="Resources\Images\timeline.png" />
 	</ItemGroup>
 
 	<ItemGroup>
