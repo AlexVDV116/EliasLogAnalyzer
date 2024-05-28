@@ -73,25 +73,6 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<MauiImage Remove="Resources\Images\database.png" />
-		<MauiImage Remove="Resources\Images\list.png" />
-		<MauiImage Remove="Resources\Images\logo.png" />
-		<MauiImage Remove="Resources\Images\menu.png" />
-		<MauiImage Remove="Resources\Images\settings.png" />
-		<MauiImage Remove="Resources\Images\summarize.png" />
-		<MauiImage Remove="Resources\Images\timeline.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Remove="Resources\Fonts\MaterialSymbolsOutlined.ttf" />
-		<None Remove="Resources\Images\database.png" />
-		<None Remove="Resources\Images\list.png" />
-		<None Remove="Resources\Images\menu.png" />
-		<None Remove="Resources\Images\settings.png" />
-		<None Remove="Resources\Images\summarize.png" />
-		<None Remove="Resources\Images\timeline.png" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="Resources\Images\database.png" />
