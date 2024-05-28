@@ -41,49 +41,43 @@
             <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
             <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource OffBlack}, Dark={StaticResource OffWhite}}" />
         </Style>
-        
+
         <FontImageSource x:Key="DataTableIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.DataTable}"
-                         Size="40"
                          Color="Black" />
         <FontImageSource x:Key="InsightsIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Insights}"
-                         Size="40"
                          Color="Black" />
         <FontImageSource x:Key="SummarizeIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Summarize}"
-                         Size="40"
                          Color="Black" />
         <FontImageSource x:Key="DatabaseIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Database}"
-                         Size="40"
                          Color="Black" />
         <FontImageSource x:Key="SettingsIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Settings}"
-                         Size="40"
                          Color="Black" />
         <FontImageSource x:Key="MenuOpenIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.MenuOpen}"
-                         Size="40"
                          Color="Black" />
     </Shell.Resources>
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" Margin="10, 20, 0, 20" HeightRequest="60" HorizontalOptions="Center">
+            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" Margin="10, 30, 0, 20" HeightRequest="60" HorizontalOptions="Center">
                 <Image Grid.Column="0"
                        Source="Resources/Images/logo.png"
                        WidthRequest="60"
                        HeightRequest="60"
                        VerticalOptions="End" />
 
-                <Label Grid.Column="1" VerticalOptions="Center" IsVisible="True">
+                <Label Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding ToggleHeaderTextVisibility}">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="ELIAS" FontAttributes="Bold" TextColor="Black" FontSize="16"/>
@@ -145,11 +139,12 @@
 
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
-            <Grid ColumnDefinitions="80, 80" Padding="0, 3">
+            <Grid ColumnDefinitions="Auto, 90" Padding="0, 5, 0 , 0">
                 <Image Grid.Column="0"
                        Source="{Binding FlyoutIcon}"
-                       Margin="5"
-                       HeightRequest="40" />
+                       Aspect="Center"
+                       HeightRequest="50"
+                       WidthRequest="50" />
                 <Label Grid.Column="1"
                        Text="{Binding Title}"
                        VerticalTextAlignment="Center" />
@@ -160,8 +155,9 @@
     <Shell.FlyoutFooter>
         <Grid HorizontalOptions="End">
             <Image Source="{StaticResource MenuOpenIcon}"
-                       Margin="5"
-                       HeightRequest="40">
+                   RotationY="180"
+                       Aspect="Center"
+                       HeightRequest="50">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleFlyoutWidthCommand}" />
                 </Image.GestureRecognizers>
