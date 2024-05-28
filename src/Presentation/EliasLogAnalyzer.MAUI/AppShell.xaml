@@ -47,8 +47,8 @@
         <DataTemplate>
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="10, 20, 0, 20" HeightRequest="60" HorizontalOptions="Center">
                 <Image Source="Resources/Images/logo.png"
-                           WidthRequest="64"
-                           HeightRequest="64"
+                           WidthRequest="60"
+                           HeightRequest="60"
                        VerticalOptions="End"
                        >
                 </Image>
@@ -66,46 +66,56 @@
         </DataTemplate>
     </Shell.FlyoutHeaderTemplate>
 
+    <FlyoutItem Title="Log Entries" FlyoutIcon="Resources/Images/list.png">
+        <Tab>
+            <ShellContent 
+            ContentTemplate="{DataTemplate pages:LogEntriesPage}"
+            Style="{StaticResource ShellStyle}"
+            Route="SettingsPage"
+            />
+        </Tab>
+    </FlyoutItem>
 
-    <ShellContent 
-        Title="Log Entries"
-        FlyoutIcon= "Resources/Images/list.png"
-        ContentTemplate="{DataTemplate pages:LogEntriesPage}"
-        Style="{StaticResource ShellStyle}"
-        Route="LogEntriesPage"
-        />
 
-    <ShellContent 
-        Title="Statistics"
-        FlyoutIcon= "Resources/Images/timeline.png"
-        ContentTemplate="{DataTemplate pages:TimelinePage}"
-        Style="{StaticResource ShellStyle}"
-        Route="TimeLinePage"
-        />
+    <FlyoutItem Title="Statistics" FlyoutIcon="Resources/Images/timeline.png">
+        <Tab>
+            <ShellContent 
+            ContentTemplate="{DataTemplate pages:TimelinePage}"
+            Style="{StaticResource ShellStyle}"
+            Route="SettingsPage"
+            />
+        </Tab>
+    </FlyoutItem>
 
-    <ShellContent 
-        Title="Summary"
-        FlyoutIcon= "Resources/Images/summarize.png"
-        ContentTemplate="{DataTemplate pages:SummarizePage}"
-        Style="{StaticResource ShellStyle}"
-        Route="SummarizePage"
-        />
+    <FlyoutItem Title="Summary" FlyoutIcon="Resources/Images/summarize.png">
+        <Tab>
+            <ShellContent 
+            ContentTemplate="{DataTemplate pages:SummarizePage}"
+            Style="{StaticResource ShellStyle}"
+            Route="SettingsPage"
+            />
+        </Tab>
+    </FlyoutItem>
 
-    <ShellContent 
-        Title="Database"
-        FlyoutIcon= "Resources/Images/database.png"
-        ContentTemplate="{DataTemplate pages:DatabasePage}"
-        Style="{StaticResource ShellStyle}"
-        Route="DatabasePage"
-        />
+    <FlyoutItem Title="Database" FlyoutIcon="Resources/Images/database.png">
+        <Tab>
+            <ShellContent 
+            ContentTemplate="{DataTemplate pages:DatabasePage}"
+            Style="{StaticResource ShellStyle}"
+            Route="SettingsPage"
+            />
+        </Tab>
+    </FlyoutItem>
 
-    <ShellContent 
-        Title="Settings"
-        FlyoutIcon= "Resources/Images/settings.png"
-        ContentTemplate="{DataTemplate pages:SettingsPage}"
-        Style="{StaticResource ShellStyle}"
-        Route="SettingsPage"
-        />
+    <FlyoutItem Title="Settings" FlyoutIcon="Resources/Images/settings.png">
+        <Tab>
+            <ShellContent 
+            ContentTemplate="{DataTemplate pages:SettingsPage}"
+            Style="{StaticResource ShellStyle}"
+            Route="SettingsPage"
+            />
+        </Tab>
+    </FlyoutItem>
 
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
