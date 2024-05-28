@@ -9,6 +9,8 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
     public partial class AppShellViewModel : ObservableObject
     {
         private readonly ISettingsService _settingsService;
+        [ObservableProperty] private double _flyoutWidth = 160;
+        [ObservableProperty] private bool _toggleHeaderTextVisibility = true;
 
         public AppShellViewModel(
             ILogger<AppShellViewModel> logger,
@@ -16,6 +18,15 @@ namespace EliasLogAnalyzer.MAUI.ViewModels
         {
             _settingsService = settingsService;
         }
+
+        [RelayCommand]
+        public void ToggleFlyoutWidth()
+        {
+            FlyoutWidth = FlyoutWidth == 160 ? 80 : 160;
+            ToggleHeaderTextVisibility = !ToggleHeaderTextVisibility;
+
+        }
+
 
         [RelayCommand]
         private void ApplyTheme(Theme theme)

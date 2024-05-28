@@ -5,5 +5,8 @@
              x:Class="EliasLogAnalyzer.MAUI.Pages.DatabasePage"
              Title="DatabasePage">
 
-    <controls:SideMenuControl VerticalOptions="FillAndExpand" HorizontalOptions="Start" />
+    <Shell.TitleView>
+        <Label Text="" />
+    </Shell.TitleView>
+
 </ContentPage>

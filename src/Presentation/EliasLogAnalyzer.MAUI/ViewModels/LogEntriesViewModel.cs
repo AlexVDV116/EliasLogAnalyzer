@@ -32,7 +32,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _searchText = string.Empty;
-    [ObservableProperty] private string _searchResultText = string.Empty;
+    [ObservableProperty] private string _searchResultText = "0 / 0 👁️";
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
     [ObservableProperty] private string _warningLogTypeText = "Warning";
@@ -133,7 +133,7 @@ public partial class LogEntriesViewModel : ObservableObject
         ).ToList();
 
         FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
-        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count} 🔎";
+        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count} 👁️";
     }
 
     [RelayCommand]

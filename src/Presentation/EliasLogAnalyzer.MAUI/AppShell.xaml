@@ -8,8 +8,10 @@
     xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
     xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
     xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+    xmlns:behaviors="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Behaviors"
     x:DataType="viewModels:AppShellViewModel"
-    Shell.FlyoutBehavior="Disabled"
+    Shell.FlyoutBehavior="Locked"
+    FlyoutWidth="{Binding FlyoutWidth}"
     Title="EliasLogAnalyzer">
 
     <Shell.MenuBarItems>
@@ -41,39 +43,96 @@
         </Style>
     </Shell.Resources>
 
+    <Shell.FlyoutHeaderTemplate>
+        <DataTemplate>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="10, 20, 0, 20" HeightRequest="60" HorizontalOptions="Center">
+                <Image Source="Resources/Images/logo.png"
+                           WidthRequest="64"
+                           HeightRequest="64"
+                       VerticalOptions="End"
+                       >
+                </Image>
+
+                <Label Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding ToggleHeaderTextVisibility}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="ELIAS" FontAttributes="Bold" TextColor="Black" FontSize="16"/>
+                            <Span Text="&#x0a;"/>
+                            <Span Text="LogAnalyzer" TextColor="{StaticResource Gray500}" FontSize="11"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Grid>
+        </DataTemplate>
+    </Shell.FlyoutHeaderTemplate>
+
+
     <ShellContent 
-        Title=""
+        Title="Log Entries"
+        FlyoutIcon= "Resources/Images/list.png"
         ContentTemplate="{DataTemplate pages:LogEntriesPage}"
         Style="{StaticResource ShellStyle}"
         Route="LogEntriesPage"
         />
 
     <ShellContent 
-        Title=""
+        Title="Statistics"
+        FlyoutIcon= "Resources/Images/timeline.png"
         ContentTemplate="{DataTemplate pages:TimelinePage}"
         Style="{StaticResource ShellStyle}"
         Route="TimeLinePage"
         />
 
     <ShellContent 
-        Title=""
+        Title="Summary"
+        FlyoutIcon= "Resources/Images/summarize.png"
         ContentTemplate="{DataTemplate pages:SummarizePage}"
         Style="{StaticResource ShellStyle}"
         Route="SummarizePage"
         />
 
     <ShellContent 
-        Title=""
+        Title="Database"
+        FlyoutIcon= "Resources/Images/database.png"
         ContentTemplate="{DataTemplate pages:DatabasePage}"
         Style="{StaticResource ShellStyle}"
         Route="DatabasePage"
         />
 
     <ShellContent 
-        Title=""
+        Title="Settings"
+        FlyoutIcon= "Resources/Images/settings.png"
         ContentTemplate="{DataTemplate pages:SettingsPage}"
         Style="{StaticResource ShellStyle}"
         Route="SettingsPage"
         />
+
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="local:AppShell">
+            <Grid ColumnDefinitions="Auto, *" Padding="0, 3">
+                <Image Source="{Binding FlyoutIcon}"
+                       Margin="5"
+                       HeightRequest="40" />
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <Shell.FlyoutFooter>
+        <Grid HorizontalOptions="End">
+            <Image Source="Resources/Images/menu.png"
+                       Margin="5"
+                       HeightRequest="40">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleFlyoutWidthCommand}" />
+                </Image.GestureRecognizers>
+                <Image.Behaviors>
+                    <behaviors:RotateImageBehavior />
+                </Image.Behaviors>
+            </Image>
+        </Grid>
+    </Shell.FlyoutFooter>
 
 </Shell>

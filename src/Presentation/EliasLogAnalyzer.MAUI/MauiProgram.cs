@@ -36,8 +36,6 @@ namespace EliasLogAnalyzer.MAUI
             // Shared service across multiple components
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
-            builder.Services.AddSingleton<INavigationService, NavigationService>();
-            builder.Services.AddSingleton<SideMenuViewModel>();
             builder.Services.AddSingleton<AppShellViewModel>();
 
 

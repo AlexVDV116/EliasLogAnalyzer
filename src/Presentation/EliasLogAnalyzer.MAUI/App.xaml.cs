@@ -17,14 +17,14 @@ namespace EliasLogAnalyzer.MAUI
             _appShellViewModel = appShellViewModel;
             _logEntriesViewModel = logEntriesViewModel;
             MainPage = new AppShell(_appShellViewModel, _logEntriesViewModel);
-            SetTheme();
+            //SetTheme();
         }
 
         private void SetTheme()
         {
             UserAppTheme = _settingsService.AppTheme != null
-                         ? _settingsService.AppTheme.AppTheme
-                         : AppTheme.Unspecified;
+                            ? _settingsService.AppTheme.AppTheme
+                            : AppTheme.Unspecified;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
