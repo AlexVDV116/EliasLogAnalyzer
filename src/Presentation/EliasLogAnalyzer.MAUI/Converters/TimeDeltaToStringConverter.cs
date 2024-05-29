@@ -8,12 +8,18 @@ namespace EliasLogAnalyzer.MAUI.Converters
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value == null || !(value is int))
+            if (value == null || value is not int)
             {
                 return string.Empty;
             }
 
             int timeDelta = (int)value;
+
+            if (timeDelta == 0)
+            {
+                return "0 ms";
+            }
+
             bool isPositive = timeDelta >= 0;
 
             timeDelta = Math.Abs(timeDelta);

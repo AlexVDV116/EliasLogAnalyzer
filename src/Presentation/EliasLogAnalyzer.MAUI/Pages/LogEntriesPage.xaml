@@ -109,8 +109,8 @@
                         <CollectionView.Header>
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                                Padding="10"
-                                ColumnDefinitions="40, 40, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                Padding="10" ColumnSpacing="10"
+                                ColumnDefinitions="30, 40, 100, 100, 100, 150, 100, 100, 150, 300, 80, 80, 200, 200">
                                 <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
                                 <Label Grid.Column="1" Text="📌" />
                                 <Label Grid.Column="2" Text="Time Delta" FontAttributes="Bold"/>
@@ -190,7 +190,7 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="30, 40, *, *, *, *, *, *, *, *, *, *, *, *, *">
+                                          ColumnDefinitions="30, 40, 100, 100, 100, 150, 80, 100, 150, 300, 80, 80, 200, 200">
                                         <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
                                         <Label Grid.Column="2" Text="{Binding TimeDelta, Converter={StaticResource TimeDeltaToStringConverter}}" />

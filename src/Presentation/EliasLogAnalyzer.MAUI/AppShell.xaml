@@ -62,9 +62,13 @@
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Settings}"
                          Color="Black" />
-        <FontImageSource x:Key="MenuOpenIcon" 
+        <FontImageSource x:Key="LeftPanelOpenIcon" 
                          FontFamily="MaterialSymbols"
-                         Glyph="{x:Static resources:IconFont.MenuOpen}"
+                         Glyph="{x:Static resources:IconFont.LeftPanelOpen}"
+                         Color="Black" />
+        <FontImageSource x:Key="LeftPanelCloseIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.LeftPanelClose}"
                          Color="Black" />
     </Shell.Resources>
 
@@ -154,18 +158,19 @@
 
     <Shell.FlyoutFooter>
         <Grid HorizontalOptions="End">
-            <Image Source="{StaticResource MenuOpenIcon}"
-                   RotationY="180"
+            <Image Source="{StaticResource LeftPanelOpenIcon}"
                        Aspect="Center"
                        HeightRequest="50">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleFlyoutWidthCommand}" />
                 </Image.GestureRecognizers>
                 <Image.Behaviors>
-                    <behaviors:RotateImageBehavior />
+                    <behaviors:ChangeIconBehavior IconOne="{StaticResource LeftPanelOpenIcon}"
+                                      IconTwo="{StaticResource LeftPanelCloseIcon}" />
                 </Image.Behaviors>
             </Image>
         </Grid>
     </Shell.FlyoutFooter>
+
 
 </Shell>

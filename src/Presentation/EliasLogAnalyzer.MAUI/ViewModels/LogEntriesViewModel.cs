@@ -3,7 +3,6 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
-using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -124,15 +123,42 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void RefreshFilter()
     {
-        var filtered = LogEntries.Where(entry =>
-            SelectedLogTypes.Contains(entry.LogType) &&
-            (string.IsNullOrWhiteSpace(SearchText) ||
-             entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-             entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-             entry.Data.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-        ).ToList();
+        var filtered = LogEntries
+            .Where(entry => SelectedLogTypes.Contains(entry.LogType) &&
+                            (string.IsNullOrWhiteSpace(SearchText) ||
+                             entry.LogTimeStamp.DateTime.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.ThreadNameOrNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.SourceLocation.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.Source.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                        entry.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                                                   entry.EventId.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                                                                                entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.Computer.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                          entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.Data.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
 
-        FilteredLogEntries = new ObservableCollection<LogEntry>(filtered);
+        // Efficiently update FilteredLogEntries without resetting the collection
+        for (int i = FilteredLogEntries.Count - 1; i >= 0; i--)
+        {
+            if (!filtered.Contains(FilteredLogEntries[i]))
+            {
+                FilteredLogEntries.RemoveAt(i);
+            }
+        }
+
+        for (int i = 0; i < filtered.Count; i++)
+        {
+            if (i >= FilteredLogEntries.Count)
+            {
+                FilteredLogEntries.Add(filtered[i]);
+            }
+            else if (!FilteredLogEntries[i].Equals(filtered[i]))
+            {
+                FilteredLogEntries.Insert(i, filtered[i]);
+            }
+        }
+
         SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count} 👁️";
     }
 
@@ -166,7 +192,7 @@ public partial class LogEntriesViewModel : ObservableObject
     private void SortByProperty(string propertyName)
     {
         PropertyInfo? propertyInfo = null;
-        if (propertyName != "DateTime")  // Check if the sorting is based on a property other than DateTime
+        if (propertyName != "DateTime")  // Since the DateTime property is nested inside LogTimeStamp
         {
             propertyInfo = typeof(LogEntry).GetProperty(propertyName);
             if (propertyInfo == null)
@@ -176,15 +202,22 @@ public partial class LogEntriesViewModel : ObservableObject
             }
         }
 
-        LogEntries = new ObservableCollection<LogEntry>(
-            LogEntries.OrderByDescending(x => x.IsPinned)   // Pinned entry first
-                      .ThenByDescending(_ => !Ascending)            // Sort direction control
-                      .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
-                      .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
-        );
+        var sorted = LogEntries
+             .OrderByDescending(x => x.IsPinned) // Pinned entry first
+             .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
+             .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
+             .ToList();
+
+        // Update LogEntries in place
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            if (!LogEntries[i].Equals(sorted[i]))
+            {
+                LogEntries.Move(LogEntries.IndexOf(sorted[i]), i);
+            }
+        }
 
         RefreshFilter();
-        OnPropertyChanged(nameof(LogEntries));
         UpdateSortOrder(propertyName);
     }
 
@@ -269,9 +302,7 @@ public partial class LogEntriesViewModel : ObservableObject
         var descriptionString = logEntry.Description;
         var markedAsMainText = logEntry.IsMarked ? "\u2B50" : string.Empty;
 
-        string dataString = compareWithMarked && MarkedLogEntry != null && MarkedLogEntry != logEntry
-            ? _logEntryAnalysisService.GenerateDiff(MarkedLogEntry.Data, logEntry.Data)
-            : System.Net.WebUtility.HtmlEncode(logEntry.Data);
+        string dataString = System.Net.WebUtility.HtmlEncode(logEntry.Data);
 
         return $@"
             <html>

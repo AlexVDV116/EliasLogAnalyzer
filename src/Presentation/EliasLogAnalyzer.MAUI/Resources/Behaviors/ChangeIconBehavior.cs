@@ -1,8 +1,12 @@
 ﻿namespace EliasLogAnalyzer.MAUI.Resources.Behaviors
 {
-    public class RotateImageBehavior : Behavior<Image>
+    public class ChangeIconBehavior : Behavior<Image>
     {
+        public ImageSource IconOne { get; set; }
+        public ImageSource IconTwo { get; set; }
+
         private TapGestureRecognizer? _tapGestureRecognizer;
+        private bool _isIconOne = true; // State tracker
 
         protected override void OnAttachedTo(Image bindable)
         {
@@ -14,27 +18,29 @@
 
         protected override void OnDetachingFrom(Image bindable)
         {
-            base.OnDetachingFrom(bindable);
             if (_tapGestureRecognizer != null)
             {
                 _tapGestureRecognizer.Tapped -= OnTapped;
                 bindable.GestureRecognizers.Remove(_tapGestureRecognizer);
             }
+            base.OnDetachingFrom(bindable);
         }
 
-        private async void OnTapped(object sender, EventArgs e)
+        private void OnTapped(object sender, EventArgs e)
         {
             var image = sender as Image;
             if (image != null)
             {
-                if (image.RotationY == 0)
+                // Switch between IconOne and IconTwo
+                if (_isIconOne)
                 {
-                    await image.RotateYTo(180, 250); // Rotate to 180 degrees over 250 milliseconds
+                    image.Source = IconTwo;
                 }
                 else
                 {
-                    await image.RotateYTo(0, 250); // Rotate back to 0 degrees
+                    image.Source = IconOne;
                 }
+                _isIconOne = !_isIconOne; // Toggle state
             }
         }
     }
