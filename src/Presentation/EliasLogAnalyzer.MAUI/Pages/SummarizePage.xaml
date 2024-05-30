@@ -3,10 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.SummarizePage"
+             xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             x:DataType="viewModels:SummarizeViewModel"
              Title="SummarizePage">
 
     <Shell.TitleView>
         <Label Text="" />
     </Shell.TitleView>
+
+    <Border Grid.Row="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
+
+    </Border>
 
 </ContentPage>

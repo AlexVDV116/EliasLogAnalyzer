@@ -17,11 +17,12 @@ public partial class LogEntry : ObservableObject
     public string Computer { get; set; }
     public string Description { get; set; }
     public string Data { get; set; }
-    
+
     [ObservableProperty] private bool _isPinned;
     [ObservableProperty] private bool _isMarked;
     [ObservableProperty] private int? _timeDelta;
-    
+    [ObservableProperty] private int? _propability;
+
     // Many-to-one relationship with LogFile
     public LogFile LogFile { get; set; }
 
@@ -42,6 +43,7 @@ public partial class LogEntry : ObservableObject
         IsPinned = false;
         IsMarked = false;
         TimeDelta = null;
+        Propability = 0;
     }
 }
 

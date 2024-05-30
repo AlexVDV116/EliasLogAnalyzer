@@ -76,7 +76,14 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="*,*">
+        <Grid RowDefinitions="*, *">
+
+            <ActivityIndicator Grid.Row="0" 
+                       IsVisible="{Binding IsLoading}"
+                       IsRunning="{Binding IsLoading}"
+                       Color="{StaticResource Primary }"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center"/>
 
             <Border Grid.Row="0" Margin="10, 0, 10, 0" Padding="10" Stroke="Lightgray">
                 <!-- SearchResultsLabel and Searchbar -->
@@ -223,7 +230,7 @@
             </Border>
 
             <!-- Bottom Half: StackLayout to display selected LogEntries Data -->
-            <Border Grid.Row="2" BackgroundColor="Transparent" Margin="10, 10, 10, 10" Padding="10" Stroke="LightGray">
+            <Border Grid.Row="1" BackgroundColor="Transparent" Margin="10, 10, 10, 10" Padding="10" Stroke="LightGray">
                 <Grid Style="{StaticResource ResponsiveGrid}">
 
                     <WebView HorizontalOptions="FillAndExpand" Grid.Column="0">

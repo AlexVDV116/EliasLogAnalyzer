@@ -37,6 +37,7 @@ namespace EliasLogAnalyzer.MAUI
             // Shared service across multiple components
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
+            builder.Services.AddSingleton<IHtmlGeneratorService, HtmlGeneratorService>();
             builder.Services.AddSingleton<AppShellViewModel>();
 
 
@@ -45,16 +46,14 @@ namespace EliasLogAnalyzer.MAUI
             builder.Services.AddTransient<ILogFileParserService, LogFileParserService>();
             builder.Services.AddTransient<ILogEntryAnalysisService, LogEntryAnalysisService>();
 
-#if WINDOWS
             // Hide CollectionView checkboxes when SelectionMode is Multiple
+#if WINDOWS
             Microsoft.Maui.Controls.Handlers.Items.CollectionViewHandler.Mapper.AppendToMapping("DisableMultiselectCheckbox",
             (handler, view) =>
             {
                 handler.PlatformView.IsMultiSelectCheckBoxEnabled = false;
             });
-
 #endif
-
 
 #if DEBUG
             builder.Logging.AddDebug();

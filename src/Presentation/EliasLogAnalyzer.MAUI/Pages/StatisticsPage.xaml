@@ -3,10 +3,97 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
+             xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+             xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   
+             x:DataType="viewModels:StatisticsViewModel"
              Title="StatisticsPage">
 
     <Shell.TitleView>
         <Label Text="" />
     </Shell.TitleView>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
+            <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
+            <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*, *">
+        <Grid Grid.Row="0" ColumnDefinitions="3*, 2*">
+            <Border Grid.Column="0" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
+                <ScrollView>
+                    <VerticalStackLayout>
+                        <Label Text="{Binding StatisticsText}" FontAttributes="Bold" />
+                        <CollectionView ItemsSource="{Binding LogEntries}" SelectionMode="Single">
+
+                            <CollectionView.Header>
+                                <Grid
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                               Padding="10" ColumnSpacing="10"
+                               ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
+                                    <Label Grid.Column="0" Text="📌" />
+                                    <Label Grid.Column="1" Text="%" FontAttributes="Bold"/>
+                                    <Label Grid.Column="2" Text="DateTime" FontAttributes="Bold"/>
+                                    <Label Grid.Column="3" Text="Ticks" FontAttributes="Bold"/>
+                                    <Label Grid.Column="4" Text="LogType" FontAttributes="Bold"/>
+                                    <Label Grid.Column="5" Text="Source" FontAttributes="Bold"/>
+                                    <Label Grid.Column="6" Text="User" FontAttributes="Bold"/>
+                                    <Label Grid.Column="6" Text="Computer" FontAttributes="Bold"/>
+
+                                </Grid>
+                            </CollectionView.Header>
+
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="entities:LogEntry">
+                                    <VerticalStackLayout>
+                                        <Grid Padding="10" ColumnSpacing="10" Margin="10, 0, 10, 0"
+                                          BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
+                                          ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
+                                            <Label Grid.Column="0" Text="📌" IsVisible="{Binding IsPinned}" />
+                                            <Label Grid.Column="1" Text="{Binding Propability}" FontAttributes="Bold" FontSize="12" />
+                                            <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" FontSize="12" />
+                                            <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" FontSize="12" />
+                                            <Label Grid.Column="4" Text="{Binding LogType}" FontSize="12" />
+                                            <Label Grid.Column="5" Text="{Binding Source}" FontSize="12" />
+                                            <Label Grid.Column="6" Text="{Binding User}" FontSize="12" />
+                                            <Label Grid.Column="7" Text="{Binding Computer}" FontSize="12" />
+                                            <FlyoutBase.ContextFlyout>
+                                                <MenuFlyout x:DataType="entities:LogEntry">
+                                                    <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
+                                                                Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
+                                                </MenuFlyout>
+                                            </FlyoutBase.ContextFlyout>
+                                        </Grid>
+                                        <BoxView HeightRequest="1" BackgroundColor="Gray" Margin="10, 0, 10, 0" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Border>
+
+
+            <Border Grid.Column="1" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
+                <WebView HorizontalOptions="FillAndExpand">
+                    <WebView.Source>
+                        <HtmlWebViewSource Html="{Binding PieChartHtml}" />
+                    </WebView.Source>
+                </WebView>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
+            <WebView HorizontalOptions="FillAndExpand">
+                <WebView.Source>
+                    <HtmlWebViewSource Html="{Binding TimelineHtml}" />
+                </WebView.Source>
+            </WebView>
+        </Border>
+    </Grid>
 
 </ContentPage>

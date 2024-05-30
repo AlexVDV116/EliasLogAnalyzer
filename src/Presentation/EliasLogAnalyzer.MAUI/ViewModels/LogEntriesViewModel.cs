@@ -13,20 +13,17 @@ public partial class LogEntriesViewModel : ObservableObject
     #region Fields
 
     private readonly ILogger<LogEntriesViewModel> _logger;
-    private readonly ISettingsService _settingsService;
     private readonly ILogFileLoaderService _logFileLoaderService;
     private readonly ILogFileParserService _logFileParserService;
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly ILogEntryAnalysisService _logEntryAnalysisService;
+    private readonly IHtmlGeneratorService _htmlGeneratorService;
 
     #endregion
 
     #region Properties
 
-    [ObservableProperty] private IList<object> _selectedLogEntries = [];
-    [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
-    [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
-    [ObservableProperty] private LogEntry? _markedLogEntry;
+    [ObservableProperty] private bool _isLoading = false;
     [ObservableProperty] private string _firstLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
@@ -48,32 +45,48 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortEventIdHeaderText = "Event ID";
     [ObservableProperty] private string _sortUserHeaderText = "User";
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
+
     [ObservableProperty] private bool _ascending = true;
     [ObservableProperty] private bool _isSecondLogEntrySelected;
     [ObservableProperty] private bool _isThirdLogEntrySelected;
 
-    public ObservableCollection<LogEntry> LogEntries { get; set; } = [];
-
+    // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
+    [ObservableProperty] public ObservableCollection<LogEntry> _logEntries = [];
+    [ObservableProperty] public ObservableCollection<LogFile> _logFiles = [];
+    [ObservableProperty] public ObservableCollection<LogType> _selectedLogTypes = [];
+    [ObservableProperty] public ObservableCollection<object> _selectedLogEntries = [];
+    [ObservableProperty] public ObservableCollection<LogFile> _selectedLogFiles = [];
+    [ObservableProperty] public ObservableCollection<LogEntry> _filteredLogEntries = [];
+    [ObservableProperty] public LogEntry? _markedLogEntry = null;
     #endregion
 
     #region Constructor
 
     public LogEntriesViewModel(
         ILogger<LogEntriesViewModel> logger,
-        ISettingsService settingsService,
         ILogFileLoaderService logFileLoaderService,
         ILogFileParserService logFileParserService,
         ILogDataSharingService logDataSharingService,
-        ILogEntryAnalysisService logEntryAnalysisService
+        ILogEntryAnalysisService logEntryAnalysisService,
+        IHtmlGeneratorService htmlGeneratorService
         )
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _settingsService = settingsService;
         _logFileLoaderService = logFileLoaderService;
         _logFileParserService = logFileParserService;
         _logDataSharingService = logDataSharingService;
         _logEntryAnalysisService = logEntryAnalysisService;
+        _htmlGeneratorService = htmlGeneratorService;
+
+        LogEntries = _logDataSharingService.LogEntries;
+        LogFiles = _logDataSharingService.LogFiles;
+        SelectedLogTypes = _logDataSharingService.SelectedLogTypes;
+        SelectedLogEntries = _logDataSharingService.SelectedLogEntries;
+        SelectedLogFiles = _logDataSharingService.SelectedLogFiles;
+        FilteredLogEntries = _logDataSharingService.FilteredLogEntries;
+        MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
     }
+
 
     #endregion
 
@@ -123,7 +136,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void RefreshFilter()
     {
-        var filtered = LogEntries
+        var filtered = _logDataSharingService.LogEntries
             .Where(entry => SelectedLogTypes.Contains(entry.LogType) &&
                             (string.IsNullOrWhiteSpace(SearchText) ||
                              entry.LogTimeStamp.DateTime.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
@@ -159,7 +172,7 @@ public partial class LogEntriesViewModel : ObservableObject
             }
         }
 
-        SearchResultText = $"{FilteredLogEntries.Count} / {LogEntries.Count} 👁️";
+        SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
     }
 
     [RelayCommand]
@@ -251,7 +264,7 @@ public partial class LogEntriesViewModel : ObservableObject
         {
             // Unmark the currently marked entry if entry is already marked
             logEntry.IsMarked = false;
-            MarkedLogEntry = null;
+            _logDataSharingService.MarkedLogEntry = null;
             SelectedLogEntries.Clear();
             ResetDiffTicks();
         }
@@ -266,12 +279,12 @@ public partial class LogEntriesViewModel : ObservableObject
             }
 
             logEntry.IsMarked = true;
-            MarkedLogEntry = logEntry;
+            _logDataSharingService.MarkedLogEntry = logEntry;
             SelectedLogEntries.Clear();
             SelectedLogEntries.Insert(0, logEntry);
 
             // Calculate DiffTicks based on the new marked entry
-            _logEntryAnalysisService.CalcDiffTicks(logEntry, LogEntries);
+            _logEntryAnalysisService.CalcDiffTicks();
         }
 
         UpdateSelectedEntryData();
@@ -286,41 +299,10 @@ public partial class LogEntriesViewModel : ObservableObject
 
     private void ResetDiffTicks()
     {
-        foreach (var entry in LogEntries)
+        foreach (var entry in _logDataSharingService.LogEntries)
         {
             entry.TimeDelta = null;
         }
-    }
-
-    private string ConvertToHtml(LogEntry logEntry, bool compareWithMarked = false)
-    {
-        var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        var logTypeString = logEntry.LogType.ToString();
-        var sourceString = logEntry.Source;
-        var userString = logEntry.User;
-        var computerString = logEntry.Computer;
-        var descriptionString = logEntry.Description;
-        var markedAsMainText = logEntry.IsMarked ? "\u2B50" : string.Empty;
-
-        string dataString = System.Net.WebUtility.HtmlEncode(logEntry.Data);
-
-        return $@"
-            <html>
-            <head>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <style>
-                    body {{ margin: 0; padding: 0; font-family: 'Consolas', 'Courier New', monospace; background-color: #f9f9f9 ; color: #333; }}
-                    pre {{ margin: 0; padding: 10px 20px; white-space: pre-wrap; word-wrap: break-word; }}
-                    h4 {{ margin: 0; padding: 10px 20px; background-color: #e9e9e9; color: #333; border-bottom: 1px solid #ddd; }}
-                </style>
-            </head>
-            <body>
-                <h4><pre><b>{markedAsMainText} {System.Net.WebUtility.HtmlEncode(dateTimeString)}  -  {System.Net.WebUtility.HtmlEncode(logTypeString)}  -  {System.Net.WebUtility.HtmlEncode(sourceString)}  -  {System.Net.WebUtility.HtmlEncode(userString)}  -  {System.Net.WebUtility.HtmlEncode(computerString)}</b></pre></h4>
-                <pre><b>Description: {System.Net.WebUtility.HtmlEncode(descriptionString)}</b></pre>
-                <pre>Data: {dataString}</pre>
-            </body>
-            </html>
-            ";
     }
 
     private void UpdateLogTypeTexts()
@@ -364,7 +346,7 @@ public partial class LogEntriesViewModel : ObservableObject
         LogEntries.Clear();
         var uniqueEntries = new HashSet<LogEntry>(LogEntries);
 
-        foreach (var file in _logDataSharingService.LogFiles)
+        foreach (var file in LogFiles)
         {
             foreach (var entry in file.LogEntries)
             {
@@ -380,9 +362,6 @@ public partial class LogEntriesViewModel : ObservableObject
 
     private void UpdateSelectedEntryData()
     {
-        // Check if there is a marked log entry to enable comparison
-        var compareWithMarked = MarkedLogEntry != null;
-
         if (SelectedLogEntries.Count == 0)
         {
             FirstLogEntryDataHtml = string.Empty;
@@ -395,12 +374,12 @@ public partial class LogEntriesViewModel : ObservableObject
 
         if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
         {
-            FirstLogEntryDataHtml = ConvertToHtml(firstEntry);
+            FirstLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(firstEntry);
         }
 
         if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
         {
-            SecondLogEntryDataHtml = ConvertToHtml(secondEntry, compareWithMarked);
+            SecondLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(secondEntry);
             IsSecondLogEntrySelected = true;
         }
         else
@@ -410,7 +389,7 @@ public partial class LogEntriesViewModel : ObservableObject
 
         if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
         {
-            ThirdLogEntryDataHtml = ConvertToHtml(thirdEntry, compareWithMarked);
+            ThirdLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(thirdEntry);
             IsThirdLogEntrySelected = true;
         }
         else
@@ -429,6 +408,8 @@ public partial class LogEntriesViewModel : ObservableObject
     {
         try
         {
+            IsLoading = true;
+
             var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
 
             // Create a list of tasks for parsing each new log file
@@ -446,6 +427,10 @@ public partial class LogEntriesViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading files.");
+        }
+        finally
+        {
+            IsLoading = false;
         }
         AggregateLogEntries();
         SortByProperty("DateTime");
