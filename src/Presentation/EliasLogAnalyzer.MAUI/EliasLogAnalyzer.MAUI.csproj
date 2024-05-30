@@ -92,11 +92,6 @@
 		<ProjectReference Include="..\..\Core\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Compile Update="Pages\TimeLinePage.xaml.cs">
-			<DependentUpon>TimelinePage.xaml</DependentUpon>
-		</Compile>
-	</ItemGroup>
 
 	<ItemGroup>
 		<MauiXaml Update="Pages\DatabasePage.xaml">
@@ -108,7 +103,7 @@
 		<MauiXaml Update="Pages\SummarizePage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-		<MauiXaml Update="Pages\TimelinePage.xaml">
+		<MauiXaml Update="Pages\StatisticsPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>

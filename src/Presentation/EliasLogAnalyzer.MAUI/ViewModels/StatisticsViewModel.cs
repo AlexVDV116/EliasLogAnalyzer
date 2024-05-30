@@ -2,9 +2,9 @@
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public partial class TimelineViewModel : ObservableObject
+public partial class StatisticsViewModel : ObservableObject
 {
-    public TimelineViewModel()
+    public StatisticsViewModel()
     {
     }
 }

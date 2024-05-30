@@ -25,8 +25,8 @@ namespace EliasLogAnalyzer.MAUI
             // UI components and their corresponding ViewModels
             builder.Services.AddSingleton<LogEntriesPage>();
             builder.Services.AddSingleton<LogEntriesViewModel>();
-            builder.Services.AddTransient<TimelinePage>();
-            builder.Services.AddTransient<TimelineViewModel>();
+            builder.Services.AddTransient<StatisticsPage>();
+            builder.Services.AddTransient<StatisticsViewModel>();
             builder.Services.AddTransient<SummarizePage>();
             builder.Services.AddTransient<SummarizeViewModel>();
             builder.Services.AddTransient<DatabasePage>();

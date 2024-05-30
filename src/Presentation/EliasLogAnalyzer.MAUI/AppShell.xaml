@@ -107,7 +107,7 @@
     <FlyoutItem Title="Statistics" Icon="{StaticResource InsightsIcon}">
         <Tab>
             <ShellContent 
-            ContentTemplate="{DataTemplate pages:TimelinePage}"
+            ContentTemplate="{DataTemplate pages:StatisticsPage}"
             Style="{StaticResource ShellStyle}"
             Route="SettingsPage"
             />

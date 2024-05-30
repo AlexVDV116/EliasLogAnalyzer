@@ -2,8 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
-             x:Class="EliasLogAnalyzer.MAUI.Pages.TimelinePage"
-             Title="TimelinePage">
+             x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
+             Title="StatisticsPage">
 
     <Shell.TitleView>
         <Label Text="" />
