@@ -12,7 +12,7 @@ public interface ILogDataSharingService
     ObservableCollection<object> SelectedLogEntries { get; set; }
     ObservableCollection<LogEntry> FilteredLogEntries { get; set; }
     ObservableCollection<LogType> SelectedLogTypes { get; set; }
-    LogEntry MarkedLogEntry { get; set; }
+    LogEntry? MarkedLogEntry { get; set; }
     void AddLogFile(LogFile logFile);
     void AddLogFileToSelected(LogFile logFile);
 }

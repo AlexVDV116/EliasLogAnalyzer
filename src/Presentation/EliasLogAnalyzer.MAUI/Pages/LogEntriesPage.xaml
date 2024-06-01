@@ -1,5 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
@@ -18,6 +19,12 @@
             <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
             <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
             <converters:TimeDeltaToStringConverter x:Key="TimeDeltaToStringConverter" />
+
+            <FontImageSource x:Key="InfoIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Info}"
+                         Color="Blue"
+                         Size="20"/>
         </ResourceDictionary>
 
         <!-- Style to make selected element in a collectionView highlighted -->
@@ -108,7 +115,10 @@
 
                         <CollectionView.EmptyView>
                             <ContentView>
-                                <Label Text="No search results..." Margin="10, 50" FontAttributes="Italic" />
+                                <HorizontalStackLayout>
+                                    <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" />
+                                    <Label Text="No results found. Try refining your search terms." Margin="10, 50" FontAttributes="Italic" IsVisible="{Binding NoSearchResults}" />
+                                </HorizontalStackLayout>
                             </ContentView>
                         </CollectionView.EmptyView>
 
@@ -117,7 +127,7 @@
                             <Grid
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10" ColumnSpacing="10"
-                                ColumnDefinitions="30, 40, 100, 100, 100, 150, 100, 100, 150, 300, 80, 80, 200, 200">
+                                          ColumnDefinitions="30, 40, 100, 100, 100, 150, 80, 80, 120, 300, 80, 100, 200, 200">
                                 <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
                                 <Label Grid.Column="1" Text="📌" />
                                 <Label Grid.Column="2" Text="Time Delta" FontAttributes="Bold"/>
@@ -197,7 +207,7 @@
                                 <VerticalStackLayout>
                                     <Grid Padding="10" ColumnSpacing="10"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="30, 40, 100, 100, 100, 150, 80, 100, 150, 300, 80, 80, 200, 200">
+                                          ColumnDefinitions="30, 40, 100, 100, 100, 150, 80, 80, 120, 300, 80, 100, 200, 200">
                                         <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
                                         <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
                                         <Label Grid.Column="2" Text="{Binding TimeDelta, Converter={StaticResource TimeDeltaToStringConverter}}" />

@@ -29,6 +29,7 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
     /// <param name="entries">The list of all entries to compare against the marked entry.</param>
     public void CalcDiffTicks()
     {
+        MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
 
         foreach (var entry in LogEntries)
         {
@@ -47,96 +48,69 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
         }
     }
 
-    public Dictionary<string, List<LogEntry>> PerformAnalysis()
+    public void AnalyzeLogEntries()
     {
-
-        var tempResults = new Dictionary<string, List<LogEntry>>();
-        foreach (var probabilityRange in new[] { "100%", "> 75%", "> 50%", "> 25%", "< 25%" })
-        {
-            tempResults[probabilityRange] = [];
-        }
+        if (MarkedLogEntry == null) return;
 
         foreach (var entry in LogEntries)
         {
-            if (entry != MarkedLogEntry && MarkedLogEntry != null)
+            if (entry != MarkedLogEntry)
             {
-                var probability = CalculateRelationProbability(MarkedLogEntry, entry);
-                entry.Propability = (int)probability;  // Set the probability value
-                var range = GetProbabilityRange(probability);
-                tempResults[range].Add(entry);
+                double probability = CalculateProbability(MarkedLogEntry, entry);
+                entry.Propability = (int)Math.Clamp(probability, 0, 100);
             }
         }
-
-        // Only add non-empty groups to results
-        var results = new Dictionary<string, List<LogEntry>>();
-        foreach (var range in tempResults)
-        {
-            if (range.Value.Count > 0)
-            {
-                results[range.Key] = range.Value;
-            }
-        }
-
-        return results;
     }
 
+    /// <summary>
+    /// Calculates the overall probability that two LogEntries are related by evaluating three aspects:
+    /// time proximity, tick count similarity, and stack trace similarity. The method sums the probabilities derived from
+    /// the differences in time (up to 5 seconds), exactness in tick alignment, and the percentage of matching stack trace lines.
+    /// </summary>
+    /// <param name="entry1">The first log entry to compare.</param>
+    /// <param name="entry2">The second log entry to compare against the first.</param>
+    /// <returns>The calculated probability, as a percentage, representing the likelihood that the two log entries are related based on their timestamps, tick counts, and stack traces.</returns>
 
-    private static string GetProbabilityRange(double probability)
-    {
-        if (probability == 100) return "100%";
-        if (probability > 75) return "> 75%";
-        if (probability > 50) return "> 50%";
-        if (probability > 25) return "> 25%";
-        return "< 25%";
-    }
-
-
-    private static double CalculateRelationProbability(LogEntry entry1, LogEntry entry2)
+    private static double CalculateProbability(LogEntry entry1, LogEntry entry2)
     {
         double probability = 0;
-
-        // Check if they are within 5 seconds of each other
-        var timeDiff = Math.Abs((entry1.LogTimeStamp.DateTime - entry2.LogTimeStamp.DateTime).TotalSeconds);
-        if (timeDiff <= 5)
-        {
-            probability += (5 - timeDiff) * 5; // Add 5% for each second within 5 seconds
-        }
-
-        // Check if they are logged at the same second
-        if (entry1.LogTimeStamp.DateTime.Second == entry2.LogTimeStamp.DateTime.Second)
-        {
-            probability += 25;
-        }
-
-        // Compare ticks
-        var ticksDiff = Math.Abs(entry1.LogTimeStamp.Ticks - entry2.LogTimeStamp.Ticks);
-        if (ticksDiff == 0)
-        {
-            probability += 25;
-        }
-        else
-        {
-            probability += 25 - Math.Min(ticksDiff / 10.0, 25); // Subtract 1% for every 10 ticks difference up to 25%
-        }
-
-        // Compare stack traces
-        var stackTrace1 = entry1.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        var stackTrace2 = entry2.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-        int matchingLines = stackTrace1.Count(line1 => stackTrace2.Any(line2 => line1.Contains(line2) || line2.Contains(line1)));
-        int totalLines = Math.Max(stackTrace1.Length, stackTrace2.Length);
-
-        var stackTraceSimilarity = (double)matchingLines / totalLines;
-        if (stackTraceSimilarity >= 0.5)
-        {
-            probability += 50;
-        }
-        else
-        {
-            probability -= (0.5 - stackTraceSimilarity) * 100 * 5; // Subtract 5% for every line less than 50% similarity
-        }
-
+        probability += CalculateTimeProbability(entry1, entry2);
+        probability += CalculateTicksProbability(entry1, entry2);
+        probability += CalculateStackTraceProbability(entry1, entry2);
         return probability;
     }
 
+    private static double CalculateTimeProbability(LogEntry entry1, LogEntry entry2)
+    {
+        var timeDiffSeconds = Math.Abs((entry1.LogTimeStamp.DateTime - entry2.LogTimeStamp.DateTime).TotalSeconds);
+        if (timeDiffSeconds <= 5)
+        {
+            return Math.Max(25 - (timeDiffSeconds * 5), 0);  // Ensure non-negative
+        }
+        return 0;
+    }
+
+    private static double CalculateTicksProbability(LogEntry entry1, LogEntry entry2)
+    {
+        var ticksDiff = Math.Abs(entry1.LogTimeStamp.Ticks - entry2.LogTimeStamp.Ticks);
+        if (ticksDiff == 0)
+        {
+            return 50;
+        }
+        // Prevent negative values and ensure result does not exceed the 0-50 range
+        return Math.Max(25 - (ticksDiff / 10.0), 0);
+    }
+
+    private static double CalculateStackTraceProbability(LogEntry entry1, LogEntry entry2)
+    {
+        var stackTrace1 = entry1.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var stackTrace2 = entry2.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+        var matchingLines = stackTrace1.Count(line => stackTrace2.Contains(line));
+        var totalLines = Math.Max(stackTrace1.Length, stackTrace2.Length);
+        var similarityPercentage = (double)matchingLines / totalLines;
+
+        // Convert similarity ratio to percentage and ensure non-negative
+        return Math.Max(similarityPercentage * 100, 0);  // Ensure non-negative and within range
+    }
 }

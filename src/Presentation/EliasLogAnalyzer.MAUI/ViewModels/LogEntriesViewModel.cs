@@ -47,15 +47,15 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
 
     [ObservableProperty] private bool _ascending = true;
-    [ObservableProperty] private bool _isSecondLogEntrySelected;
-    [ObservableProperty] private bool _isThirdLogEntrySelected;
+    [ObservableProperty] private bool _isSecondLogEntrySelected = false;
+    [ObservableProperty] private bool _isThirdLogEntrySelected = false;
+    [ObservableProperty] private bool _noSearchResults = false;
 
     // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
     [ObservableProperty] public ObservableCollection<LogEntry> _logEntries = [];
     [ObservableProperty] public ObservableCollection<LogFile> _logFiles = [];
     [ObservableProperty] public ObservableCollection<LogType> _selectedLogTypes = [];
     [ObservableProperty] public ObservableCollection<object> _selectedLogEntries = [];
-    [ObservableProperty] public ObservableCollection<LogFile> _selectedLogFiles = [];
     [ObservableProperty] public ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] public LogEntry? _markedLogEntry = null;
     #endregion
@@ -82,7 +82,6 @@ public partial class LogEntriesViewModel : ObservableObject
         LogFiles = _logDataSharingService.LogFiles;
         SelectedLogTypes = _logDataSharingService.SelectedLogTypes;
         SelectedLogEntries = _logDataSharingService.SelectedLogEntries;
-        SelectedLogFiles = _logDataSharingService.SelectedLogFiles;
         FilteredLogEntries = _logDataSharingService.FilteredLogEntries;
         MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
     }
@@ -136,6 +135,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void RefreshFilter()
     {
+        // Filtering based on current search criteria
         var filtered = _logDataSharingService.LogEntries
             .Where(entry => SelectedLogTypes.Contains(entry.LogType) &&
                             (string.IsNullOrWhiteSpace(SearchText) ||
@@ -143,36 +143,26 @@ public partial class LogEntriesViewModel : ObservableObject
                              entry.ThreadNameOrNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                              entry.SourceLocation.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                              entry.Source.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                                        entry.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                                                                   entry.EventId.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                                                                                                entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.EventId.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                              entry.Computer.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                                          entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                             entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                              entry.Data.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
             .ToList();
 
-        // Efficiently update FilteredLogEntries without resetting the collection
-        for (int i = FilteredLogEntries.Count - 1; i >= 0; i--)
+        // Update UI thread-safe manner 
+        Application.Current?.Dispatcher.Dispatch(() =>
         {
-            if (!filtered.Contains(FilteredLogEntries[i]))
+            FilteredLogEntries.Clear();
+            foreach (var item in filtered)
             {
-                FilteredLogEntries.RemoveAt(i);
+                FilteredLogEntries.Add(item);
             }
-        }
 
-        for (int i = 0; i < filtered.Count; i++)
-        {
-            if (i >= FilteredLogEntries.Count)
-            {
-                FilteredLogEntries.Add(filtered[i]);
-            }
-            else if (!FilteredLogEntries[i].Equals(filtered[i]))
-            {
-                FilteredLogEntries.Insert(i, filtered[i]);
-            }
-        }
-
-        SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
+            SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
+            NoSearchResults = FilteredLogEntries.Count == 0;
+        });
     }
 
     [RelayCommand]
@@ -204,15 +194,11 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void SortByProperty(string propertyName)
     {
-        PropertyInfo? propertyInfo = null;
-        if (propertyName != "DateTime")  // Since the DateTime property is nested inside LogTimeStamp
+        PropertyInfo? propertyInfo = propertyName == "DateTime" ? null : typeof(LogEntry).GetProperty(propertyName);
+        if (propertyName != "DateTime" && propertyInfo == null)
         {
-            propertyInfo = typeof(LogEntry).GetProperty(propertyName);
-            if (propertyInfo == null)
-            {
-                Console.WriteLine($"Property not found: {propertyName}");
-                return;
-            }
+            Console.WriteLine($"Property not found: {propertyName}");
+            return;
         }
 
         var sorted = LogEntries
@@ -222,12 +208,10 @@ public partial class LogEntriesViewModel : ObservableObject
              .ToList();
 
         // Update LogEntries in place
-        for (int i = 0; i < sorted.Count; i++)
+        LogEntries.Clear();
+        foreach (var entry in sorted)
         {
-            if (!LogEntries[i].Equals(sorted[i]))
-            {
-                LogEntries.Move(LogEntries.IndexOf(sorted[i]), i);
-            }
+            LogEntries.Add(entry);
         }
 
         RefreshFilter();
@@ -237,11 +221,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void ChangeSelectedLogType(LogType logType)
     {
-        if (SelectedLogTypes.Contains(logType))
-        {
-            SelectedLogTypes.Remove(logType);
-        }
-        else
+        if (!SelectedLogTypes.Remove(logType))
         {
             SelectedLogTypes.Add(logType);
         }
@@ -260,10 +240,12 @@ public partial class LogEntriesViewModel : ObservableObject
     [RelayCommand]
     private void MarkAsMainLogEntry(LogEntry logEntry)
     {
-        if (MarkedLogEntry == logEntry && logEntry.IsMarked)
+        var markedLogEntry = _logDataSharingService.MarkedLogEntry;
+
+        if (markedLogEntry == logEntry && logEntry.IsMarked)
         {
             // Unmark the currently marked entry if entry is already marked
-            logEntry.IsMarked = false;
+            logEntry.IsMarked = !logEntry.IsMarked;
             _logDataSharingService.MarkedLogEntry = null;
             SelectedLogEntries.Clear();
             ResetDiffTicks();
@@ -271,10 +253,10 @@ public partial class LogEntriesViewModel : ObservableObject
         else
         {
             // Unmark the previous marked entry if a new entry is marked
-            if (MarkedLogEntry != null)
+            if (markedLogEntry != null)
             {
-                MarkedLogEntry.IsMarked = false;
-                SelectedLogEntries.Remove(MarkedLogEntry);
+                markedLogEntry.IsMarked = false;
+                SelectedLogEntries.Remove(markedLogEntry);
                 ResetDiffTicks();
             }
 
@@ -332,8 +314,7 @@ public partial class LogEntriesViewModel : ObservableObject
         SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
         SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
         SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceLocationHeaderText =
-            "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
         SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
         SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");

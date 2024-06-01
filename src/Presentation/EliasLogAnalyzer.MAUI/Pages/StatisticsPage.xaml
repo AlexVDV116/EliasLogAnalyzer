@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
+             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   
@@ -19,6 +20,12 @@
             <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
             <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
         </ResourceDictionary>
+
+        <FontImageSource x:Key="InfoIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Info}"
+                         Color="Blue"
+                         Size="20"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="*, *">
@@ -26,22 +33,25 @@
             <Border Grid.Column="0" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
                 <ScrollView>
                     <VerticalStackLayout>
-                        <Label Text="{Binding StatisticsText}" FontAttributes="Bold" />
-                        <CollectionView ItemsSource="{Binding LogEntries}" SelectionMode="Single">
+                        <HorizontalStackLayout HorizontalOptions="Center" IsVisible="{Binding NoLogEntryMarked}">
+                            <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" Margin="5, 0"/>
+                            <Label Text="{Binding StatisticsText}" FontAttributes="Italic" />
+                        </HorizontalStackLayout>
+                        <CollectionView ItemsSource="{Binding LogEntries}" SelectionMode="Single" IsVisible="{Binding LogEntryMarked}">
 
                             <CollectionView.Header>
                                 <Grid
                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                               Padding="10" ColumnSpacing="10"
+                               Padding="10" ColumnSpacing="10" Margin="10, 0"
                                ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
                                     <Label Grid.Column="0" Text="📌" />
-                                    <Label Grid.Column="1" Text="%" FontAttributes="Bold"/>
+                                    <Label Grid.Column="1" Text="% ▲" FontAttributes="Bold"/>
                                     <Label Grid.Column="2" Text="DateTime" FontAttributes="Bold"/>
                                     <Label Grid.Column="3" Text="Ticks" FontAttributes="Bold"/>
                                     <Label Grid.Column="4" Text="LogType" FontAttributes="Bold"/>
                                     <Label Grid.Column="5" Text="Source" FontAttributes="Bold"/>
                                     <Label Grid.Column="6" Text="User" FontAttributes="Bold"/>
-                                    <Label Grid.Column="6" Text="Computer" FontAttributes="Bold"/>
+                                    <Label Grid.Column="7" Text="Computer" FontAttributes="Bold"/>
 
                                 </Grid>
                             </CollectionView.Header>

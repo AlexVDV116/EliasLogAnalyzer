@@ -19,8 +19,9 @@ public partial class StatisticsViewModel : ObservableObject
 
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
-    [ObservableProperty] private bool _isLogEntryMarked = false;
-    [ObservableProperty] private string _statisticsText = "Mark a LogEntry to analyse.";
+    [ObservableProperty] private bool _noLogEntryMarked = true;
+    [ObservableProperty] private bool _LogEntryMarked = true;
+    [ObservableProperty] private string _statisticsText = "Mark a LogEntry to analyse relationship propabilities.";
 
     // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
     [ObservableProperty] public ObservableCollection<LogEntry> _logEntries = [];
@@ -49,6 +50,8 @@ public partial class StatisticsViewModel : ObservableObject
         SelectedLogFiles = _logDataSharingService.SelectedLogFiles;
         FilteredLogEntries = _logDataSharingService.FilteredLogEntries;
         MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
+        NoLogEntryMarked = MarkedLogEntry == null;
+        LogEntryMarked = MarkedLogEntry != null;
 
         LogEntries.CollectionChanged += OnLogEntriesChanged;
         ((INotifyPropertyChanged)_logDataSharingService).PropertyChanged += OnMarkedLogEntryChanged;
@@ -60,6 +63,8 @@ public partial class StatisticsViewModel : ObservableObject
     private void OnMarkedLogEntryChanged(object sender, PropertyChangedEventArgs e)
     {
         MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
+        NoLogEntryMarked = MarkedLogEntry == null;
+        LogEntryMarked = MarkedLogEntry != null;
         AnalyzeLogEntries();
         GenerateCharts();
     }
@@ -77,7 +82,7 @@ public partial class StatisticsViewModel : ObservableObject
         if (MarkedLogEntry != null)
         {
             StatisticsText = string.Empty;
-            _logEntryAnalysisService.PerformAnalysis();
+            _logEntryAnalysisService.AnalyzeLogEntries();
         }
     }
 

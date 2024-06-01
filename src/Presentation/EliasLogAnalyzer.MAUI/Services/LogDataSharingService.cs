@@ -23,7 +23,7 @@ public partial class LogDataSharingService : ObservableObject, ILogDataSharingSe
     [ObservableProperty] private ObservableCollection<object> _selectedLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
-    private LogEntry _markedLogEntry;
+    private LogEntry? _markedLogEntry;
 
     public LogEntry MarkedLogEntry
     {
