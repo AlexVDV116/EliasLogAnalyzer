@@ -45,43 +45,41 @@
         <FontImageSource x:Key="DataTableIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.DataTable}"
-                         Color="Black" />
+                         Color="Black" Size="40"  />
         <FontImageSource x:Key="InsightsIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Insights}"
-                         Color="Black" />
+                         Color="Black" Size="40"  />
         <FontImageSource x:Key="SummarizeIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Summarize}"
-                         Color="Black" />
+                         Color="Black" Size="40"  />
         <FontImageSource x:Key="DatabaseIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Database}"
-                         Color="Black" />
+                         Color="Black" Size="40"  />
         <FontImageSource x:Key="SettingsIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Settings}"
-                         Color="Black" />
+                         Color="Black" Size="40" />
         <FontImageSource x:Key="LeftPanelOpenIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.LeftPanelOpen}"
-                         Color="Black" />
+                         Color="Black" Size="40" />
         <FontImageSource x:Key="LeftPanelCloseIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.LeftPanelClose}"
-                         Color="Black" />
+                         Color="Black" Size="40" />
     </Shell.Resources>
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="15, 70, 0, 40" HeightRequest="60" HorizontalOptions="Start">
+            <Grid ColumnDefinitions="Auto, Auto" Margin="15, 70, 0, 40" HeightRequest="60" HorizontalOptions="Start">
                 <Image Grid.Column="0"
                        Source="logo.png"
-                       WidthRequest="60"
-                       HeightRequest="60"
                        VerticalOptions="End" />
 
-                <Label Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding ToggleHeaderTextVisibility}">
+                <Label Grid.Column="1" VerticalOptions="Center" Margin="10, 0" IsVisible="{Binding ToggleHeaderTextVisibility}">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="ELIAS" FontAttributes="Bold" TextColor="Black" FontSize="16"/>
@@ -143,13 +141,12 @@
 
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
-            <Grid ColumnDefinitions="Auto, 90" Padding="5, 7, 0 , 0">
+            <Grid ColumnDefinitions="Auto, 90" Padding="12, 7, 0 , 0">
                 <Image Grid.Column="0"
                        Source="{Binding FlyoutIcon}"
-                       Aspect="Center"
-                       HeightRequest="50"
-                       WidthRequest="50" />
+                       Aspect="Center"/>
                 <Label Grid.Column="1"
+                       Padding="8, 15"
                        Text="{Binding Title}"
                        VerticalTextAlignment="Center" />
             </Grid>
@@ -158,9 +155,7 @@
 
     <Shell.FlyoutFooter>
         <Grid HorizontalOptions="End">
-            <Image Source="{StaticResource LeftPanelOpenIcon}"
-                       Aspect="Center"
-                       HeightRequest="50">
+            <Image Source="{StaticResource LeftPanelOpenIcon}" Aspect="Center" Margin="15">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleFlyoutWidthCommand}" />
                 </Image.GestureRecognizers>
