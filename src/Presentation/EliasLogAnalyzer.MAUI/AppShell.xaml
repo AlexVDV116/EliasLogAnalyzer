@@ -74,7 +74,7 @@
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="10" Margin="10, 30, 0, 20" HeightRequest="60" HorizontalOptions="Center">
+            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="10, 50, 0, 20" HeightRequest="60" HorizontalOptions="Start">
                 <Image Grid.Column="0"
                        Source="logo.png"
                        WidthRequest="60"

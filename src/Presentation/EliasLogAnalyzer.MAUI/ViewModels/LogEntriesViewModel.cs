@@ -29,6 +29,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _searchText = string.Empty;
     [ObservableProperty] private string _searchResultText = "0 / 0 👁️";
+    [ObservableProperty] private string _emptyViewText = "No log entries found, please load logfiles.";
     [ObservableProperty] private string _debugLogTypeText = "Debug";
     [ObservableProperty] private string _informationLogTypeText = "Information";
     [ObservableProperty] private string _warningLogTypeText = "Warning";
@@ -50,7 +51,6 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private bool _isFirstLogEntrySelected = false;
     [ObservableProperty] private bool _isSecondLogEntrySelected = false;
     [ObservableProperty] private bool _isThirdLogEntrySelected = false;
-    [ObservableProperty] private bool _noSearchResults = false;
 
     // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
     [ObservableProperty] public ObservableCollection<LogEntry> _logEntries = [];
@@ -161,8 +161,11 @@ public partial class LogEntriesViewModel : ObservableObject
                 FilteredLogEntries.Add(item);
             }
 
+            // Dynamic text to display the number of filtered entries and EmptyViewText based on search results
             SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
-            NoSearchResults = SearchText.Length > 0 && FilteredLogEntries.Count == 0;
+            EmptyViewText = SearchText.Length > 0 && FilteredLogEntries.Count == 0
+                ? "No results found. Try refining your search terms."
+                : "No log entries found, please load logfiles.";
         });
     }
 
