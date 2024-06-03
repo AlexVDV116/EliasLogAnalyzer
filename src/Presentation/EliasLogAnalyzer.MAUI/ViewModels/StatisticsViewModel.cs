@@ -67,7 +67,6 @@ public partial class StatisticsViewModel : ObservableObject
     private void SetBaseUrl()
     {
 #if WINDOWS
-        // For Windows, you might need to use an absolute path or a specific format
         BaseUrl = string.Empty;
 #elif MACCATALYST
         BaseUrl = Foundation.NSBundle.MainBundle.ResourcePath;

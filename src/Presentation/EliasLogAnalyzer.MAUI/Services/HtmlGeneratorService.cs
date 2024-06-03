@@ -6,11 +6,26 @@ using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using EliasLogAnalyzer.MAUI.Resources;
 
 namespace EliasLogAnalyzer.MAUI.Services
 {
     public class HtmlGeneratorService : IHtmlGeneratorService
     {
+        private readonly ISettingsService _settingsService;
+        
+        private Theme CurrentTheme => _settingsService.AppTheme;
+        private string BackgroundColor => CurrentTheme == Theme.Light ? "#f9f9f9" : "#333";
+        private string TextColor => CurrentTheme == Theme.Light ? "#333" : "#f9f9f9";
+        private string HeaderColor => CurrentTheme == Theme.Light ? "#e9e9e9" : "#333";
+        private string BorderColor => CurrentTheme == Theme.Light ? "#ddd" : "#666";
+        
+        
+        public HtmlGeneratorService(ISettingsService settingsService)
+        {
+            _settingsService = settingsService;
+        }
+        
         public string ConvertDataToHtml(LogEntry logEntry)
         {
             var dateTimeString = logEntry.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
@@ -28,9 +43,9 @@ namespace EliasLogAnalyzer.MAUI.Services
             <head>
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <style>
-                    body {{ margin: 0; padding: 0; font-family: 'Consolas', 'Courier New', monospace; background-color: #f9f9f9; color: #333; }}
+                    body {{ margin: 0; padding: 0; font-family: 'Consolas', 'Courier New', monospace; background-color: {BackgroundColor}; color: {TextColor}; }}
                     pre {{ margin: 0; padding: 10px 20px; white-space: pre-wrap; word-wrap: break-word; }}
-                    h4 {{ margin: 0; padding: 10px 20px; background-color: #e9e9e9; color: #333; border-bottom: 1px solid #ddd; }}
+                    h4 {{ margin: 0; padding: 10px 20px; background-color: {HeaderColor}; color: {TextColor}; border-bottom: 1px solid {BorderColor}; }}
                 </style>
             </head>
             <body>

@@ -18,14 +18,12 @@ namespace EliasLogAnalyzer.MAUI
             _logEntriesViewModel = logEntriesViewModel;
             MainPage = new AppShell(_appShellViewModel, _logEntriesViewModel);
             // Setting the theme currently bugs out the flyoutmenu https://github.com/dotnet/maui/issues/22672
-            //SetTheme();
+            SetTheme();
         }
 
         private void SetTheme()
         {
-            UserAppTheme = _settingsService.AppTheme != null
-                            ? _settingsService.AppTheme.AppTheme
-                            : AppTheme.Unspecified;
+            Application.Current.UserAppTheme = AppTheme.Light;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

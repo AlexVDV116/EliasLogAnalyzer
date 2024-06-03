@@ -47,6 +47,7 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
 
     [ObservableProperty] private bool _ascending = true;
+    [ObservableProperty] private bool _isFirstLogEntrySelected = false;
     [ObservableProperty] private bool _isSecondLogEntrySelected = false;
     [ObservableProperty] private bool _isThirdLogEntrySelected = false;
     [ObservableProperty] private bool _noSearchResults = false;
@@ -348,6 +349,7 @@ public partial class LogEntriesViewModel : ObservableObject
             FirstLogEntryDataHtml = string.Empty;
             SecondLogEntryDataHtml = string.Empty;
             ThirdLogEntryDataHtml = string.Empty;
+            IsFirstLogEntrySelected = false;
             IsSecondLogEntrySelected = false;
             IsThirdLogEntrySelected = false;
             return;
@@ -356,6 +358,12 @@ public partial class LogEntriesViewModel : ObservableObject
         if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
         {
             FirstLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(firstEntry);
+            IsFirstLogEntrySelected = true;
+        }
+        else
+        {
+            IsFirstLogEntrySelected = false;
+
         }
 
         if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
