@@ -8,6 +8,7 @@ namespace EliasLogAnalyzer.MAUI.Services
     {
         [ObservableProperty]
         private Theme _appTheme;
+
         public SettingsService()
         {
             // set the default appTheme to Light (in future this could be read from the preferences)
