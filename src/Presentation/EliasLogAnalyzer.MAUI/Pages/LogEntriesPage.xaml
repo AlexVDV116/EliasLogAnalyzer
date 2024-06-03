@@ -116,7 +116,7 @@
                         <CollectionView.EmptyView>
                             <ContentView>
                                 <HorizontalStackLayout>
-                                    <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" />
+                                    <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" IsVisible="{Binding NoSearchResults}" />
                                     <Label Text="No results found. Try refining your search terms." Margin="10, 50" FontAttributes="Italic" IsVisible="{Binding NoSearchResults}" />
                                 </HorizontalStackLayout>
                             </ContentView>

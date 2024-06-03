@@ -162,7 +162,7 @@ public partial class LogEntriesViewModel : ObservableObject
             }
 
             SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
-            NoSearchResults = FilteredLogEntries.Count == 0;
+            NoSearchResults = SearchText.Length > 0 && FilteredLogEntries.Count == 0;
         });
     }
 
