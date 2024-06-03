@@ -1,12 +1,8 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using EliasLogAnalyzer.MAUI.Pages;
-using EliasLogAnalyzer.MAUI.Resources;
-using EliasLogAnalyzer.MAUI.Services.Contracts;
-using EliasLogAnalyzer.MAUI.ViewModels;
+﻿using EliasLogAnalyzer.MAUI.ViewModels;
 
 namespace EliasLogAnalyzer.MAUI
 {
-    public partial class AppShell : Shell
+    public partial class AppShell
     {
         private readonly LogEntriesViewModel _logEntriesViewModel;
         private readonly AppShellViewModel _appShellViewModel;

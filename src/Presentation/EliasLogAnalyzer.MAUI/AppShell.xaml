@@ -10,7 +10,7 @@
     xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
     xmlns:behaviors="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Behaviors"
     x:DataType="viewModels:AppShellViewModel"
-    Shell.FlyoutBehavior="Locked"
+    FlyoutBehavior="Locked"
     FlyoutWidth="{Binding FlyoutWidth}"
     Title="EliasLogAnalyzer">
 
@@ -74,7 +74,7 @@
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="15, 70, 0, 40" HeightRequest="60" HorizontalOptions="Start">
+            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="10, 50, 0, 40" HeightRequest="60" HorizontalOptions="Start">
                 <Image Grid.Column="0"
                        Source="logo.png"
                        WidthRequest="60"

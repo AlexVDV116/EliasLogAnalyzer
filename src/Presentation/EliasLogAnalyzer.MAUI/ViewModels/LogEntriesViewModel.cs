@@ -22,7 +22,7 @@ public partial class LogEntriesViewModel : ObservableObject
     #endregion
 
     #region Properties
-
+    
     [ObservableProperty] private bool _isLoading = false;
     [ObservableProperty] private string _firstLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
