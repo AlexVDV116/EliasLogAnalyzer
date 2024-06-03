@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
-using Microsoft.Maui;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Text;
-using System.Text.Json;
-using Foundation;
+using System.Reflection;
+using static System.Net.WebRequestMethods;
+
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -17,7 +16,7 @@ public partial class StatisticsViewModel : ObservableObject
     private readonly ILogEntryAnalysisService _logEntryAnalysisService;
     private readonly IHtmlGeneratorService _htmlGeneratorService;
 
-    [ObservableProperty] private string _baseUrl = NSBundle.MainBundle.ResourcePath;
+    [ObservableProperty] private string _baseUrl;
 
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
@@ -43,6 +42,8 @@ public partial class StatisticsViewModel : ObservableObject
         _logEntryAnalysisService = logEntryAnalysisService;
         _htmlGeneratorService = htmlGeneratorService;
 
+        // Set BaseUrl based on platform to enable echart-min.js file to load in the WebView
+        SetBaseUrl();
 
         LogEntries = _logDataSharingService.LogEntries;
         LogFiles = _logDataSharingService.LogFiles;
@@ -59,6 +60,20 @@ public partial class StatisticsViewModel : ObservableObject
 
         GenerateCharts();
         AnalyzeLogEntries();
+    }
+
+    // Doestn work: https://appdir/Resources/JavaScript/echarts.min.js
+
+    private void SetBaseUrl()
+    {
+#if WINDOWS
+        // For Windows, you might need to use an absolute path or a specific format
+        BaseUrl = string.Empty;
+#elif MACCATALYST
+        BaseUrl = Foundation.NSBundle.MainBundle.ResourcePath;
+#else
+        BaseUrl = string.Empty;
+#endif
     }
 
     private void OnMarkedLogEntryChanged(object sender, PropertyChangedEventArgs e)

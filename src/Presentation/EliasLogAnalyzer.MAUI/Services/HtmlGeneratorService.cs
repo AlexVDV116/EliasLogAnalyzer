@@ -84,7 +84,7 @@ namespace EliasLogAnalyzer.MAUI.Services
             sb.AppendLine("body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: Arial; }");
             sb.AppendFormat("#{0} {{ width: {1}; height: {2}; }}\n", divId, width, height);
             sb.AppendLine("</style>");
-            sb.AppendLine("<script src=\"JavaScript/echarts.min.js\"></script>");
+            sb.AppendLine("<script src=\"Resources/JavaScript/echarts.min.js\"></script>");
             sb.AppendLine("</head><body>");
             sb.AppendFormat("<div id='{0}'></div>\n", divId);
             sb.AppendLine("<script>");
