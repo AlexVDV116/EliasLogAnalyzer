@@ -74,7 +74,7 @@
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="10, 50, 0, 20" HeightRequest="60" HorizontalOptions="Start">
+            <Grid ColumnDefinitions="Auto, Auto" ColumnSpacing="10" Margin="15, 70, 0, 40" HeightRequest="60" HorizontalOptions="Start">
                 <Image Grid.Column="0"
                        Source="logo.png"
                        WidthRequest="60"
@@ -143,7 +143,7 @@
 
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
-            <Grid ColumnDefinitions="Auto, 90" Padding="0, 5, 0 , 0">
+            <Grid ColumnDefinitions="Auto, 90" Padding="5, 7, 0 , 0">
                 <Image Grid.Column="0"
                        Source="{Binding FlyoutIcon}"
                        Aspect="Center"

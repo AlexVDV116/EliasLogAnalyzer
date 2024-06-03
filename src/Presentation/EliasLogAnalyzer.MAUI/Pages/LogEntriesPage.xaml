@@ -114,10 +114,10 @@
                                     SelectionChangedCommand="{Binding SelectionChangedCommand}">
 
                         <CollectionView.EmptyView>
-                                <HorizontalStackLayout>
-                                    <Image VerticalOptions="Start" Margin="5, 0" Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" />
-                                    <Label Text="{Binding EmptyViewText}" FontAttributes="Italic"  />
-                                </HorizontalStackLayout>
+                            <HorizontalStackLayout Padding="0, 50" >
+                                <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" VerticalOptions="Start" Margin="5, 0"  />
+                                <Label Text="{Binding EmptyViewText}" FontAttributes="Italic"  />
+                            </HorizontalStackLayout>
                         </CollectionView.EmptyView>
 
                         <!-- Headers for the Filtered LogEntries-->
