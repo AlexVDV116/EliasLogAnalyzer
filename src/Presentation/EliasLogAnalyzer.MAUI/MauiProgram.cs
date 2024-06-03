@@ -53,9 +53,7 @@ namespace EliasLogAnalyzer.MAUI
             {
                 handler.PlatformView.IsMultiSelectCheckBoxEnabled = false;
             });
-#endif
-
-#if DEBUG
+#elif DEBUG
             builder.Logging.AddDebug();
 #endif
 

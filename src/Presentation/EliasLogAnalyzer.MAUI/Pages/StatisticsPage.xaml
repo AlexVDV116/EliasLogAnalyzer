@@ -89,9 +89,10 @@
 
 
             <Border Grid.Column="1" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
-                <WebView HorizontalOptions="FillAndExpand">
+                <WebView x:Name="PieWebView" HorizontalOptions="FillAndExpand">
                     <WebView.Source>
-                        <HtmlWebViewSource Html="{Binding PieChartHtml}" />
+                        <!-- Set the BaseURL to fix JS not being loaded on MacCatalyst -->
+                        <HtmlWebViewSource BaseUrl="{Binding BaseUrl}" Html="{Binding PieChartHtml}" />
                     </WebView.Source>
                 </WebView>
             </Border>
@@ -100,7 +101,8 @@
         <Border Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
             <WebView HorizontalOptions="FillAndExpand">
                 <WebView.Source>
-                    <HtmlWebViewSource Html="{Binding TimelineHtml}" />
+                    <!-- Set the BaseURL to fix JS not being loaded on MacCatalyst -->
+                    <HtmlWebViewSource BaseUrl="{Binding BaseUrl}" Html="{Binding TimelineHtml}" />
                 </WebView.Source>
             </WebView>
         </Border>

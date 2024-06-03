@@ -1,4 +1,7 @@
-﻿using EliasLogAnalyzer.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Net;
 using System.Text;
@@ -18,7 +21,7 @@ namespace EliasLogAnalyzer.MAUI.Services
             var descriptionString = logEntry.Description;
             var markedAsMainText = logEntry.IsMarked ? "\u2B50" : string.Empty;
 
-            string dataString = WebUtility.HtmlEncode(logEntry.Data);
+            var dataString = WebUtility.HtmlEncode(logEntry.Data);
 
             return $@"
             <html>
@@ -81,7 +84,7 @@ namespace EliasLogAnalyzer.MAUI.Services
             sb.AppendLine("body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: Arial; }");
             sb.AppendFormat("#{0} {{ width: {1}; height: {2}; }}\n", divId, width, height);
             sb.AppendLine("</style>");
-            sb.AppendLine("<script src=\"Resources/JavaScript/echarts.min.js\"></script>");
+            sb.AppendLine("<script src=\"JavaScript/echarts.min.js\"></script>");
             sb.AppendLine("</head><body>");
             sb.AppendFormat("<div id='{0}'></div>\n", divId);
             sb.AppendLine("<script>");

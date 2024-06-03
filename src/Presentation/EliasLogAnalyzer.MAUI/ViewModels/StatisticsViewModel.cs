@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
+using Foundation;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class StatisticsViewModel : ObservableObject
     private readonly ILogEntryAnalysisService _logEntryAnalysisService;
     private readonly IHtmlGeneratorService _htmlGeneratorService;
 
+    [ObservableProperty] private string _baseUrl = NSBundle.MainBundle.ResourcePath;
 
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
@@ -31,7 +33,6 @@ public partial class StatisticsViewModel : ObservableObject
     [ObservableProperty] public ObservableCollection<LogFile> _selectedLogFiles = [];
     [ObservableProperty] public ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] public LogEntry? _markedLogEntry = null;
-
 
     public StatisticsViewModel(
         ILogDataSharingService logDataSharingService,

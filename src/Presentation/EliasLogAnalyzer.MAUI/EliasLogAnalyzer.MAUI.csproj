@@ -88,8 +88,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Core\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
 	</ItemGroup>
-
-
+	
 	<ItemGroup>
 		<MauiXaml Update="Pages\DatabasePage.xaml">
 			<Generator>MSBuild:Compile</Generator>
@@ -104,11 +103,11 @@
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>
-
+	
 	<ItemGroup>
-		<None Update="Resources\JavaScript\echarts.min.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+	  <MauiAsset Include="Resources\JavaScript\echarts.min.js">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
 	</ItemGroup>
 
 </Project>
