@@ -1,29 +1,23 @@
-﻿using EliasLogAnalyzer.MAUI.Services.Contracts;
-using EliasLogAnalyzer.MAUI.ViewModels;
+﻿using EliasLogAnalyzer.MAUI.ViewModels;
 
 namespace EliasLogAnalyzer.MAUI
 {
-    public partial class App : Application
+    public partial class App
     {
-        private readonly ISettingsService _settingsService;
-        private readonly LogEntriesViewModel _logEntriesViewModel;
-        private readonly AppShellViewModel _appShellViewModel;
 
-        public App(ISettingsService settingsService, AppShellViewModel appShellViewModel, LogEntriesViewModel logEntriesViewModel)
+        public App(AppShellViewModel appShellViewModel, LogEntriesViewModel logEntriesViewModel)
         {
-            _settingsService = settingsService;
 
             InitializeComponent();
-            _appShellViewModel = appShellViewModel;
-            _logEntriesViewModel = logEntriesViewModel;
-            MainPage = new AppShell(_appShellViewModel, _logEntriesViewModel);
-            // Setting the theme currently bugs out the flyoutmenu https://github.com/dotnet/maui/issues/22672
+            MainPage = new AppShell(appShellViewModel, logEntriesViewModel);
+            // Setting the theme currently bugs out the flyout menu https://github.com/dotnet/maui/issues/22672
             SetTheme();
         }
 
-        private void SetTheme()
+        private static void SetTheme()
         {
-            Application.Current.UserAppTheme = AppTheme.Light;
+            if (Application.Current != null)
+                Application.Current.UserAppTheme = AppTheme.Light;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

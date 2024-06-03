@@ -10,7 +10,7 @@
     xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
     xmlns:behaviors="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Behaviors"
     x:DataType="viewModels:AppShellViewModel"
-    Shell.FlyoutBehavior="Locked"
+    FlyoutBehavior="Locked"
     FlyoutWidth="{Binding FlyoutWidth}"
     Title="EliasLogAnalyzer">
 

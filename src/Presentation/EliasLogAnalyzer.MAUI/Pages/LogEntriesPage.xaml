@@ -4,12 +4,11 @@
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"
-             xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:DataType="viewModels:LogEntriesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
 
-    <Shell.TitleView>
+    <Shell.TitleView> 
         <Label Text="" />
     </Shell.TitleView>
 
