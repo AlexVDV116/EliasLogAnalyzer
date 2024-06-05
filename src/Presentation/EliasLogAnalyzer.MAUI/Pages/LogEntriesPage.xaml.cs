@@ -1,4 +1,3 @@
-using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.ViewModels;
 
 namespace EliasLogAnalyzer.MAUI.Pages;

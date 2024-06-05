@@ -11,57 +11,128 @@ namespace EliasLogAnalyzer.MAUI.Services;
 /// Provides collections of log files and entries for view models to bind and interact with. Acts as the single source of truth for
 /// LogEntries and LogFiles collections.
 /// </summary>
-public partial class LogDataSharingService : ObservableObject, ILogDataSharingService
+public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
+    : ObservableObject, ILogDataSharingService
 {
-    private readonly ILogger<LogFileParserService> _logger;
     private readonly HashSet<string> _loadedLogFileIdentifiers = [];
     private readonly HashSet<string> _loadedLogEntryIdentifiers = [];
 
     [ObservableProperty] private ObservableCollection<LogFile> _logFiles = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _logEntries = [];
-    [ObservableProperty] private ObservableCollection<LogFile> _selectedLogFiles = [];
     [ObservableProperty] private ObservableCollection<object> _selectedLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
-    private LogEntry? _markedLogEntry;
-
-    public LogEntry MarkedLogEntry
+    [ObservableProperty] private LogEntry? _markedLogEntry;
+    
+    public void SortByProperty(string propertyName, bool ascending = false)
     {
-        get => _markedLogEntry;
-        set
+        var propertyInfo = propertyName == "DateTime" ? null : typeof(LogEntry).GetProperty(propertyName);
+        if (propertyName != "DateTime" && propertyInfo == null)
         {
-            if (_markedLogEntry != value)
-            {
-                if (_markedLogEntry != null)
-                {
-                    _markedLogEntry.IsMarked = false; // Unmark the previous entry
-                }
-                _markedLogEntry = value;
-                OnPropertyChanged();
-                if (_markedLogEntry != null)
-                {
-                    _markedLogEntry.IsMarked = true; // Mark the new entry
-                }
-            }
+            logger.LogWarning("Property not found: {propertyName}", propertyName);
+            return;
+        }
+
+        var sorted = LogEntries
+            .OrderByDescending(x => x.IsPinned) // Pinned entry first
+            .ThenBy(x =>
+                ascending
+                    ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null))
+                    : null)
+            .ThenByDescending(x =>
+                !ascending
+                    ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null))
+                    : null)
+            .ToList();
+        
+        LogEntries.Clear(); 
+        foreach (var entry in sorted)
+        {
+            LogEntries.Add(entry);
+        }
+        UpdateFilter();
+    }
+
+    public void UpdateFilter(string searchText = "")
+    {
+        List<LogEntry> newFilteredEntries;
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            newFilteredEntries = LogEntries
+                .Where(entry => SelectedLogTypes.Contains(entry.LogType))
+                .ToList();
+        }
+        else
+        {
+            newFilteredEntries = LogEntries
+                .Where(entry => SelectedLogTypes.Contains(entry.LogType) &&
+                                (entry.Source.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                 entry.User.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                 entry.Computer.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                 entry.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                 entry.Data.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+        }
+
+        FilteredLogEntries.Clear();
+        foreach (var entry in newFilteredEntries)
+        {
+            FilteredLogEntries.Add(entry);
         }
     }
 
-
-    public LogDataSharingService(ILogger<LogFileParserService> logger)
+    public void PinLogEntry(LogEntry entry)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        entry.IsPinned = !entry.IsPinned;
+    }
+
+    public void MarkLogEntry(LogEntry logEntry)
+    {
+        // Check if there's currently a marked entry and if it's different from the one being marked
+        if (MarkedLogEntry != null && MarkedLogEntry != logEntry)
+        {
+            // Unmark the previous marked entry
+            MarkedLogEntry.IsMarked = false;
+        }
+        
+        // Toggle the mark state if it's the same entry being toggled
+        if (logEntry == MarkedLogEntry)
+        {
+            logEntry.IsMarked = !logEntry.IsMarked;
+            MarkedLogEntry = logEntry.IsMarked ? logEntry : null;
+            ResetDiffTicks();
+        }
+        else
+        {
+            // Mark the new entry
+            logEntry.IsMarked = true;
+            MarkedLogEntry = logEntry;
+        }
+        
+        // Clear selected entries to enforce the marked entry as the first
+        SelectedLogEntries.Clear();
+        if (MarkedLogEntry != null)
+        {
+            SelectedLogEntries.Add(MarkedLogEntry);
+        }
+    }
+
+    private void ResetDiffTicks()
+    {
+        foreach (var entry in LogEntries)
+        {
+            entry.TimeDelta = null;
+        }
     }
 
     public void AddLogFile(LogFile logFile)
     {
-        if (_loadedLogFileIdentifiers.Add(logFile.FullPath))
+        if (!_loadedLogFileIdentifiers.Add(logFile.FullPath)) return;
+        
+        LogFiles.Add(logFile);
+        foreach (var logEntry in logFile.LogEntries)
         {
-            LogFiles.Add(logFile);
-            foreach (var logEntry in logFile.LogEntries)
-            {
-                AddLogEntry(logEntry);
-            }
-            _logger.LogInformation("Added {logFile} to _loadedLogEntryIdentifiers.", logFile.FullPath);
+            AddLogEntry(logEntry);
         }
     }
 
@@ -72,15 +143,5 @@ public partial class LogDataSharingService : ObservableObject, ILogDataSharingSe
         {
             LogEntries.Add(logEntry);
         }
-        _logger.LogInformation("Added {uniqueIdentifier} to _loadedLogEntryIdentifiers.", uniqueIdentifier);
     }
-
-    public void AddLogFileToSelected(LogFile logFile)
-    {
-        if (SelectedLogFiles.All(lf => lf.FullPath != logFile.FullPath))
-        {
-            SelectedLogFiles.Add(logFile);
-        }
-    }
-
 }

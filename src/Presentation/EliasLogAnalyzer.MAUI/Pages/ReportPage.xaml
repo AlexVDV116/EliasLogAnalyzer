@@ -2,10 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
-             x:Class="EliasLogAnalyzer.MAUI.Pages.SummarizePage"
+             x:Class="EliasLogAnalyzer.MAUI.Pages.ReportPage"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
-             x:DataType="viewModels:SummarizeViewModel"
-             Title="SummarizePage">
+             x:DataType="viewModels:ReportViewModel"
+             Title="ReportPage">
 
     <Shell.TitleView>
         <Label Text="" />

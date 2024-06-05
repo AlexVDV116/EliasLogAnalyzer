@@ -223,7 +223,7 @@
                                             <MenuFlyout x:DataType="entities:LogEntry">
                                                 <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
                                                                 Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
-                                                <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=MarkAsMainLogEntryCommand}" CommandParameter="{Binding .}"
+                                                <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=MarkLogEntryCommand}" CommandParameter="{Binding .}"
                                                                 Text="{Binding IsMarked, Converter={StaticResource BoolToMarkedTextConverter}}" />
                                             </MenuFlyout>
                                         </FlyoutBase.ContextFlyout>

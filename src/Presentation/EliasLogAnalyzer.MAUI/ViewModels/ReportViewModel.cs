@@ -2,9 +2,9 @@
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public partial class SummarizeViewModel : ObservableObject
+public partial class ReportViewModel : ObservableObject
 {
-    public SummarizeViewModel()
+    public ReportViewModel()
     {
     }
 }

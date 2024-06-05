@@ -2,8 +2,8 @@
 {
     public class ChangeIconBehavior : Behavior<Image>
     {
-        public ImageSource IconOne { get; set; }
-        public ImageSource IconTwo { get; set; }
+        public ImageSource? IconOne { get; set; }
+        public ImageSource? IconTwo { get; set; }
 
         private TapGestureRecognizer? _tapGestureRecognizer;
         private bool _isIconOne = true; // State tracker
@@ -26,22 +26,14 @@
             base.OnDetachingFrom(bindable);
         }
 
-        private void OnTapped(object sender, EventArgs e)
+        private void OnTapped(object? sender, EventArgs e)
         {
             var image = sender as Image;
-            if (image != null)
-            {
-                // Switch between IconOne and IconTwo
-                if (_isIconOne)
-                {
-                    image.Source = IconTwo;
-                }
-                else
-                {
-                    image.Source = IconOne;
-                }
-                _isIconOne = !_isIconOne; // Toggle state
-            }
+            if (image == null) return;
+            
+            // Switch between IconOne and IconTwo
+            image.Source = _isIconOne ? IconTwo : IconOne;
+            _isIconOne = !_isIconOne; // Toggle state
         }
     }
 }

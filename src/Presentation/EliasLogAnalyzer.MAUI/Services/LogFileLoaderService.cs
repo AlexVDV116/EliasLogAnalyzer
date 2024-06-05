@@ -16,8 +16,7 @@ namespace EliasLogAnalyzer.MAUI.Services
             {
                 FileTypes = customFileType
             });
-
-            // TODO: Implement the logic to parse each log file into a LogFile domain model and return an IEnumerable of the results
+            
             return results;
         }
     }

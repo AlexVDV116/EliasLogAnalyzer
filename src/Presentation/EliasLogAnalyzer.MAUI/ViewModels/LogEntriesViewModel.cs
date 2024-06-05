@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
@@ -8,22 +7,18 @@ using Microsoft.Extensions.Logging;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public partial class LogEntriesViewModel : ObservableObject
+public partial class LogEntriesViewModel(
+    ILogger<LogEntriesViewModel> logger,
+    ILogFileLoaderService logFileLoaderService,
+    ILogFileParserService logFileParserService,
+    ILogDataSharingService logDataSharingService,
+    ILogEntryAnalysisService logEntryAnalysisService,
+    IHtmlGeneratorService htmlGeneratorService)
+    : ObservableObject
 {
-    #region Fields
-
-    private readonly ILogger<LogEntriesViewModel> _logger;
-    private readonly ILogFileLoaderService _logFileLoaderService;
-    private readonly ILogFileParserService _logFileParserService;
-    private readonly ILogDataSharingService _logDataSharingService;
-    private readonly ILogEntryAnalysisService _logEntryAnalysisService;
-    private readonly IHtmlGeneratorService _htmlGeneratorService;
-
-    #endregion
 
     #region Properties
     
-    [ObservableProperty] private bool _isLoading = false;
     [ObservableProperty] private string _firstLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
@@ -36,7 +31,6 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _errorLogTypeText = "✓ Error";
     [ObservableProperty] private string _currentSortProperty = "DateTime";
     [ObservableProperty] private string _sortHeader = "";
-    [ObservableProperty] private string _currentSortDirection = "";
     [ObservableProperty] private string _sortDateTimeHeaderText = "DateTime";
     [ObservableProperty] private string _sortLogTypeHeaderText = "LogType";
     [ObservableProperty] private string _sortThreadHeaderText = "Thread/No";
@@ -47,69 +41,34 @@ public partial class LogEntriesViewModel : ObservableObject
     [ObservableProperty] private string _sortUserHeaderText = "User";
     [ObservableProperty] private string _sortComputerHeaderText = "Computer";
 
+    [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _ascending = true;
-    [ObservableProperty] private bool _isFirstLogEntrySelected = false;
-    [ObservableProperty] private bool _isSecondLogEntrySelected = false;
-    [ObservableProperty] private bool _isThirdLogEntrySelected = false;
+    [ObservableProperty] private bool _isFirstLogEntrySelected;
+    [ObservableProperty] private bool _isSecondLogEntrySelected;
+    [ObservableProperty] private bool _isThirdLogEntrySelected;
 
-    // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
-    [ObservableProperty] public ObservableCollection<LogEntry> _logEntries = [];
-    [ObservableProperty] public ObservableCollection<LogFile> _logFiles = [];
-    [ObservableProperty] public ObservableCollection<LogType> _selectedLogTypes = [];
-    [ObservableProperty] public ObservableCollection<object> _selectedLogEntries = [];
-    [ObservableProperty] public ObservableCollection<LogEntry> _filteredLogEntries = [];
-    [ObservableProperty] public LogEntry? _markedLogEntry = null;
-    #endregion
-
-    #region Constructor
-
-    public LogEntriesViewModel(
-        ILogger<LogEntriesViewModel> logger,
-        ILogFileLoaderService logFileLoaderService,
-        ILogFileParserService logFileParserService,
-        ILogDataSharingService logDataSharingService,
-        ILogEntryAnalysisService logEntryAnalysisService,
-        IHtmlGeneratorService htmlGeneratorService
-        )
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _logFileLoaderService = logFileLoaderService;
-        _logFileParserService = logFileParserService;
-        _logDataSharingService = logDataSharingService;
-        _logEntryAnalysisService = logEntryAnalysisService;
-        _htmlGeneratorService = htmlGeneratorService;
-
-        LogEntries = _logDataSharingService.LogEntries;
-        LogFiles = _logDataSharingService.LogFiles;
-        SelectedLogTypes = _logDataSharingService.SelectedLogTypes;
-        SelectedLogEntries = _logDataSharingService.SelectedLogEntries;
-        FilteredLogEntries = _logDataSharingService.FilteredLogEntries;
-        MarkedLogEntry = _logDataSharingService.MarkedLogEntry;
-    }
-
+    // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
+    private ObservableCollection<LogType> SelectedLogTypes => logDataSharingService.SelectedLogTypes;
+    public ObservableCollection<object> SelectedLogEntries => logDataSharingService.SelectedLogEntries;
+    public ObservableCollection<LogEntry> FilteredLogEntries => logDataSharingService.FilteredLogEntries;
+    private LogEntry? MarkedLogEntry => logDataSharingService.MarkedLogEntry;
 
     #endregion
 
-    #region Commands
+    #region Selection Management
 
     [RelayCommand]
     private void SelectionChanged()
     {
-        // First, ensure the marked log entry is always the first in the collection if it exists
-        if (MarkedLogEntry != null && !SelectedLogEntries.Contains(MarkedLogEntry))
+        // Ensure the marked log entry is always the first in the collection if it exists
+        if (MarkedLogEntry != null && (SelectedLogEntries.Count == 0 || !SelectedLogEntries[0].Equals(MarkedLogEntry)))
         {
-            SelectedLogEntries.Insert(0, MarkedLogEntry);
-        }
-        else if (MarkedLogEntry != null && SelectedLogEntries.IndexOf(MarkedLogEntry) != 0)
-        {
-            // Move the marked log entry to the first position if it's not already there
-            SelectedLogEntries.Remove(MarkedLogEntry);
-            SelectedLogEntries.Insert(0, MarkedLogEntry);
+            SelectedLogEntries.Remove(MarkedLogEntry); // Remove if exists elsewhere
+            SelectedLogEntries.Insert(0, MarkedLogEntry); // Insert at the top
         }
 
-        // Then, manage selections to ensure only three entries are selected
+        // Manage selections to ensure only three entries are selected
         ManageSelections();
-
         UpdateSelectedEntryData(); // Update UI to reflect changes
     }
 
@@ -121,7 +80,6 @@ public partial class LogEntriesViewModel : ObservableObject
             // If the first entry is the marked log entry, remove the second entry to make room
             if (MarkedLogEntry != null && SelectedLogEntries[0] == MarkedLogEntry)
             {
-                // Remove the second entry, as the first one is marked
                 SelectedLogEntries.RemoveAt(1);
             }
             else
@@ -131,43 +89,42 @@ public partial class LogEntriesViewModel : ObservableObject
             }
         }
     }
+    
+    #endregion
+    
+    #region Filtering
 
-    // Command to refresh filter whenever search text or selected log types change
+    partial void OnSearchTextChanged(string? oldValue, string newValue)
+    {
+        RefreshFilter();
+    }
+    
+    // Filter the log entries based on the search text
     [RelayCommand]
     private void RefreshFilter()
     {
-        // Filtering based on current search criteria
-        var filtered = _logDataSharingService.LogEntries
-            .Where(entry => SelectedLogTypes.Contains(entry.LogType) &&
-                            (string.IsNullOrWhiteSpace(SearchText) ||
-                             entry.LogTimeStamp.DateTime.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.ThreadNameOrNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.SourceLocation.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.Source.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.EventId.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.Computer.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                             entry.Data.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
-            .ToList();
+        logDataSharingService.UpdateFilter(string.IsNullOrWhiteSpace(SearchText) ? "" : SearchText);
 
-        // Update UI thread-safe manner 
-        Application.Current?.Dispatcher.Dispatch(() =>
-        {
-            FilteredLogEntries.Clear();
-            foreach (var item in filtered)
-            {
-                FilteredLogEntries.Add(item);
-            }
-
-            // Dynamic text to display the number of filtered entries and EmptyViewText based on search results
-            SearchResultText = $"{FilteredLogEntries.Count} / {_logDataSharingService.LogEntries.Count} 👁️";
-            EmptyViewText = SearchText.Length > 0 && FilteredLogEntries.Count == 0
-                ? "No results found. Try refining your search terms."
-                : "No log entries found, please load logfiles.";
-        });
+        // Dynamic text to display the number of filtered entries and EmptyViewText based on search results
+        SearchResultText = $"{FilteredLogEntries.Count} / {logDataSharingService.LogEntries.Count} 👁️";
+        EmptyViewText = SearchText.Length > 0 && FilteredLogEntries.Count == 0
+            ? "No results found. Try refining your search terms."
+            : "No log entries found, please load logfiles.";
     }
+    
+    [RelayCommand]
+    private void ChangeSelectedLogType(LogType logType)
+    {
+        if (!SelectedLogTypes.Remove(logType))
+            SelectedLogTypes.Add(logType);
+
+        UpdateLogTypeTexts();
+        RefreshFilter();
+    }
+    
+    #endregion
+
+    #region Sorting
 
     [RelayCommand]
     private void HeaderTapped(string propertyName)
@@ -183,166 +140,32 @@ public partial class LogEntriesViewModel : ObservableObject
             CurrentSortProperty = propertyName;
             Ascending = true;
         }
-
-        SortByProperty(propertyName);
+        
+        logDataSharingService.SortByProperty(propertyName, Ascending);
         UpdateSortTexts(propertyName);
     }
-
-
-    [RelayCommand]
-    private void SetSortOrderAscending() => Ascending = true;
-
-    [RelayCommand]
-    private void SetSortOrderDescending() => Ascending = false;
-
-    [RelayCommand]
-    private void SortByProperty(string propertyName)
-    {
-        PropertyInfo? propertyInfo = propertyName == "DateTime" ? null : typeof(LogEntry).GetProperty(propertyName);
-        if (propertyName != "DateTime" && propertyInfo == null)
-        {
-            Console.WriteLine($"Property not found: {propertyName}");
-            return;
-        }
-
-        var sorted = LogEntries
-             .OrderByDescending(x => x.IsPinned) // Pinned entry first
-             .ThenBy(x => Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
-             .ThenByDescending(x => !Ascending ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null)) : null)
-             .ToList();
-
-        // Update LogEntries in place
-        LogEntries.Clear();
-        foreach (var entry in sorted)
-        {
-            LogEntries.Add(entry);
-        }
-
-        RefreshFilter();
-        UpdateSortOrder(propertyName);
-    }
-
-    [RelayCommand]
-    private void ChangeSelectedLogType(LogType logType)
-    {
-        if (!SelectedLogTypes.Remove(logType))
-        {
-            SelectedLogTypes.Add(logType);
-        }
-
-        UpdateLogTypeTexts();
-        RefreshFilter();
-    }
-
-    [RelayCommand]
-    private void PinLogEntry(LogEntry logEntry)
-    {
-        logEntry.IsPinned = !logEntry.IsPinned;
-        SortByProperty(CurrentSortProperty);
-    }
-
-    [RelayCommand]
-    private void MarkAsMainLogEntry(LogEntry logEntry)
-    {
-        var markedLogEntry = _logDataSharingService.MarkedLogEntry;
-
-        if (markedLogEntry == logEntry && logEntry.IsMarked)
-        {
-            // Unmark the currently marked entry if entry is already marked
-            logEntry.IsMarked = !logEntry.IsMarked;
-            _logDataSharingService.MarkedLogEntry = null;
-            SelectedLogEntries.Clear();
-            ResetDiffTicks();
-        }
-        else
-        {
-            // Unmark the previous marked entry if a new entry is marked
-            if (markedLogEntry != null)
-            {
-                markedLogEntry.IsMarked = false;
-                SelectedLogEntries.Remove(markedLogEntry);
-                ResetDiffTicks();
-            }
-
-            logEntry.IsMarked = true;
-            _logDataSharingService.MarkedLogEntry = logEntry;
-            SelectedLogEntries.Clear();
-            SelectedLogEntries.Insert(0, logEntry);
-
-            // Calculate DiffTicks based on the new marked entry
-            _logEntryAnalysisService.CalcDiffTicks();
-        }
-
-        UpdateSelectedEntryData();
-        SortByProperty(CurrentSortProperty);
-    }
-
-
-
-    #endregion
-
-    #region Utility Methods
-
-    private void ResetDiffTicks()
-    {
-        foreach (var entry in _logDataSharingService.LogEntries)
-        {
-            entry.TimeDelta = null;
-        }
-    }
-
-    private void UpdateLogTypeTexts()
-    {
-        DebugLogTypeText = SelectedLogTypes.Contains(LogType.Debug) ? "✓ Debug" : "Debug";
-        InformationLogTypeText = SelectedLogTypes.Contains(LogType.Information) ? "✓ Information" : "Information";
-        WarningLogTypeText = SelectedLogTypes.Contains(LogType.Warning) ? "✓ Warning" : "Warning";
-        ErrorLogTypeText = SelectedLogTypes.Contains(LogType.Error) ? "✓ Error" : "Error";
-    }
-
-    partial void OnSearchTextChanged(string value)
-    {
-        RefreshFilter();
-    }
-
-    private void UpdateSortOrder(string propertyName)
-    {
-        CurrentSortProperty = propertyName;
-        CurrentSortDirection = Ascending ? "Ascending" : "Descending";
-        UpdateSortTexts(propertyName);
-    }
-
-
+    
     // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
     private void UpdateSortTexts(string sortProperty)
     {
         SortDateTimeHeaderText = "DateTime " + (sortProperty == "DateTime" ? (Ascending ? "▲" : "▼") : "");
         SortLogTypeHeaderText = "LogType " + (sortProperty == "LogType" ? (Ascending ? "▲" : "▼") : "");
         SortThreadHeaderText = "Thread/No " + (sortProperty == "ThreadNameOrNumber" ? (Ascending ? "▲" : "▼") : "");
-        SortSourceLocationHeaderText = "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
+        SortSourceLocationHeaderText =
+            "Source Location " + (sortProperty == "SourceLocation" ? (Ascending ? "▲" : "▼") : "");
         SortSourceHeaderText = "Source " + (sortProperty == "Source" ? (Ascending ? "▲" : "▼") : "");
         SortCategoryHeaderText = "Category " + (sortProperty == "Category" ? (Ascending ? "▲" : "▼") : "");
         SortEventIdHeaderText = "Event ID " + (sortProperty == "EventId" ? (Ascending ? "▲" : "▼") : "");
         SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
         SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
     }
-
-    private void AggregateLogEntries()
+    
+        private void UpdateLogTypeTexts()
     {
-        LogEntries.Clear();
-        var uniqueEntries = new HashSet<LogEntry>(LogEntries);
-
-        foreach (var file in LogFiles)
-        {
-            foreach (var entry in file.LogEntries)
-            {
-                if (uniqueEntries.Add(entry))
-                {
-                    LogEntries.Add(entry);
-                }
-            }
-        }
-
-        RefreshFilter();
+        DebugLogTypeText = SelectedLogTypes.Contains(LogType.Debug) ? "✓ Debug" : "Debug";
+        InformationLogTypeText = SelectedLogTypes.Contains(LogType.Information) ? "✓ Information" : "Information";
+        WarningLogTypeText = SelectedLogTypes.Contains(LogType.Warning) ? "✓ Warning" : "Warning";
+        ErrorLogTypeText = SelectedLogTypes.Contains(LogType.Error) ? "✓ Error" : "Error";
     }
 
     private void UpdateSelectedEntryData()
@@ -355,105 +178,110 @@ public partial class LogEntriesViewModel : ObservableObject
             IsFirstLogEntrySelected = false;
             IsSecondLogEntrySelected = false;
             IsThirdLogEntrySelected = false;
-            return;
-        }
-
-        if (SelectedLogEntries.Count > 0 && SelectedLogEntries[0] is LogEntry firstEntry)
-        {
-            FirstLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(firstEntry);
-            IsFirstLogEntrySelected = true;
         }
         else
         {
-            IsFirstLogEntrySelected = false;
-
-        }
-
-        if (SelectedLogEntries.Count > 1 && SelectedLogEntries[1] is LogEntry secondEntry)
-        {
-            SecondLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(secondEntry);
-            IsSecondLogEntrySelected = true;
-        }
-        else
-        {
-            IsSecondLogEntrySelected = false;
-        }
-
-        if (SelectedLogEntries.Count > 2 && SelectedLogEntries[2] is LogEntry thirdEntry)
-        {
-            ThirdLogEntryDataHtml = _htmlGeneratorService.ConvertDataToHtml(thirdEntry);
-            IsThirdLogEntrySelected = true;
-        }
-        else
-        {
-            IsThirdLogEntrySelected = false;
+            (FirstLogEntryDataHtml, IsFirstLogEntrySelected) = SetLogEntryData(0);
+            (SecondLogEntryDataHtml, IsSecondLogEntrySelected) = SetLogEntryData(1);
+            (ThirdLogEntryDataHtml, IsThirdLogEntrySelected) = SetLogEntryData(2);
         }
     }
+    
+    private (string HtmlContent, bool IsSelected) SetLogEntryData(int index)
+    {
+        // Check if the index is within the bounds of the selected entries
+        if (SelectedLogEntries.Count <= index) return (string.Empty, false);
+        if (SelectedLogEntries[index] is not LogEntry logEntry) return (string.Empty, false);
+            
+        // Check if the current entry is the marked entry and is not in the first position
+        if (logEntry == MarkedLogEntry && index != 0)
+        {
+            return (string.Empty, false); // Skip rendering the marked entry if not in the first position
+        }
+
+        var htmlContent = htmlGeneratorService.ConvertDataToHtml(logEntry);
+        return (htmlContent, true);
+    }
+
+    
+    #endregion
+    
+    #region Pinning and Marking
+
+    [RelayCommand]
+    private void PinLogEntry(LogEntry logEntry)
+    {
+        logDataSharingService.PinLogEntry(logEntry);
+        logDataSharingService.SortByProperty(CurrentSortProperty, Ascending);
+    }
+
+    [RelayCommand]
+    private void MarkLogEntry(LogEntry logEntry)
+    {
+        logDataSharingService.MarkLogEntry(logEntry);
+
+        // If a log entry is marked, calculate the time difference between the marked entry and other entries
+        if (MarkedLogEntry != null)
+        {
+            logEntryAnalysisService.CalcDiffTicks();
+        }
+
+        UpdateSelectedEntryData();
+        logDataSharingService.SortByProperty(CurrentSortProperty, Ascending);
+    }
+
+    #endregion
+    
+    #region Loading and Parsing
 
     /// <summary>
-    /// Asynchronously loads multiple log files and parses them concurrently. 
-    /// Each parsing operation is performed in its own task, ensuring that the parsing process is concurrent
-    /// and efficient. 
+    /// Initiates the process of loading and parsing log files asynchronously.
     /// </summary>
     [RelayCommand]
-    private async Task LoadLogFiles()
+    private async Task LoadLogFilesAsync()
     {
+        IsLoading = true;
         try
         {
-            IsLoading = true;
-
-            var fileResults = await _logFileLoaderService.LoadLogFilesAsync();
-
-            // Create a list of tasks for parsing each new log file
-            var parsingTasks = fileResults.Select(ParseLogFileAsync).ToList();
-
-            // Await all tasks to complete
-            var parsedLogFiles = await Task.WhenAll(parsingTasks);
-
-            // Add the parsed log files to the shared service collection
-            foreach (var logFile in parsedLogFiles)
-            {
-                _logDataSharingService.AddLogFile(logFile);
-            }
+            await LoadAndParseAllFilesAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading files.");
+            logger.LogError(ex, "Error loading or parsing files.");
         }
         finally
         {
             IsLoading = false;
         }
-        AggregateLogEntries();
-        SortByProperty("DateTime");
-        RefreshFilter();
+    }
+    
+    /// <summary>
+    /// Loads log files and processes them concurrently adding them to the shared log data service.
+    /// Uses Parallel.ForEachAsync to handle parsing in a parallel manner for better performance
+    /// </summary>
+    private async Task LoadAndParseAllFilesAsync()
+    {
+        var fileResults = await logFileLoaderService.LoadLogFilesAsync();
+        await Parallel.ForEachAsync(fileResults, async (fileResult, _) =>
+        {
+            var logFile = await logFileParserService.ParseLogFileAsync(fileResult);
+            logDataSharingService.AddLogFile(logFile);
+            foreach (var logEntry in logFile.LogEntries)
+            {
+                logDataSharingService.AddLogEntry(logEntry);
+            }
+        });
+
+        RefreshViewState();
     }
 
     /// <summary>
-    /// Asynchronously parses a single log file from a provided FileResult object. This method is designed
-    /// to be called concurrently for multiple files, as each invocation operates independently, ensuring
-    /// thread safety.
+    /// Refreshes the view state by sorting and filtering entries.
     /// </summary>
-    /// <param name="fileResult">The file result from which the log file will be parsed.</param>
-    /// <returns>A task that, when completed, returns a LogFile object containing all parsed entries.</returns>
-    private async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
+    private void RefreshViewState()
     {
-        var (logEntries, fileSize) = await _logFileParserService.ParseLogAsync(fileResult);
-        var logFile = new LogFile
-        {
-            FileName = fileResult.FileName,
-            FullPath = fileResult.FullPath,
-            FileSize = fileSize,
-            Computer = logEntries.FirstOrDefault()?.Computer ?? "Unknown",
-            LogEntries = logEntries
-        };
-
-        foreach (var logEntry in logEntries)
-        {
-            logEntry.LogFile = logFile;
-        }
-
-        return logFile;
+        logDataSharingService.SortByProperty("DateTime", Ascending);
+        RefreshFilter();
     }
 
     #endregion

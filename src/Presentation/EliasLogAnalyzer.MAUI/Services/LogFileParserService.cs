@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
@@ -6,129 +7,91 @@ using Microsoft.Extensions.Logging;
 namespace EliasLogAnalyzer.MAUI.Services;
 
 /// <summary>
-/// Class for reading a LogFile and parsing individual LogEntries into the <see cref="LogEntry"/> domain model.
+/// Service that provides functionality to parse log files into structured log entries.
 /// </summary>
-public class LogFileParserService : ILogFileParserService
+public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFileParserService
 {
-    private readonly ILogger<LogFileParserService> _logger;
     private const string DateFormat = "dd-MM-yyyy";
     private const string TimeFormat = "HH:mm:ss";
 
-    public  LogFileParserService(ILogger<LogFileParserService> logger)
+    /// <summary>
+    /// Parses a log file and creates a structured LogFile object.
+    /// </summary>
+    /// <param name="fileResult">File to parse.</param>
+    /// <returns>A LogFile object containing parsed log entries.</returns>
+    public async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        var entries = await ParseLogEntriesAsync(fileResult);
+        return new LogFile
+        {
+            FileName = fileResult.FileName,
+            FullPath = fileResult.FullPath,
+            Computer = entries.FirstOrDefault()?.Computer ?? "Unknown",
+            LogEntries = entries
+        };
     }
 
     /// <summary>
     /// Reads the contents of a LogFile and parses individual LogEntries into the <see cref="LogEntry"/> domain model.
     /// </summary>
-    /// <param name="fileResult">The representation of a file, as a result of a pick action by the user, and its content type.</param>
-    /// /// <exception cref="IOException">Thrown when the log file could not be read.</exception>
-    public async Task<(List<LogEntry> Entries, long FileSize)> ParseLogAsync(FileResult fileResult)
+    /// <param name="fileResult">The file, as a result of a pick action by the user, and its content type.</param>
+    /// <returns>List of parsed log entries.</returns>
+    /// <exception cref="IOException">Thrown when the log file could not be read.</exception>
+    private async Task<List<LogEntry>> ParseLogEntriesAsync(FileResult fileResult)
     {
-        var headers = new List<string>(); // Local headers list for each file
-
         var entries = new List<LogEntry>();
-        long fileSize = 0;
-
         try
         {
             await using var stream = await fileResult.OpenReadAsync();
-            // Checking if the stream supports seeking to obtain file size
-            if (stream.CanSeek)
-            {
-                fileSize = stream.Length;
-            }
-
             using var reader = new StreamReader(stream);
-            var line = await reader.ReadLineAsync();
-            if (line != null)
+            var headersParsed = false;
+            var headers = new List<string>();
+
+            while (await reader.ReadLineAsync() is { } line)
             {
-                // Parse headers using the local list
-                ParseHeaders(line, headers);
-                await ParseEntries(reader, entries, headers);
-            }
-        }
-        catch (IOException ex)
-        {
-            _logger.LogError("An I/O error occurred while reading the file: {ErrorMessage}", ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An unexpected error occurred: {ErrorMessage}", ex.Message);
-        }
-
-        return (entries, fileSize);
-    }
-
-    /// <summary>
-    /// The first log line of a LogFile must be the header. Reads and extracts headers from the first line of the file.
-    /// </summary>
-    /// <param name="line">The first line of a LogFile which holds the headers.</param>
-    /// <param name="headers">The list of headers to populate.</param>
-    private void ParseHeaders(string line, List<string> headers)
-    {
-        try
-        {
-            headers.AddRange(line.Split('\t'));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("Error parsing headers: {ErrorMessage}", ex.Message);
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Reads and Parses lines in a LogFile and checks if they are new log entries or continuation of the previous entry.
-    /// </summary>
-    /// <param name="reader">The Streamreader.</param>
-    /// <param name="entries">The list of LogEntries for this LogFile.</param>
-    /// <param name="headers">The list of headers for this LogFile.</param>
-    private async Task ParseEntries(StreamReader reader, List<LogEntry> entries, List<string> headers)
-    {
-        while (await reader.ReadLineAsync() is { } line)
-        {
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            try
-            {
-                if (IsLogEntryStart(line, headers))
+                if (!headersParsed)
                 {
-                    entries.Add(ParseLogEntry(line, headers));
+                    headers.AddRange(line.Split('\t'));
+                    headersParsed = true;
+                    continue;
+                }
+
+                if (IsLogEntryStart(line))
+                {
+                    var entry = ParseLogEntry(line, headers);
+                    entries.Add(entry);
                 }
                 else
                 {
                     AppendToLastEntryData(entries, line);
                 }
             }
-            catch (FormatException ex)
-            {
-                _logger.LogError("Format error while parsing line: {LineContent} - {ErrorMessage}", line, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error processing line: {LineContent} - {ErrorMessage}", line, ex.Message);
-            }
         }
+        catch (IOException ex)
+        {
+            logger.LogError("Failed to read file: {ErrorMessage}", ex.Message);
+            throw;
+        }
+        return entries;
     }
 
     /// <summary>
-    /// Check if the line starts with a date that matches the "Date" field format and has the same amount of fields as
-    /// the headers minus Data, to determine a new log entry start.
+    /// Determines if a line indicates the start of a new log entry based on date format and header presence.
     /// </summary>
-    /// <param name="line">The line to check if it matches the new LogEntry signature.</param>
-    /// <param name="headers">The list of headers to compare the line fields with.</param>
-    private static bool IsLogEntryStart(string line, List<string> headers)
+    /// <param name="line">Line to evaluate.</param>
+    /// <returns>True if line starts a new log entry; otherwise, false.</returns>
+    private static bool IsLogEntryStart(string line)
     {
-        var splitLine = line.Split('\t');
-        return DateTime.TryParseExact(splitLine[0], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None,
-            out _) && splitLine.Length >= headers.Count - 1;
+        var parts = line.Split('\t', 2);
+        return DateTime.TryParseExact(parts[0], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _) 
+               && parts.Length == 2;  // Ensure there's more to the line than just a date
     }
 
     /// <summary>
-    /// Appends a line to the Data field of the last log entry in the list.
+    /// Appends additional data to the last log entry if not starting a new entry.
     /// </summary>
+    /// <param name="entries">Current list of entries.</param>
+    /// <param name="line">Line to append.</param>
     private static void AppendToLastEntryData(List<LogEntry> entries, string line)
     {
         if (entries.Count > 0)
@@ -137,68 +100,48 @@ public class LogFileParserService : ILogFileParserService
         }
     }
 
+
     /// <summary>
-    /// Creates a new <see cref="LogEntry"/> class instance and populates it with values from the new LogEntry line.
+    /// Converts a line of text into an <see cref="LogEntry"/>  object based on provided headers.
     /// </summary>
-    /// <param name="line">The line that holds the values of a new LogEntry</param>
-    /// <param name="headers">The list of headers to match the values with.</param>
-    private LogEntry ParseLogEntry(string line, List<string> headers)
+    /// <param name="line">Line of text to parse.</param>
+    /// <param name="headers">Column headers for mapping data.</param>
+    /// <returns>Parsed LogEntry object.</returns>
+    private LogEntry ParseLogEntry(string line, IReadOnlyList<string> headers)
     {
         var values = line.Split('\t');
         var entry = new LogEntry();
 
         for (var i = 0; i < headers.Count && i < values.Length; i++)
         {
-            var header = headers[i];
-            var value = values[i];
-            PopulateEntry(entry, header, value);
+            PopulateEntry(entry, headers[i], values[i]);
         }
 
         return entry;
     }
-    
-    private LogType ParseLogType(string logTypeString)
-    {
-        logTypeString = logTypeString.Trim();
 
-        // Normalize case variations
-        switch (logTypeString.ToLower())
-        {
-            case "debug":
-                return LogType.Debug;
-            case "info":
-            case "information":
-                return LogType.Information;
-            case "warn":
-            case "warning":
-                return LogType.Warning;
-            case "error":
-            case "fatal":
-                return LogType.Error; 
-            default:
-                _logger.LogWarning("Unrecognized log type '{LogType}'", logTypeString);
-                return LogType.None;
-        }
-    }
-
+    /// <summary>
+    /// Parses a time string to set the time and tick properties on a LogEntry.
+    /// </summary>
+    /// <param name="timeString">The string containing the time and optionally ticks.</param>
+    /// <param name="entry">The LogEntry to update with parsed time information.</param>
     private static void ParseTime(string timeString, LogEntry entry)
     {
         var parts = timeString.Split(' ');
-        if (parts.Length > 1)
-        {
-            var time = TimeOnly.ParseExact(parts[0], TimeFormat, CultureInfo.InvariantCulture);
-            entry.LogTimeStamp.DateTime = entry.LogTimeStamp.DateTime.Add(time.ToTimeSpan());
-            var ticks = parts[1];
-            entry.LogTimeStamp.Ticks = long.Parse(ticks);
-        }
+        if (parts.Length <= 1) return;
+        
+        var time = TimeOnly.ParseExact(parts[0], TimeFormat, CultureInfo.InvariantCulture);
+        entry.LogTimeStamp.DateTime = entry.LogTimeStamp.DateTime.Add(time.ToTimeSpan());
+        var ticks = parts[1];
+        entry.LogTimeStamp.Ticks = long.Parse(ticks);
     }
 
     /// <summary>
-    /// Determines the header and value of a line and populates the corresponding field in the <see cref="LogEntry"/> class.
+    /// Populates properties of a LogEntry based on header and value, including parsing dates and times.
     /// </summary>
-    /// <param name="entry">The <see cref="LogEntry"/>  class to populate.</param>
-    /// <param name="header">The header which corresponds to a field of the see cref="LogEntry"/> class.</param>
-    /// <param name="value">The value which belongs to the header.</param>
+    /// <param name="entry">Log entry to populate.</param>
+    /// <param name="header">Header corresponding to the property to populate.</param>
+    /// <param name="value">Value to set.</param>
     private void PopulateEntry(LogEntry entry, string header, string value)
     {
         try
@@ -211,51 +154,49 @@ public class LogFileParserService : ILogFileParserService
                 case "TIME":
                     ParseTime(value, entry);
                     break;
-                case "DATETIMESORTVALUE":
-                    entry.LogTimeStamp.DateTimeSortValue = value;
-                    break;
-                case "LOGTYPE":
-                    entry.LogType = ParseLogType(value);
-                    break;
-                case "THREADNAME/NUMBER":
-                    entry.ThreadNameOrNumber = value;
-                    break;
-                case "SOURCELOCATION":
-                    entry.SourceLocation = value;
-                    break;
-                case "SOURCE":
-                    entry.Source = value;
-                    break;
-                case "CATEGORY":
-                    entry.Category = value;
-                    break;
-                case "EVENTID":
-                    entry.EventId = int.Parse(value);
-                    break;
-                case "USER":
-                    entry.User = value;
-                    break;
-                case "COMPUTER":
-                    entry.Computer = value;
-                    break;
-                case "DESCRIPTION":
-                    entry.Description = value;
-                    break;
-                case "DATA":
-                    // Set Data to empty initially, to be filled if there are subsequent lines by AppendToLastEntryData()
-                    entry.Data = "";
+                default:
+                    ReflectivePopulate(entry, header, value);
                     break;
             }
         }
-        catch (FormatException ex)
+        catch (Exception ex)
         {
-            _logger.LogError("Format error parsing {Header} with value {Value}: {ErrorMessage}", header, value,
-                ex.Message);
+            logger.LogError("Error populating {Header}: {ErrorMessage}", header, ex.Message);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Uses reflection to set property values on LogEntry based on the header, supporting dynamic property assignment.
+    /// </summary>
+    /// <param name="entry">Log entry to populate.</param>
+    /// <param name="header">Header identifying the property.</param>
+    /// <param name="value">Value to set on the property.</param>
+    private void ReflectivePopulate(LogEntry entry, string header, string value)
+    {
+        var propertyInfo = entry.GetType().GetProperty(header, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        if (propertyInfo == null)
+        {
+            logger.LogWarning("No property found for header: {Header}", header);
+            return;
+        }
+
+        try
+        {
+            if (propertyInfo.PropertyType.IsEnum)
+            {
+                var parsedEnum = Enum.Parse(propertyInfo.PropertyType, value, true);
+                propertyInfo.SetValue(entry, parsedEnum);
+            }
+            else
+            {
+                var convertedValue = Convert.ChangeType(value, propertyInfo.PropertyType, CultureInfo.InvariantCulture);
+                propertyInfo.SetValue(entry, convertedValue);
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError("Error populating {Header} for log entry: {ErrorMessage}", header, ex.Message);
+            logger.LogError("Error setting property {PropertyName} with value {Value}: {ErrorMessage}", propertyInfo.Name, value, ex.Message);
             throw;
         }
     }

@@ -112,11 +112,11 @@
         </Tab>
     </FlyoutItem>
 
-    <FlyoutItem Title="Summary" Icon="{StaticResource SummarizeIcon}">
+    <FlyoutItem Title="Report" Icon="{StaticResource SummarizeIcon}">
         <Tab>
-            <ShellContent ContentTemplate="{DataTemplate pages:SummarizePage}"
+            <ShellContent ContentTemplate="{DataTemplate pages:ReportPage}"
             Style="{StaticResource ShellStyle}"
-            Route="SettingsPage"
+            Route="ReportPage"
             />
         </Tab>
     </FlyoutItem>

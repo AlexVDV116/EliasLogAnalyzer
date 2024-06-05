@@ -63,7 +63,7 @@
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
                                           ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
                                             <Label Grid.Column="0" Text="📌" IsVisible="{Binding IsPinned}" />
-                                            <Label Grid.Column="1" Text="{Binding Propability}" FontAttributes="Bold" FontSize="12" />
+                                            <Label Grid.Column="1" Text="{Binding Probability}" FontAttributes="Bold" FontSize="12" />
                                             <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" FontSize="12" />
                                             <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" FontSize="12" />
                                             <Label Grid.Column="4" Text="{Binding LogType}" FontSize="12" />
