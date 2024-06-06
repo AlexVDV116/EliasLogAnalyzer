@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.ReportPage"
+             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              x:DataType="viewModels:ReportViewModel"
              Title="ReportPage">
@@ -10,69 +11,88 @@
     <Shell.TitleView>
         <Label Text="" />
     </Shell.TitleView>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <FontImageSource x:Key="InfoIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Info}"
+                         Color="Blue"
+                         Size="20"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
     <Border Grid.Row="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
         <ScrollView>
             <StackLayout Margin="10">
 
                 <!-- Bug Report Section -->
-                <Grid RowSpacing="10" ColumnSpacing="15" RowDefinitions="Auto, Auto, Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto, *, Auto, *, Auto, Auto">
+                <Grid RowSpacing="20" ColumnSpacing="20" RowDefinitions="Auto, Auto, Auto,Auto,Auto,Auto,Auto,Auto,Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
 
 
-                    <Label Text="Name of developer:" Grid.Row="0" Grid.Column="0" />
-                    <Entry Placeholder="Enter name" Text="{Binding DeveloperName}" Grid.Row="0" Grid.Column="1" />
+                    <Label Text="Date/Time:" Grid.Row="0" Grid.Column="0" VerticalOptions="Center" />
+                    <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto, *">
+                        <DatePicker Grid.Column="0" Date="{Binding ReportDate}" VerticalOptions="Center" />
+                        <TimePicker Grid.Column="1"  Time="{Binding ReportTime, Mode=TwoWay}" VerticalOptions="Center" Margin="10, 0" />
+                    </Grid>
 
-                    <Label Text="Name of workstation:" Grid.Row="0" Grid.Column="2" />
-                    <Entry Placeholder="Enter workstation" Text="{Binding WorkstationName}" Grid.Row="0" Grid.Column="3" />
+                    <Label Text="Severity:" Grid.Row="0" Grid.Column="2" TextColor="{Binding SeverityTextColor}" />
+                    <Picker ItemsSource="{Binding Severities}" SelectedItem="{Binding Severity}" Grid.Row="0" Grid.Column="3" />
 
-                    <Label Text="Date/Time:" Grid.Row="0" Grid.Column="4" />
-                    <DatePicker Date="{Binding ReportDateTime}" Grid.Row="0" Grid.Column="5" />
+                    <Label Text="Name of developer:" Grid.Row="1" Grid.Column="0" VerticalOptions="Center" />
+                    <Entry Placeholder="Enter name" PlaceholderColor="{Binding DeveloperNamePlaceholderColor}" Text="{Binding DeveloperName}" Grid.Row="1" Grid.Column="1" />
 
-                    <Label Text="Situation:" Grid.Row="1" Grid.Column="0" />
-                    <Editor Placeholder="Describe the situation" Text="{Binding Situation}" Grid.Row="1" Grid.Column="1" MaxLength="500" HeightRequest="100" />
+                    <Label Text="Name of workstation:" Grid.Row="1" Grid.Column="2" VerticalOptions="Center" />
+                    <Entry Placeholder="Enter workstation" Text="{Binding WorkstationName}" Grid.Row="1" Grid.Column="3" />
 
-                    <Label Text="Observation:" Grid.Row="1" Grid.Column="2" />
-                    <Editor Placeholder="What was observed" Text="{Binding Observation}" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1"  MaxLength="500" HeightRequest="100" />
+                    <Label Text="Situation:" Grid.Row="2" Grid.Column="0" />
+                    <Editor Placeholder="Describe the situation" Text="{Binding Situation}" Grid.Row="2" Grid.Column="1" MaxLength="500" HeightRequest="100" />
 
-                    <Label Text="Severity:" Grid.Row="1" Grid.Column="4" />
-                    <Picker ItemsSource="{Binding Severities}" SelectedItem="{Binding Severity}" Grid.Row="1" Grid.Column="6" HeightRequest="50" VerticalOptions="Start" />
+                    <Label Text="Observation:" Grid.Row="2" Grid.Column="2" />
+                    <Editor Placeholder="What was observed" Text="{Binding Observation}" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="1"  MaxLength="500" HeightRequest="100" />
 
-                    <Label Text="Expectation:" Grid.Row="2" Grid.Column="0" />
-                    <Editor Placeholder="What was expected" Text="{Binding Expectation}" Grid.Row="2" Grid.Column="1" HeightRequest="100" />
+                    <Label Text="Expectation:" Grid.Row="3" Grid.Column="0" Grid.RowSpan="2" />
+                    <Editor Placeholder="What was expected" Text="{Binding Expectation}" Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" HeightRequest="100" />
 
-                    <Label Text="Tag:" Grid.Row="2" Grid.Column="2" />
-                    <Entry Placeholder="Tag" Text="{Binding Tag}" Grid.Row="2" Grid.Column="3" HeightRequest="50" VerticalOptions="Start" />
+                    <Label Text="Tag:" Grid.Row="3" Grid.Column="2" VerticalOptions="Center" />
+                    <Entry Placeholder="Tag" Text="{Binding Tag}" Grid.Row="3" Grid.Column="3" HeightRequest="50" VerticalOptions="Start" />
 
-                    <Label Text="Build:" Grid.Row="2" Grid.Column="2" VerticalOptions="Center" />
-                    <Entry Placeholder="Build identifier" Text="{Binding Build}" Grid.Row="2" Grid.Column="3" VerticalOptions="End" Grid.ColumnSpan="1" />
-
-                    <BoxView Grid.Row="3" Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="Gray" Margin="0, 30, 90, 30" />
+                    <Label Text="Build:" Grid.Row="4" Grid.Column="2" VerticalOptions="Center" />
+                    <Entry Placeholder="Build identifier" Text="{Binding Build}" Grid.Row="4" Grid.Column="3" VerticalOptions="End" Grid.ColumnSpan="1" />
 
                     <!-- Analysis Secition -->
-                    <Label Text="Analysis:" Grid.Row="4" Grid.Column="0" />
-                    <Editor Placeholder="Describe the analysis" Text="{Binding Analysis}" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Label Text="Analysis:" Grid.Row="5" Grid.Column="0" />
+                    <Editor Placeholder="Describe the analysis" PlaceholderColor="{Binding AnalysisPlaceholderColor}" Text="{Binding Analysis}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
 
-                    <Label Text="Possible solutions:" Grid.Row="5" Grid.Column="0" />
-                    <Editor Placeholder="Possible solutions" Text="{Binding PossibleSolutions}" Grid.Row="5" Grid.Column="1"  HeightRequest="100" />
+                    <Label Text="Possible solutions:" Grid.Row="6" Grid.Column="0"  />
+                    <Editor Placeholder="Possible solutions" Text="{Binding PossibleSolutions}" Grid.Row="6" Grid.Column="1"  HeightRequest="100" />
 
-                    <Label Text="What to test:" Grid.Row="5" Grid.Column="2" />
-                    <Editor Placeholder="Test cases to consider" Text="{Binding WhatToTest}" Grid.Row="5" Grid.Column="3" HeightRequest="100" />
+                    <Label Text="What to test:" Grid.Row="6" Grid.Column="2" />
+                    <Editor Placeholder="Test cases to consider" Text="{Binding WhatToTest}" Grid.Row="6" Grid.Column="3" HeightRequest="100" />
 
-                    <Label Text="Effort (in hours):" Grid.Row="6" Grid.Column="0" />
-                    <Entry Placeholder="Estimated effort" Text="{Binding Effort}" Grid.Row="6" Grid.Column="1" />
+                    <Label Text="Effort (in hours):" Grid.Row="7" Grid.Column="0" VerticalOptions="Center" />
+                    <Picker ItemsSource="{Binding Efforts}" SelectedItem="{Binding Effort}" Grid.Row="7" Grid.Column="1" />
 
-                    <Label Text="Risk:" Grid.Row="6" Grid.Column="2" />
-                    <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="6" Grid.Column="3" />
+                    <Label Text="Risk:" Grid.Row="7" Grid.Column="2" VerticalOptions="Center" />
+                    <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="7" Grid.Column="3" />
 
-                    <Label Text="Workaround:" Grid.Row="7" Grid.Column="0" />
-                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Label Text="Workaround:" Grid.Row="8" Grid.Column="0" />
+                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
 
-                    <Label Text="Recommendation:" Grid.Row="8" Grid.Column="0" />
-                    <Editor Placeholder="Final recommendation" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Label Text="Recommendation:" Grid.Row="9" Grid.Column="0" />
+                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecomendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
 
-                    <!-- Submit Button -->
-                    <Button Grid.Row="8" Grid.Column="4" Text="Submit" Command="{Binding SubmitCommand}" HeightRequest="50" VerticalOptions="End" />
-                    <Button Grid.Row="8" Grid.Column="5" Text="Copy to Clipboard" Command="{Binding SubmitCommand}" HeightRequest="50" VerticalOptions="End" />
+                    <HorizontalStackLayout Grid.Row="10" Grid.Column="1">
+                        <Image Source="{StaticResource InfoIcon}" IsVisible="{Binding ShowPinImage}" Aspect="Center" Margin="0, 0, 5, 0"/>
+                        <Label Text="{Binding PinnedLogEntriesText}" Grid.Row="10" Grid.Column="1" ToolTipProperties.Text="Pinning LogEntries will embed them into the report." />
+                    </HorizontalStackLayout>
                 </Grid>
+
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <Button Text="Submit" Command="{Binding SubmitCommand}" HeightRequest="50" WidthRequest="100" Margin="10"/>
+                    <Button Text="Copy to Clipboard" Command="{Binding CopyToClipboardCommand}" HeightRequest="50" WidthRequest="150" Margin="10" />
+                </HorizontalStackLayout>
             </StackLayout>
         </ScrollView>
     </Border>

@@ -20,6 +20,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
 
     [ObservableProperty] private ObservableCollection<LogFile> _logFiles = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _logEntries = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _pinnedLogEntries = [];
     [ObservableProperty] private ObservableCollection<object> _selectedLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
@@ -110,6 +111,15 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
     public void PinLogEntry(LogEntry entry)
     {
         entry.IsPinned = !entry.IsPinned;
+
+        if (entry.IsPinned)
+        {
+            PinnedLogEntries.Add(entry);
+        }
+        else
+        {
+            PinnedLogEntries.Remove(entry);
+        }
     }
 
     public void MarkLogEntry(LogEntry logEntry)

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
-             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
+             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"             
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
              xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   

@@ -110,7 +110,7 @@
                                        SearchCommand="{Binding RefreshFilterCommand}" />
                             <ImageButton Grid.Column="1" Source="{StaticResource DeleteIcon}" Command="{Binding DeleteLogEntriesCommand}" 
                                          Aspect="Center" HeightRequest="25" WidthRequest="25" VerticalOptions="Center" Margin="0, 0" 
-                                         ToolTipProperties.Text="Delete LogEntries" />
+                                         ToolTipProperties.Text="Delete log entries" />
 
                         </Grid>
                     </Grid>

@@ -14,10 +14,11 @@
         public string Analysis { get; set; }
         public string PossibleSolutions { get; set; }
         public string WhatToTest { get; set; }
-        public int Effort { get; set; }
+        public double Effort { get; set; }
         public string Risk { get; set; }
         public string Workaround { get; set; }
         public string Recommendation { get; set; }
+        public IList<LogEntry> PinnedLogEntries { get; set; }
 
         public BugReport()
         {
@@ -37,6 +38,7 @@
             Risk = string.Empty;
             Workaround = string.Empty;
             Recommendation = string.Empty;
+            PinnedLogEntries = [];
         }
     }
 

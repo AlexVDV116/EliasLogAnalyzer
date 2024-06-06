@@ -7,6 +7,7 @@ public interface ILogDataSharingService
 {
     ObservableCollection<LogFile> LogFiles { get; set; }
     ObservableCollection<LogEntry> LogEntries { get; set; }
+    ObservableCollection<LogEntry> PinnedLogEntries { get; set; }
     ObservableCollection<object> SelectedLogEntries { get; set; }
     ObservableCollection<LogEntry> FilteredLogEntries { get; set; }
     ObservableCollection<LogType> SelectedLogTypes { get; set; }
