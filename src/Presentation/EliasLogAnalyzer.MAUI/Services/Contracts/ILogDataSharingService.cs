@@ -17,4 +17,5 @@ public interface ILogDataSharingService
     void PinLogEntry(LogEntry entry);
     void MarkLogEntry(LogEntry entry);
     void SortByProperty(string propertyName, bool ascending = false);
+    void ClearAllLogs();
 }

@@ -108,7 +108,9 @@
                                        Placeholder="Search log entries..."
                                        Text="{Binding SearchText, Mode=TwoWay}"
                                        SearchCommand="{Binding RefreshFilterCommand}" />
-                            <ImageButton Grid.Column="1" Source="{StaticResource DeleteIcon}" Aspect="Center" HeightRequest="25" WidthRequest="25" VerticalOptions="Center" Margin="0, 0" ToolTipProperties.Text="Delete LogEntries" />
+                            <ImageButton Grid.Column="1" Source="{StaticResource DeleteIcon}" Command="{Binding DeleteLogEntriesCommand}" 
+                                         Aspect="Center" HeightRequest="25" WidthRequest="25" VerticalOptions="Center" Margin="0, 0" 
+                                         ToolTipProperties.Text="Delete LogEntries" />
 
                         </Grid>
                     </Grid>

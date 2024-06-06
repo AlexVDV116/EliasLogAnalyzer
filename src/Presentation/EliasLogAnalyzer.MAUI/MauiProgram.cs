@@ -38,6 +38,7 @@ namespace EliasLogAnalyzer.MAUI
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
             builder.Services.AddSingleton<IHtmlGeneratorService, HtmlGeneratorService>();
+            builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<AppShellViewModel>();
 
 

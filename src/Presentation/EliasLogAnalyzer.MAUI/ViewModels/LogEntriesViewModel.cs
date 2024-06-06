@@ -13,7 +13,8 @@ public partial class LogEntriesViewModel(
     ILogFileParserService logFileParserService,
     ILogDataSharingService logDataSharingService,
     ILogEntryAnalysisService logEntryAnalysisService,
-    IHtmlGeneratorService htmlGeneratorService)
+    IHtmlGeneratorService htmlGeneratorService,
+    IDialogService dialogService)
     : ObservableObject
 {
 
@@ -231,7 +232,7 @@ public partial class LogEntriesViewModel(
 
     #endregion
 
-    #region Loading and Parsing
+    #region Loading, Parsing and Deletion
 
     /// <summary>
     /// Initiates the process of loading and parsing log files asynchronously.
@@ -289,6 +290,25 @@ public partial class LogEntriesViewModel(
     {
         logDataSharingService.SortByProperty("DateTime", Ascending);
         RefreshFilter();
+    }
+
+    [RelayCommand]
+    private async Task DeleteLogEntries()
+    {
+        bool confirm = await dialogService.ShowConfirmAsync("Confirm Delete",
+            "Are you sure you want to delete all log entries?", "Yes", "No");
+
+        if (confirm)
+        {
+            logDataSharingService.ClearAllLogs();
+            RefreshViewStateAfterDeletion();
+        }
+    }
+
+    private void RefreshViewStateAfterDeletion()
+    {
+        SearchResultText = "0 / 0 👁️";
+        EmptyViewText = "No log entries found, please load logfiles.";
     }
 
     #endregion

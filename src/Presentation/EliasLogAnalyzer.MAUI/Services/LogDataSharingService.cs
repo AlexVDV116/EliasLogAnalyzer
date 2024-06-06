@@ -186,4 +186,16 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
         }
     }
 
+    public void ClearAllLogs()
+    {
+        _loadedLogFileIdentifiers.Clear();
+        _loadedLogEntryIdentifiers.Clear();
+
+        LogFiles.Clear();
+        LogEntries.Clear();
+        SelectedLogEntries.Clear();
+        FilteredLogEntries.Clear();
+        MarkedLogEntry = null;
+    }
+
 }
