@@ -4,36 +4,25 @@ using System.Collections.ObjectModel;
 
 namespace EliasLogAnalyzer.MAUI.Services;
 
-public class LogEntryAnalysisService : ILogEntryAnalysisService
+public class LogEntryAnalysisService(ILogDataSharingService logDataSharingService) : ILogEntryAnalysisService
 {
-    private readonly ILogDataSharingService _logDataSharingService;
 
     // Properties directly bound to the data sharing service, LogDataSharingService acts as the single source of truth for collections
-    private readonly ObservableCollection<LogEntry> _logEntries;
-    private LogEntry? _markedLogEntry;
-
-    public LogEntryAnalysisService(ILogDataSharingService logDataSharingService)
-    {
-        _logDataSharingService = logDataSharingService;
-
-        _logEntries = _logDataSharingService.LogEntries;
-        _markedLogEntry = _logDataSharingService.MarkedLogEntry;
-
-    }
+    private ObservableCollection<LogEntry> LogEntries => logDataSharingService.LogEntries;
+    private LogEntry? MarkedLogEntry => logDataSharingService.MarkedLogEntry;
 
     /// <summary>
     /// Calculates the Time Delta for a collection of log entries based on the difference with a marked entry.
     /// </summary>
     public void CalcDiffTicks()
     {
-        _markedLogEntry = _logDataSharingService.MarkedLogEntry;
 
-        foreach (var entry in _logEntries)
+        foreach (var entry in LogEntries)
         {
-            if (entry != _markedLogEntry && _markedLogEntry != null)
+            if (entry != MarkedLogEntry && MarkedLogEntry != null)
             {
-                var timeDiff = (entry.LogTimeStamp.DateTime - _markedLogEntry.LogTimeStamp.DateTime).TotalMilliseconds;
-                var ticksDiff = entry.LogTimeStamp.Ticks - _markedLogEntry.LogTimeStamp.Ticks;
+                var timeDiff = (entry.LogTimeStamp.DateTime - MarkedLogEntry.LogTimeStamp.DateTime).TotalMilliseconds;
+                var ticksDiff = entry.LogTimeStamp.Ticks - MarkedLogEntry.LogTimeStamp.Ticks;
 
                 // Use ticks difference when time difference is zero
                 entry.TimeDelta = timeDiff == 0 ? (int)ticksDiff : (int)timeDiff;
@@ -47,13 +36,13 @@ public class LogEntryAnalysisService : ILogEntryAnalysisService
 
     public void AnalyzeLogEntries()
     {
-        if (_markedLogEntry == null) return;
+        if (MarkedLogEntry == null) return;
 
-        foreach (var entry in _logEntries)
+        foreach (var entry in LogEntries)
         {
-            if (entry != _markedLogEntry)
+            if (entry != MarkedLogEntry)
             {
-                double probability = CalculateProbability(_markedLogEntry, entry);
+                double probability = CalculateProbability(MarkedLogEntry, entry);
                 entry.Probability = (int)Math.Clamp(probability, 0, 100);
             }
         }

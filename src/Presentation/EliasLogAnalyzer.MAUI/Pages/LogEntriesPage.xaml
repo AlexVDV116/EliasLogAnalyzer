@@ -8,7 +8,7 @@
              x:DataType="viewModels:LogEntriesViewModel"
              x:Class="EliasLogAnalyzer.MAUI.Pages.LogEntriesPage">
 
-    <Shell.TitleView> 
+    <Shell.TitleView>
         <Label Text="" />
     </Shell.TitleView>
 
@@ -24,6 +24,11 @@
                          Glyph="{x:Static resources:IconFont.Info}"
                          Color="Blue"
                          Size="20"/>
+            <FontImageSource x:Key="DeleteIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Delete}"
+                         Color="Black"
+                         Size="25"/>
         </ResourceDictionary>
 
         <!-- Style to make selected element in a collectionView highlighted -->
@@ -95,14 +100,16 @@
                 <!-- SearchResultsLabel and Searchbar -->
                 <Grid RowDefinitions="Auto,*">
                     <Grid>
-                        <Grid Grid.Row="0"  ColumnDefinitions="Auto, *" >
-                            <Label Grid.Column="0" Text="{Binding SearchResultText}" VerticalTextAlignment="Center" Padding="10"/>
-                            <SearchBar Grid.Column="1"
+                        <Grid Grid.Row="0"  ColumnDefinitions="Auto, Auto, *" >
+                            <Label Grid.Column="0" Text="{Binding SearchResultText}" VerticalTextAlignment="Center" Padding="10" ToolTipProperties.Text="Filtered / Total"/>
+                            <SearchBar Grid.Column="2"
                                        Margin="0, 3"
                                        ios:SearchBar.SearchBarStyle="Minimal"
                                        Placeholder="Search log entries..."
                                        Text="{Binding SearchText, Mode=TwoWay}"
                                        SearchCommand="{Binding RefreshFilterCommand}" />
+                            <ImageButton Grid.Column="1" Source="{StaticResource DeleteIcon}" Aspect="Center" HeightRequest="25" WidthRequest="25" VerticalOptions="Center" Margin="0, 0" ToolTipProperties.Text="Delete LogEntries" />
+
                         </Grid>
                     </Grid>
 
@@ -115,7 +122,7 @@
                         <CollectionView.EmptyView>
                             <HorizontalStackLayout Padding="0, 50" >
                                 <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" VerticalOptions="Start" Margin="5, 0"  />
-                                <Label Text="{Binding EmptyViewText}" FontAttributes="Italic"  />
+                                <Label Text="{Binding EmptyViewText}" />
                             </HorizontalStackLayout>
                         </CollectionView.EmptyView>
 
@@ -125,9 +132,24 @@
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                 Padding="10" ColumnSpacing="10"
                                           ColumnDefinitions="30, 40, 100, 100, 100, 150, 80, 80, 120, 300, 80, 100, 200, 200">
-                                <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
-                                <Label Grid.Column="1" Text="📌" />
-                                <Label Grid.Column="2" Text="Time Delta" FontAttributes="Bold"/>
+                                <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                       CommandParameter="Marked" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="1" Text="📌" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                       CommandParameter="Pin" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="2" Text="Time Delta" FontAttributes="Bold" >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"
+                                                       CommandParameter="DateTime" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                                 <Label Grid.Column="3" Text="{Binding SortDateTimeHeaderText}" FontAttributes="Bold">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding HeaderTappedCommand}"

@@ -4,16 +4,20 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using EliasLogAnalyzer.MAUI.Resources;
+using System.Collections.ObjectModel;
 
 namespace EliasLogAnalyzer.MAUI.Services
 {
-    public class HtmlGeneratorService(ISettingsService settingsService) : IHtmlGeneratorService
+    public class HtmlGeneratorService(ISettingsService settingsService, ILogDataSharingService logDataSharingService) : IHtmlGeneratorService
     {
         private Theme CurrentTheme => settingsService.AppTheme;
         private string BackgroundColor => CurrentTheme == Theme.Light ? "#f9f9f9" : "#333";
         private string TextColor => CurrentTheme == Theme.Light ? "#333" : "#f9f9f9";
         private string HeaderColor => CurrentTheme == Theme.Light ? "#e9e9e9" : "#333";
         private string BorderColor => CurrentTheme == Theme.Light ? "#ddd" : "#666";
+
+        // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
+        private ObservableCollection<LogEntry> LogEntries => logDataSharingService.LogEntries;
 
 
         public string ConvertDataToHtml(LogEntry logEntry)
@@ -46,38 +50,38 @@ namespace EliasLogAnalyzer.MAUI.Services
             </html>";
         }
 
-        public string GenerateTimeLineHtml(IList<LogEntry> logEntries)
+        public string GenerateTimeLineHtml()
         {
-            
+
             var sb = new StringBuilder();
             AppendHtmlHeader(sb, "main", "calc(100% - 120px)", "400px");
-            
-            if (logEntries.Count == 0)
+
+            if (LogEntries.Count == 0)
             {
                 AppendEmptyChartScript(sb, "main", "line");
             }
             else
             {
-                AppendTimeLineChartScript(sb, logEntries);
+                AppendTimeLineChartScript(sb, LogEntries);
             }
 
             AppendHtmlFooter(sb);
             return sb.ToString();
         }
 
-        public string GeneratePieChartHtml(IList<LogEntry> logEntries)
+        public string GeneratePieChartHtml()
         {
-            
+
             var sb = new StringBuilder();
             AppendHtmlHeader(sb, "pieChart", "calc(100% - 80px)", "100%");
 
-            if (!logEntries.Any())
+            if (!LogEntries.Any())
             {
                 AppendEmptyChartScript(sb, "pieChart", "pie");
             }
             else
             {
-                AppendPieChartScript(sb, logEntries);
+                AppendPieChartScript(sb, LogEntries);
             }
 
             AppendHtmlFooter(sb);

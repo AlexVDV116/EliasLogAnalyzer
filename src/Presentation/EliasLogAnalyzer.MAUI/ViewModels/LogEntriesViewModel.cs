@@ -212,7 +212,6 @@ public partial class LogEntriesViewModel(
     private void PinLogEntry(LogEntry logEntry)
     {
         logDataSharingService.PinLogEntry(logEntry);
-        logDataSharingService.SortByProperty(CurrentSortProperty, Ascending);
     }
 
     [RelayCommand]

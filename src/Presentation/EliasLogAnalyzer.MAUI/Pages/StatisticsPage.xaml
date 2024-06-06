@@ -33,25 +33,29 @@
             <Border Grid.Column="0" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
                 <ScrollView>
                     <VerticalStackLayout>
-                        <HorizontalStackLayout HorizontalOptions="Center" IsVisible="{Binding NoLogEntryMarked}">
-                            <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" Margin="5, 0"/>
-                            <Label Text="{Binding StatisticsText}" FontAttributes="Italic" />
-                        </HorizontalStackLayout>
-                        <CollectionView ItemsSource="{Binding LogEntries}" SelectionMode="Single" IsVisible="{Binding LogEntryMarked}">
+                        <CollectionView ItemsSource="{Binding SortedLogEntriesByProbability}" SelectionMode="Single" >
+
+                            <CollectionView.EmptyView>
+                                <HorizontalStackLayout Padding="0, 50">
+                                    <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" Margin="5, 0"/>
+                                    <Label Text="{Binding StatisticsText}" />
+                                </HorizontalStackLayout>
+                            </CollectionView.EmptyView>
 
                             <CollectionView.Header>
                                 <Grid
                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
                                Padding="10" ColumnSpacing="10" Margin="10, 0"
-                               ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
-                                    <Label Grid.Column="0" Text="📌" />
-                                    <Label Grid.Column="1" Text="% ▲" FontAttributes="Bold"/>
-                                    <Label Grid.Column="2" Text="DateTime" FontAttributes="Bold"/>
-                                    <Label Grid.Column="3" Text="Ticks" FontAttributes="Bold"/>
-                                    <Label Grid.Column="4" Text="LogType" FontAttributes="Bold"/>
-                                    <Label Grid.Column="5" Text="Source" FontAttributes="Bold"/>
-                                    <Label Grid.Column="6" Text="User" FontAttributes="Bold"/>
-                                    <Label Grid.Column="7" Text="Computer" FontAttributes="Bold"/>
+                               ColumnDefinitions="40, 40, 50, 80, 80, 150, 150, 200, 200">
+                                    <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
+                                    <Label Grid.Column="1" Text="📌" />
+                                    <Label Grid.Column="2" Text="% ▲" FontAttributes="Bold"/>
+                                    <Label Grid.Column="3" Text="DateTime" FontAttributes="Bold"/>
+                                    <Label Grid.Column="4" Text="Ticks" FontAttributes="Bold"/>
+                                    <Label Grid.Column="5" Text="LogType" FontAttributes="Bold"/>
+                                    <Label Grid.Column="6" Text="Source" FontAttributes="Bold"/>
+                                    <Label Grid.Column="7" Text="User" FontAttributes="Bold"/>
+                                    <Label Grid.Column="8" Text="Computer" FontAttributes="Bold"/>
 
                                 </Grid>
                             </CollectionView.Header>
@@ -61,18 +65,19 @@
                                     <VerticalStackLayout>
                                         <Grid Padding="10" ColumnSpacing="10" Margin="10, 0, 10, 0"
                                           BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="40, 50, 80, 80, 150, 150, 200, 200">
-                                            <Label Grid.Column="0" Text="📌" IsVisible="{Binding IsPinned}" />
-                                            <Label Grid.Column="1" Text="{Binding Probability}" FontAttributes="Bold" FontSize="12" />
-                                            <Label Grid.Column="2" Text="{Binding LogTimeStamp.DateTime}" FontSize="12" />
-                                            <Label Grid.Column="3" Text="{Binding LogTimeStamp.Ticks}" FontSize="12" />
-                                            <Label Grid.Column="4" Text="{Binding LogType}" FontSize="12" />
-                                            <Label Grid.Column="5" Text="{Binding Source}" FontSize="12" />
-                                            <Label Grid.Column="6" Text="{Binding User}" FontSize="12" />
-                                            <Label Grid.Column="7" Text="{Binding Computer}" FontSize="12" />
+                                          ColumnDefinitions="40, 40, 50, 80, 80, 150, 150, 200, 200">
+                                            <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
+                                            <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
+                                            <Label Grid.Column="2" Text="{Binding Probability}" FontAttributes="Bold" FontSize="12" />
+                                            <Label Grid.Column="3" Text="{Binding LogTimeStamp.DateTime}" FontSize="12" />
+                                            <Label Grid.Column="4" Text="{Binding LogTimeStamp.Ticks}" FontSize="12" />
+                                            <Label Grid.Column="5" Text="{Binding LogType}" FontSize="12" />
+                                            <Label Grid.Column="6" Text="{Binding Source}" FontSize="12" />
+                                            <Label Grid.Column="7" Text="{Binding User}" FontSize="12" />
+                                            <Label Grid.Column="8" Text="{Binding Computer}" FontSize="12" />
                                             <FlyoutBase.ContextFlyout>
                                                 <MenuFlyout x:DataType="entities:LogEntry">
-                                                    <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:LogEntriesViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
+                                                    <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:StatisticsViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
                                                                 Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
                                                 </MenuFlyout>
                                             </FlyoutBase.ContextFlyout>
@@ -91,7 +96,6 @@
             <Border Grid.Column="1" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
                 <WebView x:Name="PieWebView" HorizontalOptions="FillAndExpand">
                     <WebView.Source>
-                        <!-- Set the BaseURL to fix JS not being loaded on MacCatalyst -->
                         <HtmlWebViewSource BaseUrl="{Binding BaseUrl}" Html="{Binding PieChartHtml}" />
                     </WebView.Source>
                 </WebView>
@@ -101,7 +105,6 @@
         <Border Grid.Row="1" Margin="10" Padding="10" Stroke="LightGray">
             <WebView HorizontalOptions="FillAndExpand">
                 <WebView.Source>
-                    <!-- Set the BaseURL to fix JS not being loaded on MacCatalyst -->
                     <HtmlWebViewSource BaseUrl="{Binding BaseUrl}" Html="{Binding TimelineHtml}" />
                 </WebView.Source>
             </WebView>

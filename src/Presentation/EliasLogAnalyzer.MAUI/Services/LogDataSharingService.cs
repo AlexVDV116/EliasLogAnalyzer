@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
@@ -24,34 +25,59 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
     [ObservableProperty] private LogEntry? _markedLogEntry;
 
-    public void SortByProperty(string propertyName, bool ascending = false)
+    public void SortByProperty(string propertyName, bool ascending = true)
     {
-        var propertyInfo = propertyName == "DateTime" ? null : typeof(LogEntry).GetProperty(propertyName);
-        if (propertyName != "DateTime" && propertyInfo == null)
+        // Check for property existence unless it's a special case
+        PropertyInfo? propertyInfo = null;
+        if (propertyName != "DateTime" && propertyName != "Pin" && propertyName != "Marked")
         {
-            logger.LogWarning("Property not found: {propertyName}", propertyName);
-            return;
+            propertyInfo = typeof(LogEntry).GetProperty(propertyName);
+            if (propertyInfo == null)
+            {
+                logger.LogWarning("Property not found: {propertyName}", propertyName);
+                return;
+            }
         }
 
-        var sorted = LogEntries
-            .OrderByDescending(x => x.IsPinned) // Pinned entry first
-            .ThenBy(x =>
-                ascending
-                    ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null))
-                    : null)
-            .ThenByDescending(x =>
-                !ascending
-                    ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null))
-                    : null)
-            .ToList();
+        // Configure the initial query, possibly with no sorting applied initially
+        var entriesQuery = LogEntries.AsQueryable();
 
+        if (propertyName == "Marked")
+        {
+            entriesQuery = entriesQuery
+                .OrderByDescending(entry => entry.IsMarked)
+                .ThenBy(entry => entry.IsPinned)
+                .ThenBy(entry => entry.LogTimeStamp.DateTime);
+        }
+        else if (propertyName == "Pin")
+        {
+            entriesQuery = entriesQuery
+                .OrderByDescending(entry => entry.IsPinned)
+                .ThenBy(entry => entry.LogTimeStamp.DateTime);
+        }
+        else if (propertyName == "DateTime") // Handling DateTime separately because its property is nested inside LogTimeStamp
+        {
+            entriesQuery = ascending ?
+                entriesQuery.OrderBy(entry => entry.LogTimeStamp.DateTime) :
+                entriesQuery.OrderByDescending(entry => entry.LogTimeStamp.DateTime);
+        }
+        else if (propertyInfo != null)
+        {
+            entriesQuery = ascending ?
+                entriesQuery.OrderBy(entry => propertyInfo.GetValue(entry, null)) :
+                entriesQuery.OrderByDescending(entry => propertyInfo.GetValue(entry, null));
+        }
+
+        var sortedEntries = entriesQuery.ToList();
         LogEntries.Clear();
-        foreach (var entry in sorted)
+        foreach (var entry in sortedEntries)
         {
             LogEntries.Add(entry);
         }
+
         UpdateFilter();
     }
+
 
     public void UpdateFilter(string searchText = "")
     {
