@@ -136,12 +136,28 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
         }
     }
 
+    /// <summary>
+    /// Adds a log entry to the collection if it is unique.
+    /// This method differentiates between log entries by creating a unique identifier that includes the file path,
+    /// timestamp, and a hash of the log entry's data content. This ensures that entries with the same timestamp and
+    /// header but different contents are recognized as distinct. Entries considered duplicates (same timestamp, headers,
+    /// and data content) are not added, preventing data redundancy.
+    /// </summary>
+    /// <param name="logEntry">The log entry to add.</param>
     public void AddLogEntry(LogEntry logEntry)
     {
-        var uniqueIdentifier = $"{logEntry.LogFile.FullPath}:{logEntry.LogTimeStamp.DateTime}";
+        // Include both the header information and a hash of the Data content to ensure uniqueness
+        var dataHash = logEntry.Data.GetHashCode().ToString();
+        var uniqueIdentifier = $"{logEntry.LogFile.FullPath}:{logEntry.LogTimeStamp.DateTime}:{dataHash}";
+
         if (_loadedLogEntryIdentifiers.Add(uniqueIdentifier))
         {
             LogEntries.Add(logEntry);
         }
+        else
+        {
+            logger.LogWarning("Duplicate log entry skipped: {UniqueIdentifier}", uniqueIdentifier);
+        }
     }
+
 }
