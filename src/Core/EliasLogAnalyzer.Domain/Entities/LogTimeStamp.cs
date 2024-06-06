@@ -11,4 +11,11 @@ public class LogTimestamp
 
     // Ticks milliseconds since system has started
     public long Ticks { get; set; }
+
+    public LogTimestamp()
+    {
+        DateTime = DateTime.MinValue;
+        DateTimeSortValue = string.Empty;
+        Ticks = 0;
+    }
 }

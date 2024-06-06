@@ -23,7 +23,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
     [ObservableProperty] private ObservableCollection<LogEntry> _filteredLogEntries = [];
     [ObservableProperty] private ObservableCollection<LogType> _selectedLogTypes = [LogType.Error];
     [ObservableProperty] private LogEntry? _markedLogEntry;
-    
+
     public void SortByProperty(string propertyName, bool ascending = false)
     {
         var propertyInfo = propertyName == "DateTime" ? null : typeof(LogEntry).GetProperty(propertyName);
@@ -44,8 +44,8 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
                     ? (propertyName == "DateTime" ? x.LogTimeStamp.DateTime : propertyInfo?.GetValue(x, null))
                     : null)
             .ToList();
-        
-        LogEntries.Clear(); 
+
+        LogEntries.Clear();
         foreach (var entry in sorted)
         {
             LogEntries.Add(entry);
@@ -94,7 +94,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
             // Unmark the previous marked entry
             MarkedLogEntry.IsMarked = false;
         }
-        
+
         // Toggle the mark state if it's the same entry being toggled
         if (logEntry == MarkedLogEntry)
         {
@@ -108,7 +108,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
             logEntry.IsMarked = true;
             MarkedLogEntry = logEntry;
         }
-        
+
         // Clear selected entries to enforce the marked entry as the first
         SelectedLogEntries.Clear();
         if (MarkedLogEntry != null)
@@ -128,7 +128,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
     public void AddLogFile(LogFile logFile)
     {
         if (!_loadedLogFileIdentifiers.Add(logFile.FullPath)) return;
-        
+
         LogFiles.Add(logFile);
         foreach (var logEntry in logFile.LogEntries)
         {

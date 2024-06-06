@@ -18,7 +18,7 @@ public partial class LogEntriesViewModel(
 {
 
     #region Properties
-    
+
     [ObservableProperty] private string _firstLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _secondLogEntryDataHtml = string.Empty;
     [ObservableProperty] private string _thirdLogEntryDataHtml = string.Empty;
@@ -89,16 +89,16 @@ public partial class LogEntriesViewModel(
             }
         }
     }
-    
+
     #endregion
-    
+
     #region Filtering
 
     partial void OnSearchTextChanged(string? oldValue, string newValue)
     {
         RefreshFilter();
     }
-    
+
     // Filter the log entries based on the search text
     [RelayCommand]
     private void RefreshFilter()
@@ -111,7 +111,7 @@ public partial class LogEntriesViewModel(
             ? "No results found. Try refining your search terms."
             : "No log entries found, please load logfiles.";
     }
-    
+
     [RelayCommand]
     private void ChangeSelectedLogType(LogType logType)
     {
@@ -121,7 +121,7 @@ public partial class LogEntriesViewModel(
         UpdateLogTypeTexts();
         RefreshFilter();
     }
-    
+
     #endregion
 
     #region Sorting
@@ -140,11 +140,11 @@ public partial class LogEntriesViewModel(
             CurrentSortProperty = propertyName;
             Ascending = true;
         }
-        
+
         logDataSharingService.SortByProperty(propertyName, Ascending);
         UpdateSortTexts(propertyName);
     }
-    
+
     // Updates the MenuBarItems text and CollectionView Header text to display current sort direction and property
     private void UpdateSortTexts(string sortProperty)
     {
@@ -159,8 +159,8 @@ public partial class LogEntriesViewModel(
         SortUserHeaderText = "User " + (sortProperty == "User" ? (Ascending ? "▲" : "▼") : "");
         SortComputerHeaderText = "Computer " + (sortProperty == "Computer" ? (Ascending ? "▲" : "▼") : "");
     }
-    
-        private void UpdateLogTypeTexts()
+
+    private void UpdateLogTypeTexts()
     {
         DebugLogTypeText = SelectedLogTypes.Contains(LogType.Debug) ? "✓ Debug" : "Debug";
         InformationLogTypeText = SelectedLogTypes.Contains(LogType.Information) ? "✓ Information" : "Information";
@@ -186,13 +186,13 @@ public partial class LogEntriesViewModel(
             (ThirdLogEntryDataHtml, IsThirdLogEntrySelected) = SetLogEntryData(2);
         }
     }
-    
+
     private (string HtmlContent, bool IsSelected) SetLogEntryData(int index)
     {
         // Check if the index is within the bounds of the selected entries
         if (SelectedLogEntries.Count <= index) return (string.Empty, false);
         if (SelectedLogEntries[index] is not LogEntry logEntry) return (string.Empty, false);
-            
+
         // Check if the current entry is the marked entry and is not in the first position
         if (logEntry == MarkedLogEntry && index != 0)
         {
@@ -203,9 +203,9 @@ public partial class LogEntriesViewModel(
         return (htmlContent, true);
     }
 
-    
+
     #endregion
-    
+
     #region Pinning and Marking
 
     [RelayCommand]
@@ -231,7 +231,7 @@ public partial class LogEntriesViewModel(
     }
 
     #endregion
-    
+
     #region Loading and Parsing
 
     /// <summary>
@@ -254,7 +254,7 @@ public partial class LogEntriesViewModel(
             IsLoading = false;
         }
     }
-    
+
     /// <summary>
     /// Loads log files and processes them concurrently adding them to the shared log data service.
     /// Uses Parallel.ForEachAsync to handle parsing in a parallel manner for better performance
@@ -262,15 +262,23 @@ public partial class LogEntriesViewModel(
     private async Task LoadAndParseAllFilesAsync()
     {
         var fileResults = await logFileLoaderService.LoadLogFilesAsync();
-        await Parallel.ForEachAsync(fileResults, async (fileResult, _) =>
+
+        // Create a list of tasks for parsing each new log file
+        var parsingTasks = fileResults.Select(logFileParserService.ParseLogFileAsync).ToList();
+
+        // Await all tasks to complete
+        var parsedLogFiles = await Task.WhenAll(parsingTasks);
+
+        // Add the parsed log files to the shared service collection
+        foreach (var logFile in parsedLogFiles)
         {
-            var logFile = await logFileParserService.ParseLogFileAsync(fileResult);
             logDataSharingService.AddLogFile(logFile);
             foreach (var logEntry in logFile.LogEntries)
             {
+                logEntry.LogFile = logFile;
                 logDataSharingService.AddLogEntry(logEntry);
             }
-        });
+        }
 
         RefreshViewState();
     }

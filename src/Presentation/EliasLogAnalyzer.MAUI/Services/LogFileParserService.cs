@@ -83,7 +83,7 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
     private static bool IsLogEntryStart(string line)
     {
         var parts = line.Split('\t', 2);
-        return DateTime.TryParseExact(parts[0], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _) 
+        return DateTime.TryParseExact(parts[0], DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
                && parts.Length == 2;  // Ensure there's more to the line than just a date
     }
 
@@ -100,9 +100,8 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
         }
     }
 
-
     /// <summary>
-    /// Converts a line of text into an <see cref="LogEntry"/>  object based on provided headers.
+    /// Converts a line of text into an <see cref="LogEntry"/> object based on provided headers.
     /// </summary>
     /// <param name="line">Line of text to parse.</param>
     /// <param name="headers">Column headers for mapping data.</param>
@@ -129,11 +128,27 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
     {
         var parts = timeString.Split(' ');
         if (parts.Length <= 1) return;
-        
+
         var time = TimeOnly.ParseExact(parts[0], TimeFormat, CultureInfo.InvariantCulture);
         entry.LogTimeStamp.DateTime = entry.LogTimeStamp.DateTime.Add(time.ToTimeSpan());
         var ticks = parts[1];
         entry.LogTimeStamp.Ticks = long.Parse(ticks);
+    }
+
+    private static LogType ParseLogType(string logTypeString)
+    {
+        logTypeString = logTypeString.Trim();
+        return logTypeString.ToLower() switch
+        {
+            "debug" => LogType.Debug,
+            "info" => LogType.Information,
+            "information" => LogType.Information,
+            "warn" => LogType.Warning,
+            "warning" => LogType.Warning,
+            "error" => LogType.Error,
+            "fatal" => LogType.Error,
+            _ => throw new ArgumentException($"Unrecognized log type: {logTypeString}")
+        };
     }
 
     /// <summary>
@@ -154,49 +169,44 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
                 case "TIME":
                     ParseTime(value, entry);
                     break;
+                case "LOGTYPE":
+                    entry.LogType = ParseLogType(value);
+                    break;
+                case "THREADNAME/NUMBER":
+                    entry.ThreadNameOrNumber = value;
+                    break;
+                case "SOURCELOCATION":
+                    entry.SourceLocation = value;
+                    break;
+                case "SOURCE":
+                    entry.Source = value;
+                    break;
+                case "CATEGORY":
+                    entry.Category = value;
+                    break;
+                case "EVENTID":
+                    entry.EventId = int.Parse(value);
+                    break;
+                case "USER":
+                    entry.User = value;
+                    break;
+                case "COMPUTER":
+                    entry.Computer = value;
+                    break;
+                case "DESCRIPTION":
+                    entry.Description = value;
+                    break;
+                case "DATA":
+                    entry.Data = value;
+                    break;
                 default:
-                    ReflectivePopulate(entry, header, value);
+                    logger.LogWarning("Unhandled property for header: {Header}", header);
                     break;
             }
         }
         catch (Exception ex)
         {
             logger.LogError("Error populating {Header}: {ErrorMessage}", header, ex.Message);
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Uses reflection to set property values on LogEntry based on the header, supporting dynamic property assignment.
-    /// </summary>
-    /// <param name="entry">Log entry to populate.</param>
-    /// <param name="header">Header identifying the property.</param>
-    /// <param name="value">Value to set on the property.</param>
-    private void ReflectivePopulate(LogEntry entry, string header, string value)
-    {
-        var propertyInfo = entry.GetType().GetProperty(header, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-        if (propertyInfo == null)
-        {
-            logger.LogWarning("No property found for header: {Header}", header);
-            return;
-        }
-
-        try
-        {
-            if (propertyInfo.PropertyType.IsEnum)
-            {
-                var parsedEnum = Enum.Parse(propertyInfo.PropertyType, value, true);
-                propertyInfo.SetValue(entry, parsedEnum);
-            }
-            else
-            {
-                var convertedValue = Convert.ChangeType(value, propertyInfo.PropertyType, CultureInfo.InvariantCulture);
-                propertyInfo.SetValue(entry, convertedValue);
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Error setting property {PropertyName} with value {Value}: {ErrorMessage}", propertyInfo.Name, value, ex.Message);
             throw;
         }
     }
