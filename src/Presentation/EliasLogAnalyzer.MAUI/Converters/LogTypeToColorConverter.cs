@@ -1,5 +1,5 @@
 using System.Globalization;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 
 namespace EliasLogAnalyzer.MAUI.Converters
 {

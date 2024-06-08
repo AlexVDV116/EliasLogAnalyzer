@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 
 namespace EliasLogAnalyzer.MAUI.Services.Contracts;
 

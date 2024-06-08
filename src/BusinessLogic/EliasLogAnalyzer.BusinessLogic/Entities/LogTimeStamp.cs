@@ -1,7 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Runtime.CompilerServices;
-
-namespace EliasLogAnalyzer.Domain.Entities;
+﻿namespace EliasLogAnalyzer.BusinessLogic.Entities;
 
 public class LogTimestamp
 {

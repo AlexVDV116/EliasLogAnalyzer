@@ -1,6 +1,6 @@
+using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +9,7 @@ namespace EliasLogAnalyzer.MAUI.Services;
 /// <summary>
 /// Service that provides functionality to parse log files into structured log entries.
 /// </summary>
-public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFileParserService
+public class LogFileParserService(ILogger<LogFileParserService> logger, IHashService hashService) : ILogFileParserService
 {
     private const string DateFormat = "dd-MM-yyyy";
     private const string TimeFormat = "HH:mm:ss";
@@ -22,13 +22,22 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
     public async Task<LogFile> ParseLogFileAsync(FileResult fileResult)
     {
         var entries = await ParseLogEntriesAsync(fileResult);
-        return new LogFile
+        var logFile = new LogFile
         {
             FileName = fileResult.FileName,
             FullPath = fileResult.FullPath,
             Computer = entries.FirstOrDefault()?.Computer ?? "Unknown",
             LogEntries = entries
         };
+
+        logFile.Hash = hashService.GenerateLogFileHash(logFile);
+
+        foreach (var entry in entries)
+        {
+            entry.LogFile = logFile; // Associate the LogFile with each LogEntry
+        }
+
+        return logFile;
     }
 
     /// <summary>
@@ -59,6 +68,7 @@ public class LogFileParserService(ILogger<LogFileParserService> logger) : ILogFi
                 if (IsLogEntryStart(line))
                 {
                     var entry = ParseLogEntry(line, headers);
+                    entry.Hash = hashService.GenerateLogEntryHash(entry);
                     entries.Add(entry);
                 }
                 else

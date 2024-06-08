@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;

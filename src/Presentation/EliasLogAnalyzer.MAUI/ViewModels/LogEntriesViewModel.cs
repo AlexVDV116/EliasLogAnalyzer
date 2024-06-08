@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -275,7 +275,6 @@ public partial class LogEntriesViewModel(
             logDataSharingService.AddLogFile(logFile);
             foreach (var logEntry in logFile.LogEntries)
             {
-                logEntry.LogFile = logFile;
                 logDataSharingService.AddLogEntry(logEntry);
             }
         }

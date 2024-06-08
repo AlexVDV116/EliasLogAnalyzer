@@ -14,11 +14,16 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <FontImageSource x:Key="InfoIcon" 
+            <FontImageSource x:Key="SubmitIcon" 
                          FontFamily="MaterialSymbols"
-                         Glyph="{x:Static resources:IconFont.Info}"
-                         Color="Blue"
-                         Size="20"/>
+                         Glyph="{x:Static resources:IconFont.UploadFile}"
+                         Color="{StaticResource Primary}"
+                         Size="75"/>
+            <FontImageSource x:Key="CopyIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.ContentPasteGo}"
+                           Color="{StaticResource Primary}"
+                         Size="75"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -78,20 +83,19 @@
                     <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="7" Grid.Column="3" />
 
                     <Label Text="Workaround:" Grid.Row="8" Grid.Column="0" />
-                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="8" Grid.Column="1" HeightRequest="100" />
 
-                    <Label Text="Recommendation:" Grid.Row="9" Grid.Column="0" />
-                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecomendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Label Text="Recommendation:" Grid.Row="8" Grid.Column="2" />
+                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecomendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" HeightRequest="100" />
 
                     <HorizontalStackLayout Grid.Row="10" Grid.Column="1">
-                        <Image Source="{StaticResource InfoIcon}" IsVisible="{Binding ShowPinImage}" Aspect="Center" Margin="0, 0, 5, 0"/>
-                        <Label Text="{Binding PinnedLogEntriesText}" Grid.Row="10" Grid.Column="1" ToolTipProperties.Text="Pinning LogEntries will embed them into the report." />
+                        <Label Text="{Binding PinnedLogEntriesText}" Grid.Row="10" Grid.Column="1" ToolTipProperties.Text="Pinning LogEntries will embed them with the report." />
                     </HorizontalStackLayout>
                 </Grid>
 
-                <HorizontalStackLayout HorizontalOptions="Center">
-                    <Button Text="Submit" Command="{Binding SubmitCommand}" HeightRequest="50" WidthRequest="100" Margin="10"/>
-                    <Button Text="Copy to Clipboard" Command="{Binding CopyToClipboardCommand}" HeightRequest="50" WidthRequest="150" Margin="10" />
+                <HorizontalStackLayout HorizontalOptions="Center" Margin="10">
+                    <ImageButton Source="{StaticResource SubmitIcon}" Command="{Binding SubmitCommand}" HeightRequest="75" WidthRequest="100" ToolTipProperties.Text="Submit" />
+                    <ImageButton Source="{StaticResource CopyIcon}" Command="{Binding CopyToClipboardCommand}" HeightRequest="75" WidthRequest="150" ToolTipProperties.Text="Copy to clipboard" />
                 </HorizontalStackLayout>
             </StackLayout>
         </ScrollView>

@@ -22,6 +22,9 @@ namespace EliasLogAnalyzer.MAUI
                     fonts.AddFont("MaterialSymbolsOutlined.ttf", "MaterialSymbols");
                 });
 
+            // API
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7028/") });
+
             // UI components and their corresponding ViewModels
             builder.Services.AddSingleton<LogEntriesPage>();
             builder.Services.AddSingleton<LogEntriesViewModel>();
@@ -35,17 +38,20 @@ namespace EliasLogAnalyzer.MAUI
             builder.Services.AddTransient<SettingsViewModel>();
 
             // Shared service across multiple components
+            builder.Services.AddSingleton<AppShellViewModel>();
             builder.Services.AddSingleton<ISettingsService, SettingsService>();
             builder.Services.AddSingleton<ILogDataSharingService, LogDataSharingService>();
-            builder.Services.AddSingleton<IHtmlGeneratorService, HtmlGeneratorService>();
-            builder.Services.AddSingleton<IDialogService, DialogService>();
-            builder.Services.AddSingleton<AppShellViewModel>();
+            builder.Services.AddSingleton<IApiService, ApiService>();
+
 
 
             // Services used within a single ViewModel
             builder.Services.AddTransient<ILogFileLoaderService, LogFileLoaderService>();
             builder.Services.AddTransient<ILogFileParserService, LogFileParserService>();
             builder.Services.AddTransient<ILogEntryAnalysisService, LogEntryAnalysisService>();
+            builder.Services.AddTransient<IHtmlGeneratorService, HtmlGeneratorService>();
+            builder.Services.AddTransient<IDialogService, DialogService>();
+            builder.Services.AddTransient<IHashService, HashService>();
 
             // Hide CollectionView checkboxes when SelectionMode is Multiple
 #if WINDOWS

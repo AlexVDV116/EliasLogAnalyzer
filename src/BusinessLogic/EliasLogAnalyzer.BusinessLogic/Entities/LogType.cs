@@ -1,4 +1,4 @@
-namespace EliasLogAnalyzer.Domain.Entities;
+﻿namespace EliasLogAnalyzer.BusinessLogic.Entities;
 
 /// <summary>
 /// Log type enumeration

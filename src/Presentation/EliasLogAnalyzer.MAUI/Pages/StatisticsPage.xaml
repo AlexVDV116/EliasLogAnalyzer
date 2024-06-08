@@ -5,7 +5,7 @@
              x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
              xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"             
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
-             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.BusinessLogic.Entities;assembly=EliasLogAnalyzer.BusinessLogic"
              xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   
              x:DataType="viewModels:StatisticsViewModel"
              Title="StatisticsPage">

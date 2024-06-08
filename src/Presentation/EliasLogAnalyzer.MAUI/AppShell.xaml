@@ -7,7 +7,7 @@
     xmlns:pages="clr-namespace:EliasLogAnalyzer.MAUI.Pages"
     xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
     xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
-    xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+    xmlns:entities="clr-namespace:EliasLogAnalyzer.BusinessLogic.Entities;assembly=EliasLogAnalyzer.BusinessLogic"
     xmlns:behaviors="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Behaviors"
     x:DataType="viewModels:AppShellViewModel"
     FlyoutBehavior="Locked"
@@ -155,7 +155,7 @@
 
     <Shell.FlyoutFooter>
         <Grid HorizontalOptions="End">
-            <Image Source="{StaticResource LeftPanelOpenIcon}" Aspect="Center" Margin="15">
+            <Image Source="{StaticResource LeftPanelOpenIcon}" Aspect="Center" Margin="15" ToolTipProperties.Text="Open / Close">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleFlyoutWidthCommand}" />
                 </Image.GestureRecognizers>

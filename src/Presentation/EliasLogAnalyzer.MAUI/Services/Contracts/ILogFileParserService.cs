@@ -1,4 +1,4 @@
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 
 namespace EliasLogAnalyzer.MAUI.Services.Contracts;
 

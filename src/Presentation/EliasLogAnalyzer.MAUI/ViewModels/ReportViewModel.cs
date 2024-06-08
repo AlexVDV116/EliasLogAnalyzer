@@ -1,12 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EliasLogAnalyzer.Domain.Entities;
-using EliasLogAnalyzer.MAUI.Services;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
-using Microsoft.Maui;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -14,6 +12,7 @@ public partial class ReportViewModel : ObservableObject
 {
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly IDialogService _dialogService;
+    private readonly IApiService _apiService;
 
     [ObservableProperty] private string developerName = string.Empty;
     [ObservableProperty] private string workstationName = string.Empty;
@@ -44,14 +43,19 @@ public partial class ReportViewModel : ObservableObject
     public ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
 
     public List<string> Severities { get; } = ["Critical", "High", "Medium", "Low"];
-    public List<double> Efforts { get; } = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
+    public List<double> Efforts { get; } = [1, 2, 3, 4, 5, 6, 8, 12, 16, 24];
     public DateTime CombinedDateTime => ReportDate.Date + ReportTime;
 
 
-    public ReportViewModel(ILogDataSharingService logDataSharingService, IDialogService dialogService)
+    public ReportViewModel(
+        ILogDataSharingService logDataSharingService,
+        IDialogService dialogService,
+        IApiService apiService)
     {
         _logDataSharingService = logDataSharingService;
         _dialogService = dialogService;
+        _apiService = apiService;
+
         PinnedLogEntries.CollectionChanged += OnPinnedLogEntriesChanged;
         UpdatePinnedEntriesText();
 
@@ -112,12 +116,11 @@ public partial class ReportViewModel : ObservableObject
 
 
     [RelayCommand]
-    private void Submit()
+    private async Task Submit()
     {
         ValidateForm();
         if (IsFormValid())
         {
-
             var bugReport = new BugReport
             {
                 DeveloperName = DeveloperName.Trim(),
@@ -139,11 +142,19 @@ public partial class ReportViewModel : ObservableObject
                 PinnedLogEntries = _logDataSharingService.PinnedLogEntries.ToList()
             };
 
-            _dialogService.ShowMessage("Report submitted", "Successfully submitted your report.");
+            var result = await _apiService.AddBugReportAsync(bugReport);
+            if (result.Success)
+            {
+                await _dialogService.ShowMessage("Success", "Report successfully submitted.");
+            }
+            else
+            {
+                await _dialogService.ShowMessage("Error", result.ErrorMessage);
+            }
         }
         else
         {
-            // Form invalid
+            await _dialogService.ShowMessage("Validation Error", "Please fill in all required fields.");
         }
     }
 

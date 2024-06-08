@@ -1,12 +1,12 @@
-﻿using EliasLogAnalyzer.Domain.Entities;
+﻿using EliasLogAnalyzer.BusinessLogic.Entities;
 
-namespace EliasLogAnalyzer.MAUI.Services.Contracts
+namespace EliasLogAnalyzer.MAUI.Services.Contracts;
+
+public interface IHtmlGeneratorService
 {
-    public interface IHtmlGeneratorService
-    {
-        string ConvertDataToHtml(LogEntry logEntry);
-        string GenerateTimeLineHtml();
-        string GeneratePieChartHtml();
-    }
-
+    string ConvertDataToHtml(LogEntry logEntry);
+    string GenerateTimeLineHtml();
+    string GeneratePieChartHtml();
 }
+
+

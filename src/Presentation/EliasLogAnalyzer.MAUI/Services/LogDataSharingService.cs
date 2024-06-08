@@ -1,7 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
-using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -183,8 +184,7 @@ public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
     public void AddLogEntry(LogEntry logEntry)
     {
         // Include both the header information and a hash of the Data content to ensure uniqueness
-        var dataHash = logEntry.Data.GetHashCode().ToString();
-        var uniqueIdentifier = $"{logEntry.LogFile.FullPath}:{logEntry.LogTimeStamp.DateTime}:{dataHash}";
+        var uniqueIdentifier = logEntry.Hash;
 
         if (_loadedLogEntryIdentifiers.Add(uniqueIdentifier))
         {
