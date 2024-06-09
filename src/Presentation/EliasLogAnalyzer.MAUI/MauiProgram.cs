@@ -22,7 +22,7 @@ namespace EliasLogAnalyzer.MAUI
                     fonts.AddFont("MaterialSymbolsOutlined.ttf", "MaterialSymbols");
                 });
 
-            // API
+            // HttpClient
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7028/") });
 
             // UI components and their corresponding ViewModels

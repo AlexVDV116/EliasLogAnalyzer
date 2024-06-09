@@ -4,12 +4,57 @@
              xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.DatabasePage"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
              x:DataType="viewModels:DatabaseViewModel"
              Title="DatabasePage">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <FontImageSource x:Key="ConnectionIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Cloud}"
+                         Color="Green"
+                         Size="30"/>
+            <FontImageSource x:Key="NoConnectionIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.CloudOff}"
+                         Color="Red"
+                         Size="30"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Shell.TitleView>
-        <Label Text="" />
+        <Grid ColumnDefinitions="*, Auto">
+            <ActivityIndicator Grid.Column="0" 
+                       IsVisible="{Binding IsChecking}"
+                       IsRunning="{Binding IsChecking}"
+                       Color="{StaticResource Primary }"
+                       WidthRequest="24"
+                       HeightRequest="24"
+                       HorizontalOptions="End"
+                       VerticalOptions="Center" />
+            <Image Grid.Column="0"
+                   Source="{StaticResource ConnectionIcon}"
+                   IsVisible="{Binding ConnectedIconVisible}"
+                   WidthRequest="24"
+                   HeightRequest="24"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center" />
+            <Image Grid.Column="0"
+                   Source="{StaticResource NoConnectionIcon}"
+                   IsVisible="{Binding NotConnectedIconVisible}"
+                   WidthRequest="24"
+                   HeightRequest="24"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center" />
+            <Label Grid.Column="1" 
+                   Text="{Binding ConnectionStatus}"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center"
+                   Margin="10,0,10,0"/>
+        </Grid>
     </Shell.TitleView>
+
 
     <Border Grid.Row="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
 

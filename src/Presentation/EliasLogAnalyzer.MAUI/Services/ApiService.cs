@@ -19,6 +19,34 @@ public class ApiService : IApiService
         _logger = logger;
     }
 
+    public async Task<ApiResult> CheckDatabaseConnectionAsync()
+    {
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync("api/Database/CheckConnection").ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult.Ok();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return ApiResult.Fail($"Failed to check database connection: {errorContent}");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HttpRequestException occurred while checking the database connection.");
+            return ApiResult.Fail("Unable to connect to the server. Please check your network connection.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while checking the database connection.");
+            return ApiResult.Fail("An unexpected error occurred. Please try again later.");
+        }
+    }
+
+
     public async Task<ApiResult> AddBugReportAsync(BugReport bugReport)
     {
         try
