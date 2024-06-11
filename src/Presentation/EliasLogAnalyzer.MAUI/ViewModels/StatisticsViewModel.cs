@@ -19,7 +19,7 @@ public partial class StatisticsViewModel : ObservableObject
     [ObservableProperty] private string _baseUrl = string.Empty;
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
-    [ObservableProperty] private bool _noLogEntryMarked = true;
+    [ObservableProperty] private bool _noLogEntryMarked;
     [ObservableProperty] private bool _logEntryMarked;
     [ObservableProperty] private string _statisticsText = "Mark a LogEntry to analyse relationship probabilities.";
 
@@ -38,6 +38,7 @@ public partial class StatisticsViewModel : ObservableObject
 
         InitializeBindings();
         GenerateCharts();
+        AnalyzeLogEntries();
     }
 
     [RelayCommand] private void PinLogEntry(LogEntry logEntry) => _logDataSharingService.PinLogEntry(logEntry);
@@ -75,7 +76,7 @@ public partial class StatisticsViewModel : ObservableObject
 
     private void OnMarkedLogEntryChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(_logDataSharingService.MarkedLogEntry))
+        if (e.PropertyName == nameof(MarkedLogEntry))
         {
             UpdatePageState();
             AnalyzeLogEntries();
@@ -98,15 +99,20 @@ public partial class StatisticsViewModel : ObservableObject
 
     private void AnalyzeLogEntries()
     {
-        if (_logDataSharingService.MarkedLogEntry == null)
+        if (MarkedLogEntry == null)
         {
             StatisticsText = "Mark a LogEntry to analyse relationship probabilities.";
-            return;
+            NoLogEntryMarked = true;
+            SortedLogEntriesByProbability.Clear();
         }
-
-        StatisticsText = string.Empty;
-        _logEntryAnalysisService.AnalyzeLogEntries();
-        OnPropertyChanged(nameof(SortedLogEntriesByProbability));
+        else
+        {
+            StatisticsText = string.Empty;
+            NoLogEntryMarked = false;
+            _logEntryAnalysisService.AnalyzeLogEntries();
+            InitializeSortedCollection();
+            OnPropertyChanged(nameof(SortedLogEntriesByProbability));
+        }
     }
 
     private void GenerateCharts()
