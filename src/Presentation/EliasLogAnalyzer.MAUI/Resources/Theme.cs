@@ -1,4 +1,6 @@
-﻿namespace EliasLogAnalyzer.MAUI.Resources
+﻿using Microsoft.Maui.ApplicationModel;
+
+namespace EliasLogAnalyzer.MAUI.Resources
 {
     public sealed class Theme
     {

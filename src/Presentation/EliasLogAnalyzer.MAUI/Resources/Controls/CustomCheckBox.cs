@@ -1,3 +1,6 @@
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+
 namespace EliasLogAnalyzer.MAUI.Resources.Controls;
 
 public class CustomCheckBox : ContentView

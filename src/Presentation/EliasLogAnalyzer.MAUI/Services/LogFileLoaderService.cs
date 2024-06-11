@@ -1,4 +1,6 @@
 ﻿using EliasLogAnalyzer.MAUI.Services.Contracts;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
 
 namespace EliasLogAnalyzer.MAUI.Services
 {

@@ -1,4 +1,5 @@
 using EliasLogAnalyzer.BusinessLogic.Entities;
+using Microsoft.Maui.Storage;
 
 namespace EliasLogAnalyzer.MAUI.Services.Contracts;
 

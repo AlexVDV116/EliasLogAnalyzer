@@ -1,4 +1,5 @@
 using EliasLogAnalyzer.MAUI.ViewModels;
+using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Pages;
 

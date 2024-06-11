@@ -1,4 +1,6 @@
-﻿namespace EliasLogAnalyzer.MAUI.Services.Contracts
+﻿using Microsoft.Maui.Storage;
+
+namespace EliasLogAnalyzer.MAUI.Services.Contracts
 {
     public interface ILogFileLoaderService
     {

@@ -1,4 +1,7 @@
-﻿namespace EliasLogAnalyzer.MAUI.Resources.Behaviors
+﻿using System;
+using Microsoft.Maui.Controls;
+
+namespace EliasLogAnalyzer.MAUI.Resources.Behaviors
 {
     public class ChangeIconBehavior : Behavior<Image>
     {

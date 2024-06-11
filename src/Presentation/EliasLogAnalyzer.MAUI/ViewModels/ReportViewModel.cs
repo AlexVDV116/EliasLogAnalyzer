@@ -5,6 +5,8 @@ using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Graphics;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
