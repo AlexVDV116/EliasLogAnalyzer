@@ -32,7 +32,6 @@
         <Grid Grid.Row="0" ColumnDefinitions="3*, 2*">
             <Border Grid.Column="0" BackgroundColor="Transparent" Margin="10" Padding="10" Stroke="LightGray">
                 <ScrollView>
-                    <VerticalStackLayout>
                         <CollectionView ItemsSource="{Binding SortedLogEntriesByProbability}" SelectionMode="Single" >
 
                             <CollectionView.EmptyView>
@@ -88,7 +87,6 @@
                             </CollectionView.ItemTemplate>
 
                         </CollectionView>
-                    </VerticalStackLayout>
                 </ScrollView>
             </Border>
 
