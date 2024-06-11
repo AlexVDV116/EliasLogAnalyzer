@@ -1,6 +1,5 @@
 ﻿using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,9 +14,9 @@ public class HashService : IHashService
         var hash = SHA256.HashData(bytes);
 
         var builder = new StringBuilder();
-        for (var i = 0; i < hash.Length; i++)
+        foreach (var t in hash)
         {
-            builder.Append(hash[i].ToString("x2"));
+            builder.Append(t.ToString("x2"));
         }
 
         return builder.ToString();
@@ -37,9 +36,9 @@ public class HashService : IHashService
         var fileHash = SHA256.HashData(fileBytes);
 
         var fileHashBuilder = new StringBuilder();
-        for (int i = 0; i < fileHash.Length; i++)
+        foreach (var t in fileHash)
         {
-            fileHashBuilder.Append(fileHash[i].ToString("x2"));
+            fileHashBuilder.Append(t.ToString("x2"));
         }
 
         return fileHashBuilder.ToString();

@@ -1,9 +1,8 @@
 using EliasLogAnalyzer.MAUI.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Pages;
 
-public partial class SettingsPage : ContentPage
+public partial class SettingsPage
 {
     public SettingsPage(SettingsViewModel settingsViewModel)
     {

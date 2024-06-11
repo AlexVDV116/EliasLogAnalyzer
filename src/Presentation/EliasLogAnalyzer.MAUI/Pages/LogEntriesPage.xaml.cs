@@ -1,9 +1,8 @@
 using EliasLogAnalyzer.MAUI.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Pages;
 
-public partial class LogEntriesPage : ContentPage
+public partial class LogEntriesPage
 {
 
     public LogEntriesPage(LogEntriesViewModel logEntriesViewModel)

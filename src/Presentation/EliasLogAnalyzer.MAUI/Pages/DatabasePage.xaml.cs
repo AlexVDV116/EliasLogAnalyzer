@@ -1,9 +1,8 @@
 using EliasLogAnalyzer.MAUI.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Pages;
 
-public partial class DatabasePage : ContentPage
+public partial class DatabasePage
 {
     private readonly DatabaseViewModel _databaseViewModel;
 

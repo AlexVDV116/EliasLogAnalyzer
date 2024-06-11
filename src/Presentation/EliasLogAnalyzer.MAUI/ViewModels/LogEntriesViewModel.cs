@@ -50,9 +50,9 @@ public partial class LogEntriesViewModel(
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
     private ObservableCollection<LogType> SelectedLogTypes => logDataSharingService.SelectedLogTypes;
+    private LogEntry? MarkedLogEntry => logDataSharingService.MarkedLogEntry;
     public ObservableCollection<object> SelectedLogEntries => logDataSharingService.SelectedLogEntries;
     public ObservableCollection<LogEntry> FilteredLogEntries => logDataSharingService.FilteredLogEntries;
-    private LogEntry? MarkedLogEntry => logDataSharingService.MarkedLogEntry;
 
     #endregion
 

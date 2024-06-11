@@ -86,7 +86,7 @@
                     <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="8" Grid.Column="1" HeightRequest="100" />
 
                     <Label Text="Recommendation:" Grid.Row="8" Grid.Column="2" />
-                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecomendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecommendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" HeightRequest="100" />
 
                     <HorizontalStackLayout Grid.Row="10" Grid.Column="1">
                         <Label Text="{Binding PinnedLogEntriesText}" Grid.Row="10" Grid.Column="1" ToolTipProperties.Text="Pinning LogEntries will embed them with the report." />

@@ -15,20 +15,17 @@ public partial class StatisticsViewModel : ObservableObject
     private readonly ILogEntryAnalysisService _logEntryAnalysisService;
     private readonly IHtmlGeneratorService _htmlGeneratorService;
 
-    [ObservableProperty] public ObservableCollection<LogEntry> _sortedLogEntriesByProbability = [];
+    [ObservableProperty] private ObservableCollection<LogEntry> _sortedLogEntriesByProbability = [];
     [ObservableProperty] private string _baseUrl = string.Empty;
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
     [ObservableProperty] private bool _noLogEntryMarked = true;
-    [ObservableProperty] private bool _logEntryMarked = false;
+    [ObservableProperty] private bool _logEntryMarked;
     [ObservableProperty] private string _statisticsText = "Mark a LogEntry to analyse relationship probabilities.";
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
-    public ObservableCollection<LogEntry> LogEntries => _logDataSharingService.LogEntries;
-    public ObservableCollection<object> SelectedLogEntries => _logDataSharingService.SelectedLogEntries;
-    public ObservableCollection<LogEntry> FilteredLogEntries => _logDataSharingService.FilteredLogEntries;
+    private ObservableCollection<LogEntry> LogEntries => _logDataSharingService.LogEntries;
     private LogEntry? MarkedLogEntry => _logDataSharingService.MarkedLogEntry;
-
 
     public StatisticsViewModel(
         ILogDataSharingService logDataSharingService,
@@ -66,10 +63,8 @@ public partial class StatisticsViewModel : ObservableObject
         ((INotifyPropertyChanged)_logDataSharingService).PropertyChanged += OnMarkedLogEntryChanged;
     }
 
-    public void InitializeSortedCollection()
+    private void InitializeSortedCollection()
     {
-        if (LogEntries == null) return;
-
         var filteredAndSortedEntries = LogEntries
              .Where(entry => entry.Probability > 0)
              .OrderByDescending(entry => entry.Probability)

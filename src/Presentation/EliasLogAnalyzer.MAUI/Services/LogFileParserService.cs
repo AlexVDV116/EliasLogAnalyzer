@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Globalization;
 using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;

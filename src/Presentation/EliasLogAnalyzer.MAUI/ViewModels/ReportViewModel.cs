@@ -4,7 +4,6 @@ using EliasLogAnalyzer.BusinessLogic.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Graphics;
 
@@ -16,37 +15,37 @@ public partial class ReportViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly IApiService _apiService;
 
-    [ObservableProperty] private string developerName = string.Empty;
-    [ObservableProperty] private string workstationName = string.Empty;
-    [ObservableProperty] private DateTime reportDate = DateTime.Now;
-    [ObservableProperty] private TimeSpan reportTime = DateTime.Now.TimeOfDay;
-    [ObservableProperty] private string situation = string.Empty;
-    [ObservableProperty] private string observation = string.Empty;
-    [ObservableProperty] private string expectation = string.Empty;
-    [ObservableProperty] private string tag = string.Empty;
-    [ObservableProperty] private string build = string.Empty;
-    [ObservableProperty] private string severity = string.Empty;
-    [ObservableProperty] private string analysis = string.Empty;
-    [ObservableProperty] private string possibleSolutions = string.Empty;
-    [ObservableProperty] private string whatToTest = string.Empty;
-    [ObservableProperty] private double effort = 0;
-    [ObservableProperty] private string risk = string.Empty;
-    [ObservableProperty] private string workaround = string.Empty;
-    [ObservableProperty] private string recommendation = string.Empty;
+    [ObservableProperty] private string _developerName = string.Empty;
+    [ObservableProperty] private string _workstationName = string.Empty;
+    [ObservableProperty] private DateTime _reportDate = DateTime.Now;
+    [ObservableProperty] private TimeSpan _reportTime = DateTime.Now.TimeOfDay;
+    [ObservableProperty] private string _situation = string.Empty;
+    [ObservableProperty] private string _observation = string.Empty;
+    [ObservableProperty] private string _expectation = string.Empty;
+    [ObservableProperty] private string _tag = string.Empty;
+    [ObservableProperty] private string _build = string.Empty;
+    [ObservableProperty] private string _severity = string.Empty;
+    [ObservableProperty] private string _analysis = string.Empty;
+    [ObservableProperty] private string _possibleSolutions = string.Empty;
+    [ObservableProperty] private string _whatToTest = string.Empty;
+    [ObservableProperty] private double _effort;
+    [ObservableProperty] private string _risk = string.Empty;
+    [ObservableProperty] private string _workaround = string.Empty;
+    [ObservableProperty] private string _recommendation = string.Empty;
     [ObservableProperty] private string _pinnedLogEntriesText = string.Empty;
     [ObservableProperty] private bool _showPinImage;
 
     [ObservableProperty] private Color _developerNamePlaceholderColor = Colors.LightGray;
     [ObservableProperty] private Color _analysisPlaceholderColor = Colors.LightGray;
-    [ObservableProperty] private Color _recomendationPlaceholderColor = Colors.LightGray;
+    [ObservableProperty] private Color _recommendationPlaceholderColor = Colors.LightGray;
     [ObservableProperty] private Color _severityTextColor = Colors.LightGray;
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
-    public ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
-
+    private ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
+    
+    private DateTime CombinedDateTime => ReportDate.Date + ReportTime;
     public List<string> Severities { get; } = ["Critical", "High", "Medium", "Low"];
     public List<double> Efforts { get; } = [1, 2, 3, 4, 5, 6, 8, 12, 16, 24];
-    public DateTime CombinedDateTime => ReportDate.Date + ReportTime;
 
 
     public ReportViewModel(
@@ -165,7 +164,7 @@ public partial class ReportViewModel : ObservableObject
         DeveloperNamePlaceholderColor = string.IsNullOrWhiteSpace(DeveloperName) ? Colors.Red : Colors.LightGray;
         SeverityTextColor = string.IsNullOrWhiteSpace(Severity) ? Colors.Red : Colors.Black;
         AnalysisPlaceholderColor = string.IsNullOrWhiteSpace(Analysis) ? Colors.Red : Colors.LightGray;
-        RecomendationPlaceholderColor = string.IsNullOrWhiteSpace(Recommendation) ? Colors.Red : Colors.LightGray;
+        RecommendationPlaceholderColor = string.IsNullOrWhiteSpace(Recommendation) ? Colors.Red : Colors.LightGray;
 
     }
 

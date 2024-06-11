@@ -1,6 +1,6 @@
 ﻿namespace EliasLogAnalyzer.MAUI.Resources
 {
-    static class IconFont
+    internal static class IconFont
     {
         // SideMenu Icons
         public const string DataTable = "\ue99c";

@@ -1,9 +1,8 @@
 using EliasLogAnalyzer.MAUI.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Pages;
 
-public partial class ReportPage : ContentPage
+public partial class ReportPage
 {
     public ReportPage(ReportViewModel reportViewModel)
     {

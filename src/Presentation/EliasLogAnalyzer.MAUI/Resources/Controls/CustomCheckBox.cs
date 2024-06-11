@@ -5,10 +5,9 @@ namespace EliasLogAnalyzer.MAUI.Resources.Controls;
 
 public class CustomCheckBox : ContentView
 {
-    private readonly BoxView checkBox;
-    private readonly Frame frame;
-    
-    public static readonly BindableProperty IsCheckedProperty =
+    private readonly BoxView _checkBox;
+
+    private static readonly BindableProperty IsCheckedProperty =
         BindableProperty.Create(nameof(IsChecked), typeof(bool), typeof(CustomCheckBox), false, propertyChanged: OnIsCheckedChanged);
 
     public bool IsChecked
@@ -19,7 +18,7 @@ public class CustomCheckBox : ContentView
 
     public CustomCheckBox()
     {
-        checkBox = new BoxView
+        _checkBox = new BoxView
         {
             WidthRequest = 20,
             HeightRequest = 20,
@@ -28,18 +27,18 @@ public class CustomCheckBox : ContentView
             HorizontalOptions = LayoutOptions.Center
         };
 
-        checkBox.GestureRecognizers.Add(new TapGestureRecognizer
+        _checkBox.GestureRecognizers.Add(new TapGestureRecognizer
         {
             Command = new Command(() => IsChecked = !IsChecked)
         });
         
-        frame = new Frame
+        var frame = new Frame
         {
             WidthRequest = 20,
             HeightRequest = 20,
             CornerRadius = 0,
             BorderColor = Color.FromArgb("FF02A3A4"),
-            Content = checkBox,
+            Content = _checkBox,
             Padding = 0
         };
 
@@ -49,6 +48,6 @@ public class CustomCheckBox : ContentView
     private static void OnIsCheckedChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var checkBox = (CustomCheckBox)bindable;
-        checkBox.checkBox.Color = (bool)newValue ? Color.FromArgb("FF02A3A4") : Color.FromArgb("FFFFFFFF");
+        checkBox._checkBox.Color = (bool)newValue ? Color.FromArgb("FF02A3A4") : Color.FromArgb("FFFFFFFF");
     }
 }

@@ -12,9 +12,9 @@ public partial class DatabaseViewModel : ObservableObject
 
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isChecking;
-    [ObservableProperty] private string _connectionStatus = "Checking connection...";
     [ObservableProperty] private bool _connectedIconVisible;
     [ObservableProperty] private bool _notConnectedIconVisible;
+    [ObservableProperty] private string _connectionStatus = "Checking connection...";
 
     public IAsyncRelayCommand CheckConnectionCommand { get; }
 
@@ -26,7 +26,7 @@ public partial class DatabaseViewModel : ObservableObject
 
     private void UpdateConnectionStatus(ApiResult result)
     {
-        if (result.Success == true)
+        if (result.Success)
         {
             IsConnected = true;
             NotConnectedIconVisible = false;

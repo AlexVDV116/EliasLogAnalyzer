@@ -2,9 +2,4 @@
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
-public partial class SettingsViewModel : ObservableObject
-{
-    public SettingsViewModel()
-    {
-    }
-}
+public  class SettingsViewModel : ObservableObject { }
