@@ -5,34 +5,44 @@
              x:Class="EliasLogAnalyzer.MAUI.Pages.ReportPage"
              xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
+             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
+             xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   
              x:DataType="viewModels:ReportViewModel"
              Title="ReportPage">
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <FontImageSource x:Key="SubmitIcon" 
+            <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
+            <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
+            <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
+        </ResourceDictionary>
+        <FontImageSource x:Key="SubmitIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.UploadFile}"
                          Color="{StaticResource Primary}"
                          Size="75"/>
-            <FontImageSource x:Key="CopyIcon" 
+        <FontImageSource x:Key="CopyIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.ContentPasteGo}"
                            Color="{StaticResource Primary}"
                          Size="75"/>
-            <FontImageSource x:Key="ConnectionIcon" 
+        <FontImageSource x:Key="ConnectionIcon" 
                              FontFamily="MaterialSymbols"
                              Glyph="{x:Static resources:IconFont.Cloud}"
                              Color="Green"
                              Size="30"/>
-            <FontImageSource x:Key="NoConnectionIcon" 
+        <FontImageSource x:Key="NoConnectionIcon" 
                              FontFamily="MaterialSymbols"
                              Glyph="{x:Static resources:IconFont.CloudOff}"
                              Color="Red"
                              Size="30"/>
-        </ResourceDictionary>
+        <FontImageSource x:Key="InfoIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Info}"
+                         Color="Blue"
+                         Size="20"/>
     </ContentPage.Resources>
-    
+
     <Shell.TitleView>
         <Grid ColumnDefinitions="*, Auto">
             <ActivityIndicator Grid.Column="0" 
@@ -65,39 +75,98 @@
         </Grid>
     </Shell.TitleView>
 
-
-    <Border Grid.Row="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
-        <ScrollView>
-            <StackLayout Margin="10">
-
+    <Grid ColumnDefinitions="*, *">
+        <Border Grid.Column="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
+            <StackLayout>
                 <!-- Bug Report Section -->
-                <Grid RowSpacing="20" ColumnSpacing="20" RowDefinitions="Auto, Auto, Auto,Auto,Auto,Auto,Auto,Auto,Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
-                    
-                    <Label Text="Analysis:" Grid.Row="5" Grid.Column="0" />
-                    <Editor Placeholder="Describe the analysis" PlaceholderColor="{Binding AnalysisPlaceholderColor}" Text="{Binding Analysis}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
+                <Grid RowSpacing="20" ColumnSpacing="20" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *" Margin="20, 20">
 
-                    <Label Text="Possible solutions:" Grid.Row="6" Grid.Column="0"  />
-                    <Editor Placeholder="Possible solutions" Text="{Binding PossibleSolutions}" Grid.Row="6" Grid.Column="1"  HeightRequest="100" />
+                    <Label Text="Analysis:" Grid.Row="0" Grid.Column="0" />
+                    <Editor Placeholder="Describe the analysis" PlaceholderColor="{Binding AnalysisPlaceholderColor}" Text="{Binding Analysis}" Grid.Row="0" Grid.Column="1" HeightRequest="100" />
 
-                    <Label Text="Risk:" Grid.Row="7" Grid.Column="2" VerticalOptions="Center" />
-                    <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="7" Grid.Column="3" />
+                    <Label Text="Possible solutions:" Grid.Row="1" Grid.Column="0"  />
+                    <Editor Placeholder="Possible solutions" Text="{Binding PossibleSolutions}" Grid.Row="1" Grid.Column="1"  HeightRequest="100" />
 
-                    <Label Text="Impact:" Grid.Row="8" Grid.Column="0" />
-                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Impact}" Grid.Row="8" Grid.Column="1" HeightRequest="100" />
+                    <Label Text="Risk:" Grid.Row="2" Grid.Column="0" />
+                    <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="2" Grid.Column="1" HeightRequest="100" />
 
-                    <Label Text="Recommendation:" Grid.Row="8" Grid.Column="2" />
-                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecommendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" HeightRequest="100" />
+                    <Label Text="Impact:" Grid.Row="3" Grid.Column="0" />
+                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Impact}" Grid.Row="3" Grid.Column="1" HeightRequest="100" />
 
-                    <HorizontalStackLayout Grid.Row="10" Grid.Column="1">
-                        <Label Text="{Binding PinnedLogEntriesText}" Grid.Row="10" Grid.Column="1" ToolTipProperties.Text="Pinning LogEntries will embed them with the report." />
-                    </HorizontalStackLayout>
+                    <Label Text="Recommendation:" Grid.Row="4" Grid.Column="0" />
+                    <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecommendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="4" Grid.Column="1" HeightRequest="100" />
                 </Grid>
 
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="10">
-                    <ImageButton Source="{StaticResource SubmitIcon}" Command="{Binding SubmitCommand}" HeightRequest="75" WidthRequest="100" ToolTipProperties.Text="Submit" />
-                    <ImageButton Source="{StaticResource CopyIcon}" Command="{Binding CopyToClipboardCommand}" HeightRequest="75" WidthRequest="150" ToolTipProperties.Text="Copy to clipboard" />
+                    <StackLayout>
+                        <ImageButton Source="{StaticResource SubmitIcon}" Command="{Binding SubmitCommand}" HeightRequest="75" WidthRequest="100" />
+                        <Label Text="Submit report" HorizontalOptions="Center" FontSize="Caption" Margin="5" />
+                    </StackLayout>
+                    <StackLayout>
+                        <ImageButton Source="{StaticResource CopyIcon}" Command="{Binding CopyToClipboardCommand}" HeightRequest="75" WidthRequest="150" />
+                        <Label Text="Copy to clipboard" HorizontalOptions="Center" FontSize="Caption" Margin="5" />
+                    </StackLayout>
                 </HorizontalStackLayout>
             </StackLayout>
-        </ScrollView>
-    </Border>
+        </Border>
+
+        <Border Grid.Column="1" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
+            <CollectionView Grid.Row="0" Grid.Column="3" ItemsSource="{Binding PinnedLogEntries}" SelectionMode="None" >
+
+                <CollectionView.EmptyView>
+                    <HorizontalStackLayout Padding="5, 50">
+                        <Image Source="{StaticResource InfoIcon}" Aspect="Center" HeightRequest="20" WidthRequest="20" Margin="5, 0"/>
+                        <Label Text="{Binding EmptyCollectionViewText}" />
+                    </HorizontalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.Header>
+                    <Grid
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                               Padding="10" ColumnSpacing="10" Margin="10, 0"
+                                 ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
+                        <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
+                        <Label Grid.Column="1" Text="📌" />
+                        <Label Grid.Column="2" Text="% ▲" FontAttributes="Bold"/>
+                        <Label Grid.Column="3" Text="DateTime" FontAttributes="Bold"/>
+                        <Label Grid.Column="4" Text="Ticks" FontAttributes="Bold"/>
+                        <Label Grid.Column="5" Text="LogType" FontAttributes="Bold"/>
+                        <Label Grid.Column="6" Text="Source" FontAttributes="Bold"/>
+                        <Label Grid.Column="7" Text="User" FontAttributes="Bold"/>
+                        <Label Grid.Column="8" Text="Computer" FontAttributes="Bold"/>
+
+                    </Grid>
+                </CollectionView.Header>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="entities:LogEntry">
+                        <VerticalStackLayout>
+                            <Grid Padding="10" ColumnSpacing="10" Margin="10, 0, 10, 0"
+                                          BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
+                                          ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
+                                <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
+                                <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
+                                <Label Grid.Column="2" Text="{Binding Probability}" FontAttributes="Bold" FontSize="12" />
+                                <Label Grid.Column="3" Text="{Binding LogTimeStamp.DateTime}" FontSize="12" />
+                                <Label Grid.Column="4" Text="{Binding LogTimeStamp.Ticks}" FontSize="12" />
+                                <Label Grid.Column="5" Text="{Binding LogType}" FontSize="12" />
+                                <Label Grid.Column="6" Text="{Binding Source}" FontSize="12" />
+                                <Label Grid.Column="7" Text="{Binding User}" FontSize="12" />
+                                <Label Grid.Column="8" Text="{Binding Computer}" FontSize="12" />
+                                <FlyoutBase.ContextFlyout>
+                                    <MenuFlyout x:DataType="entities:LogEntry">
+                                        <MenuFlyoutItem Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:StatisticsViewModel}}, Path=PinLogEntryCommand}" CommandParameter="{Binding .}"
+                                        Text="{Binding IsPinned, Converter={StaticResource BoolToPinTextConverter}}" />
+                                    </MenuFlyout>
+                                </FlyoutBase.ContextFlyout>
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="Gray" Margin="10, 0, 10, 0" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+        </Border>
+    </Grid>
+
 </ContentPage>

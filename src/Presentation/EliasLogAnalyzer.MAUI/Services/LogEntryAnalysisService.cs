@@ -89,8 +89,9 @@ public class LogEntryAnalysisService(ILogDataSharingService logDataSharingServic
 
     private static double CalculateStackTraceProbability(LogEntry entry1, LogEntry entry2)
     {
-        var stackTrace1 = entry1.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        var stackTrace2 = entry2.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        char[] separator = ['\r', '\n'];
+        var stackTrace1 = entry1.Data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+        var stackTrace2 = entry2.Data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
         var matchingLines = stackTrace1.Count(line => stackTrace2.Contains(line));
         var totalLines = Math.Max(stackTrace1.Length, stackTrace2.Length);

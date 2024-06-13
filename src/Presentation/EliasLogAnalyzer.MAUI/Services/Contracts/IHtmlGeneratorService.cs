@@ -7,6 +7,8 @@ public interface IHtmlGeneratorService
     string ConvertDataToHtml(LogEntry logEntry);
     string GenerateTimeLineHtml();
     string GeneratePieChartHtml();
+
+    string GenerateMultiBarChartHtml();
 }
 
 

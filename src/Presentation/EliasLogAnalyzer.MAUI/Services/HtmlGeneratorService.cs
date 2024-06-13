@@ -87,6 +87,25 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
         return sb.ToString();
     }
 
+
+    public string GenerateMultiBarChartHtml()
+    {
+        var sb = new StringBuilder();
+        AppendHtmlHeader(sb, "multiBarChart", "100%", "100%");
+
+        if (!LogEntries.Any())
+        {
+            AppendEmptyChartScript(sb, "multiBarChart", "bar");
+        }
+        else
+        {
+            AppendMultiBarChartScript(sb, LogEntries);
+        }
+
+        AppendHtmlFooter(sb);
+        return sb.ToString();
+    }
+
     private static void AppendHtmlHeader(StringBuilder sb, string divId, string width, string height)
     {
         sb.AppendLine("<html><head>");
@@ -104,41 +123,26 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
     private static void AppendEmptyChartScript(StringBuilder sb, string divId, string chartType)
     {
         sb.Append($"var myChart = echarts.init(document.getElementById('{divId}'));\n");
+        sb.AppendLine("window.onresize = function() { myChart.resize(); };");  // Resize event handler
+
         sb.AppendLine("var option = {");
         sb.AppendLine("    tooltip: { show: false },");
 
         switch (chartType)
         {
             case "line":
-                sb.AppendLine("    xAxis: {");
-                sb.AppendLine("        type: 'category',");
-                sb.AppendLine("        data: ['No Data'],");
-                sb.AppendLine("    },");
-                sb.AppendLine("    yAxis: {");
-                sb.AppendLine("        type: 'value',");
-                sb.AppendLine("        show: true,");
-                sb.AppendLine("    },");
-                sb.AppendLine("    series: [{");
-                sb.AppendLine("        data: [0],");
-                sb.AppendLine("        type: 'line',");
-                sb.AppendLine("        showSymbol: true,");
-                sb.AppendLine("        symbolSize: 0,");
-                sb.AppendLine("    }]");
+                sb.AppendLine("    xAxis: { type: 'category', data: ['No Data'] },");
+                sb.AppendLine("    yAxis: { type: 'value' },");
+                sb.AppendLine("    series: [{ data: [0], type: 'line' }]");
                 break;
             case "pie":
                 sb.AppendLine("    legend: { data: ['No Data'] },");
-                sb.AppendLine("    series: [{");
-                sb.AppendLine("        type: 'pie',");
-                sb.AppendLine("        radius: '50%',");
-                sb.AppendLine("        data: [{ value: 0, name: 'No Data' }],");
-                sb.AppendLine("        emphasis: {");
-                sb.AppendLine("            itemStyle: {");
-                sb.AppendLine("                shadowBlur: 10,");
-                sb.AppendLine("                shadowOffsetX: 0,");
-                sb.AppendLine("                shadowColor: 'rgba(0, 0, 0, 0.5)'");
-                sb.AppendLine("            }");
-                sb.AppendLine("        }");
-                sb.AppendLine("    }]");
+                sb.AppendLine("    series: [{ type: 'pie', data: [{ value: 0, name: 'No Data' }] }]");
+                break;
+            case "bar":
+                sb.AppendLine("    xAxis: { type: 'category', data: ['No Data'], axisLabel: { rotate: 0 } },");
+                sb.AppendLine("    yAxis: { type: 'value' },");
+                sb.AppendLine("    series: [{ data: [0], type: 'bar' }]");
                 break;
         }
 
@@ -172,6 +176,7 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
         sb.AppendLine("        orient: 'vertical',");
         sb.AppendLine("        left: 'right',");
         sb.AppendLine("        selected: {");
+
         // Default all log types to not visible except for errors
         logTypes.ForEach(logType =>
         {
@@ -179,16 +184,16 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
         });
         sb.AppendLine("        }");
         sb.AppendLine("    },");
+        sb.AppendLine("    dataZoom: [{ type: 'slider', start: 0, end: 100 }, { type: 'inside' }],");
         sb.AppendLine("    xAxis: { type: 'category', data: " +
                       JsonSerializer.Serialize(times.Select(t => t.ToString("yyyy-MM-dd HH:mm:ss"))) + " },");
         sb.AppendLine("    yAxis: {");
         sb.AppendLine("        type: 'value',");
         sb.AppendLine("        minInterval: 1,");
-        sb.AppendLine("        axisLabel: {");
-        sb.AppendLine("            formatter: '{value}',");
-        sb.AppendLine("        }");
+        sb.AppendLine("        axisLabel: { formatter: '{value}', }");
         sb.AppendLine("    },");
         sb.AppendLine("    series: [");
+
 
         foreach (var logType in logTypes)
         {
@@ -204,6 +209,15 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
             sb.AppendLine("    lineStyle: { color: '" + GetColorForLogType(logType.ToString()) + "' },");
             sb.AppendLine("},");
         }
+
+        // Adjustments for Marked and Pinned Entries
+        var markedData = logEntries.Where(e => e.IsMarked).Select(e => new { value = new object[] { e.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss"), 0 }, symbol = "diamond", symbolSize = 10 }).ToList();
+        var pinnedData = logEntries.Where(e => e.IsPinned).Select(e => new { value = new object[] { e.LogTimeStamp.DateTime.ToString("yyyy-MM-dd HH:mm:ss"), 0 }, symbol = "rect", symbolSize = 10 }).ToList();
+
+        // Add marked entries series
+        sb.AppendLine("{ name: 'Marked Entries', type: 'scatter', itemStyle: { color: 'red' }, data: " + JsonSerializer.Serialize(markedData) + "},");
+        // Add pinned entries series
+        sb.AppendLine("{ name: 'Pinned Entries', type: 'scatter', itemStyle: { color: 'blue' }, data: " + JsonSerializer.Serialize(pinnedData) + "},");
 
         sb.AppendLine("    ]");
         sb.AppendLine("};");
@@ -238,6 +252,42 @@ public class HtmlGeneratorService(ISettingsService settingsService, ILogDataShar
         sb.AppendLine("};");
         sb.AppendLine("pieChart.setOption(option);");
     }
+
+    private static void AppendMultiBarChartScript(StringBuilder sb, ObservableCollection<LogEntry> logEntries)
+    {
+        // Replace empty sources with "Unspecified" and then process
+        var sources = logEntries
+            .Select(e => string.IsNullOrEmpty(e.Source) ? "Unspecified" : e.Source)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToList();
+
+        var logTypes = Enum.GetValues(typeof(LogType)).Cast<LogType>().ToList();
+
+        var seriesData = logTypes.Select(logType => new
+        {
+            name = logType.ToString(),
+            type = "bar",
+            data = sources.Select(source => logEntries.Count(e => (string.IsNullOrEmpty(e.Source) ? "Unspecified" : e.Source) == source && e.LogType == logType)).ToList()
+        }).ToList();
+
+        sb.AppendLine("var myChart = echarts.init(document.getElementById('multiBarChart'));");
+        sb.AppendLine("window.onresize = function() { myChart.resize(); };");
+        sb.AppendLine("var option = {");
+        sb.AppendLine("    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },");
+        sb.AppendLine("    legend: { data: " + JsonSerializer.Serialize(logTypes.Select(lt => lt.ToString())) + " },");
+        sb.AppendLine("    xAxis: {");
+        sb.AppendLine("        type: 'category',");
+        sb.AppendLine("        data: " + JsonSerializer.Serialize(sources) + ",");
+        sb.AppendLine("        axisLabel: { rotate: 10 }");
+        sb.AppendLine("    },");
+        sb.AppendLine("    yAxis: { type: 'value' },");
+        sb.AppendLine("    series: " + JsonSerializer.Serialize(seriesData));
+        sb.AppendLine("};");
+        sb.AppendLine("myChart.setOption(option);");
+    }
+
+
 
     private static string GetColorForLogType(string logType)
     {

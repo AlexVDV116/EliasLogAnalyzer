@@ -19,9 +19,10 @@ public partial class StatisticsViewModel : ObservableObject
     [ObservableProperty] private string _baseUrl = string.Empty;
     [ObservableProperty] private string _timelineHtml = string.Empty;
     [ObservableProperty] private string _pieChartHtml = string.Empty;
+    [ObservableProperty] private string _barChartHtml = string.Empty;
     [ObservableProperty] private bool _noLogEntryMarked;
     [ObservableProperty] private bool _logEntryMarked;
-    [ObservableProperty] private string _statisticsText = "Mark a LogEntry to analyse relationship probabilities.";
+    [ObservableProperty] private string _emptyCollectionViewText = "Mark a LogEntry to analyse relationship probabilities.";
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
     private ObservableCollection<LogEntry> LogEntries => _logDataSharingService.LogEntries;
@@ -38,7 +39,6 @@ public partial class StatisticsViewModel : ObservableObject
 
         InitializeBindings();
         GenerateCharts();
-        AnalyzeLogEntries();
     }
 
     [RelayCommand] private void PinLogEntry(LogEntry logEntry) => _logDataSharingService.PinLogEntry(logEntry);
@@ -79,7 +79,6 @@ public partial class StatisticsViewModel : ObservableObject
         if (e.PropertyName == nameof(MarkedLogEntry))
         {
             UpdatePageState();
-            AnalyzeLogEntries();
             GenerateCharts();
             InitializeSortedCollection();
         }
@@ -93,31 +92,13 @@ public partial class StatisticsViewModel : ObservableObject
 
     private void OnLogEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        AnalyzeLogEntries();
         GenerateCharts();
-    }
-
-    private void AnalyzeLogEntries()
-    {
-        if (MarkedLogEntry == null)
-        {
-            StatisticsText = "Mark a LogEntry to analyse relationship probabilities.";
-            NoLogEntryMarked = true;
-            SortedLogEntriesByProbability.Clear();
-        }
-        else
-        {
-            StatisticsText = string.Empty;
-            NoLogEntryMarked = false;
-            _logEntryAnalysisService.AnalyzeLogEntries();
-            InitializeSortedCollection();
-            OnPropertyChanged(nameof(SortedLogEntriesByProbability));
-        }
     }
 
     private void GenerateCharts()
     {
         TimelineHtml = _htmlGeneratorService.GenerateTimeLineHtml();
         PieChartHtml = _htmlGeneratorService.GeneratePieChartHtml();
+        BarChartHtml = _htmlGeneratorService.GenerateMultiBarChartHtml();
     }
 }

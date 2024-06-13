@@ -226,6 +226,7 @@ public partial class LogEntriesViewModel(
             logEntryAnalysisService.CalcDiffTicks();
         }
 
+        logEntryAnalysisService.AnalyzeLogEntries();
         UpdateSelectedEntryData();
         logDataSharingService.SortByProperty(CurrentSortProperty, Ascending);
     }
