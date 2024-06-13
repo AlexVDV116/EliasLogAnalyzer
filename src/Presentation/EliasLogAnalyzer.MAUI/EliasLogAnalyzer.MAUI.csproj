@@ -56,8 +56,8 @@
 	<ItemGroup>
 		<!-- App Icon -->
 		<Content Include="Resources\Images\logo.png" />
-	
-		
+
+
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
@@ -106,7 +106,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\BusinessLogic\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
+		<ProjectReference Include="..\..\Domain\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
 	</ItemGroup>
 
 </Project>
