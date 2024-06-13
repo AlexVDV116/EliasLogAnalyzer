@@ -1,7 +1,5 @@
 using System.Globalization;
-using EliasLogAnalyzer.BusinessLogic.Entities;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
+using EliasLogAnalyzer.Domain.Entities;
 
 namespace EliasLogAnalyzer.MAUI.Converters
 {

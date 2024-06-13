@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EliasLogAnalyzer.BusinessLogic.Entities;
-using EliasLogAnalyzer.API.Repositories.BugReports;
-using System.Diagnostics;
+using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.Persistence.Repositories.BugReports;
 
 namespace EliasLogAnalyzer.API.Controllers;
 

@@ -1,9 +1,8 @@
 ﻿using EliasLogAnalyzer.MAUI.Resources;
 
-namespace EliasLogAnalyzer.MAUI.Services.Contracts
+namespace EliasLogAnalyzer.MAUI.Services.Contracts;
+
+public interface ISettingsService
 {
-    public interface ISettingsService
-    {
-        Theme AppTheme { get; set; }
-    }
+    Theme AppTheme { get; set; }
 }

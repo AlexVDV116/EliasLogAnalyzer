@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Converters;
 using Xunit;
 using Xunit.Abstractions;

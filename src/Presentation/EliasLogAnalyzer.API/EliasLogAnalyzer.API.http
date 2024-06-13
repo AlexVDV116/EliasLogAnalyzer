@@ -1,6 +1,0 @@
-@EliasLogAnalyzer.API_HostAddress = http://localhost:5072
-
-GET {{EliasLogAnalyzer.API_HostAddress}}/
-Accept: application/json
-
-###

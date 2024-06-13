@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,7 @@ namespace EliasLogAnalyzer.MAUI.Services;
 /// Provides collections of log files and entries for view models to bind and interact with. Acts as the single source of truth for
 /// LogEntries and LogFiles collections.
 /// </summary>
-public partial class LogDataSharingService(ILogger<LogFileParserService> logger)
+public partial class LogDataSharingService(ILogger<LogDataSharingService> logger)
     : ObservableObject, ILogDataSharingService
 {
     private readonly HashSet<string> _loadedLogFileIdentifiers = [];

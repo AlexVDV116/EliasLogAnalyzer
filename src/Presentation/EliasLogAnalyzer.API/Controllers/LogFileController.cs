@@ -1,5 +1,5 @@
-﻿using EliasLogAnalyzer.API.Repositories.LogFiles;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+﻿using EliasLogAnalyzer.Domain.Entities;
+using EliasLogAnalyzer.Persistence.Repositories.LogFiles;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EliasLogAnalyzer.API.Controllers;

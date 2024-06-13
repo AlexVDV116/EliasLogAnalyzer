@@ -3,10 +3,7 @@ using EliasLogAnalyzer.MAUI.Pages;
 using EliasLogAnalyzer.MAUI.Services;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using EliasLogAnalyzer.MAUI.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls.Hosting;
-using Microsoft.Maui.Hosting;
 
 namespace EliasLogAnalyzer.MAUI
 {
@@ -26,7 +23,7 @@ namespace EliasLogAnalyzer.MAUI
                 });
 
             // HttpClient
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7028/") });
+            builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7028/") });
 
             // UI components and their corresponding ViewModels
             builder.Services.AddSingleton<LogEntriesPage>();

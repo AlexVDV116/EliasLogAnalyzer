@@ -106,7 +106,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\BusinessLogic\EliasLogAnalyzer.BusinessLogic\EliasLogAnalyzer.BusinessLogic.csproj" />
+		<ProjectReference Include="..\..\BusinessLogic\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

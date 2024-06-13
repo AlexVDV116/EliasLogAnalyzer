@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Resources;
 using EliasLogAnalyzer.MAUI.Services;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Moq;
 using Xunit;
 
-namespace UnitTests;
+namespace UnitTests.ServicesTests;
 
 // Purpose: This file contains unit tests for the HtmlGeneratorService class in the EliasLogAnalyzer.MAUI project.
 // The HtmlGeneratorService class generates HTML representations of log entries, including converting log entry data to HTML and creating timeline and pie chart visualizations.

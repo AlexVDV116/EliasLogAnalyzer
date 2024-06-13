@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using EliasLogAnalyzer.MAUI.Resources;
-using Microsoft.Maui.Controls;
 
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;

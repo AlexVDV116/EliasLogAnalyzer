@@ -1,9 +1,8 @@
 ﻿using EliasLogAnalyzer.MAUI.Services.Contracts;
-using Microsoft.Maui.Controls;
 
 namespace EliasLogAnalyzer.MAUI.Services;
 
-internal class DialogService : IDialogService
+public class DialogService : IDialogService
 {
     public async Task ShowMessage(string title, string message)
     {

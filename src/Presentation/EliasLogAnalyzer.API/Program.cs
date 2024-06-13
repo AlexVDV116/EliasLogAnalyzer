@@ -1,7 +1,7 @@
-using EliasLogAnalyzer.API.Data;
-using EliasLogAnalyzer.API.Repositories.BugReports;
-using EliasLogAnalyzer.API.Repositories.LogEntries;
-using EliasLogAnalyzer.API.Repositories.LogFiles;
+using EliasLogAnalyzer.Persistence.Data;
+using EliasLogAnalyzer.Persistence.Repositories.BugReports;
+using EliasLogAnalyzer.Persistence.Repositories.LogEntries;
+using EliasLogAnalyzer.Persistence.Repositories.LogFiles;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

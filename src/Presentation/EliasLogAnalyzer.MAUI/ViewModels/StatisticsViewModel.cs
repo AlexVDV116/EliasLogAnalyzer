@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EliasLogAnalyzer.BusinessLogic.Entities;
-using EliasLogAnalyzer.MAUI.Services.Contracts;
+using EliasLogAnalyzer.Domain.Entities;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using EliasLogAnalyzer.MAUI.Services.Contracts;
 
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;

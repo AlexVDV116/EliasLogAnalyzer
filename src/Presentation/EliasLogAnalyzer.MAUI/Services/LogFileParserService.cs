@@ -1,8 +1,7 @@
 using System.Globalization;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Storage;
 
 namespace EliasLogAnalyzer.MAUI.Services;
 

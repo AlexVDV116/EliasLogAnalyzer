@@ -1,9 +1,6 @@
-﻿using Microsoft.Maui.Storage;
+﻿namespace EliasLogAnalyzer.MAUI.Services.Contracts;
 
-namespace EliasLogAnalyzer.MAUI.Services.Contracts
+public interface ILogFileLoaderService
 {
-    public interface ILogFileLoaderService
-    {
-        Task<IEnumerable<FileResult>> LoadLogFilesAsync();
-    }
+    Task<IEnumerable<FileResult>> LoadLogFilesAsync();
 }

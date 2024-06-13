@@ -1,13 +1,11 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using Moq;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace UnitTests;
+namespace UnitTests.ServicesTests;
 
 // Purpose: This file is used to test the LogEntryAnalysisService class in the EliasLogAnalyzer.MAUI project. The 
 // LogEntryAnalysisService class is used to calculate the time delta and probability of log entries based on a marked log entry.
@@ -15,9 +13,9 @@ public class LogEntryAnalysisServiceTests
 {
     private readonly LogEntryAnalysisService _service;
     private readonly ObservableCollection<LogEntry> _logEntries;
-    private readonly LogEntry _markedLogEntry;
-    public LogEntryAnalysisServiceTests(ITestOutputHelper output)
-    {
+
+    public LogEntryAnalysisServiceTests()
+    { 
         Mock<ILogDataSharingService> mockLogDataSharingService = new();
         _logEntries = new ObservableCollection<LogEntry>
         {
@@ -37,14 +35,14 @@ public class LogEntryAnalysisServiceTests
                 Data = "Stack trace line 4\nStack trace line 5"
             }
         };
-        _markedLogEntry = new LogEntry
+        var markedLogEntry = new LogEntry
         {
             LogTimeStamp = new LogTimestamp { DateTime = DateTime.Parse("2023-06-01T12:00:00Z"), Ticks = 1000 },
             Data = "Stack trace line 1\nStack trace line 2"
         };
 
         mockLogDataSharingService.SetupGet(s => s.LogEntries).Returns(_logEntries);
-        mockLogDataSharingService.SetupGet(s => s.MarkedLogEntry).Returns(_markedLogEntry);
+        mockLogDataSharingService.SetupGet(s => s.MarkedLogEntry).Returns(markedLogEntry);
 
         _service = new LogEntryAnalysisService(mockLogDataSharingService.Object);
     }

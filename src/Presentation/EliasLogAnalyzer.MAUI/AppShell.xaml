@@ -7,7 +7,7 @@
     xmlns:pages="clr-namespace:EliasLogAnalyzer.MAUI.Pages"
     xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
     xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"
-    xmlns:entities="clr-namespace:EliasLogAnalyzer.BusinessLogic.Entities;assembly=EliasLogAnalyzer.BusinessLogic"
+    xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
     xmlns:behaviors="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Behaviors"
     x:DataType="viewModels:AppShellViewModel"
     FlyoutBehavior="Locked"

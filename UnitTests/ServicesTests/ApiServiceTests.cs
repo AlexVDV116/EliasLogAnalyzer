@@ -1,12 +1,12 @@
 using System.Net;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Xunit;
 
-namespace UnitTests;
+namespace UnitTests.ServicesTests;
 
 // Purpose: This file contains unit tests for the ApiService class in the EliasLogAnalyzer.MAUI project.
 // The ApiService class is responsible for making API calls to the EliasLogAnalyzer API. 

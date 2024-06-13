@@ -1,4 +1,4 @@
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using Xunit;
 
 namespace UnitTests.DomainClassesTests;

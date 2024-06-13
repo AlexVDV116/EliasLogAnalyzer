@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
-using EliasLogAnalyzer.BusinessLogic.Entities;
+using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace UnitTests;
+namespace UnitTests.ServicesTests;
 
 public class LogDataSharingServiceTests
 {
@@ -13,7 +13,7 @@ public class LogDataSharingServiceTests
 
     public LogDataSharingServiceTests()
     {
-        Mock<ILogger<LogFileParserService>> mockLogger = new();
+        Mock<ILogger<LogDataSharingService>> mockLogger = new();
         _service = new LogDataSharingService(mockLogger.Object);
     }
 
@@ -66,7 +66,7 @@ public class LogDataSharingServiceTests
             new LogEntry { LogType = LogType.Warning, Source = "SourceB" }
         };
         _service.LogEntries = logEntries;
-        _service.SelectedLogTypes = new ObservableCollection<LogType> { LogType.Error };
+        _service.SelectedLogTypes = [LogType.Error];
 
         // Act
         _service.UpdateFilter("SourceA");
