@@ -8,10 +8,6 @@
              x:DataType="viewModels:ReportViewModel"
              Title="ReportPage">
 
-    <Shell.TitleView>
-        <Label Text="" />
-    </Shell.TitleView>
-
     <ContentPage.Resources>
         <ResourceDictionary>
             <FontImageSource x:Key="SubmitIcon" 
@@ -24,8 +20,50 @@
                          Glyph="{x:Static resources:IconFont.ContentPasteGo}"
                            Color="{StaticResource Primary}"
                          Size="75"/>
+            <FontImageSource x:Key="ConnectionIcon" 
+                             FontFamily="MaterialSymbols"
+                             Glyph="{x:Static resources:IconFont.Cloud}"
+                             Color="Green"
+                             Size="30"/>
+            <FontImageSource x:Key="NoConnectionIcon" 
+                             FontFamily="MaterialSymbols"
+                             Glyph="{x:Static resources:IconFont.CloudOff}"
+                             Color="Red"
+                             Size="30"/>
         </ResourceDictionary>
     </ContentPage.Resources>
+    
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*, Auto">
+            <ActivityIndicator Grid.Column="0" 
+                               IsVisible="{Binding IsChecking}"
+                               IsRunning="{Binding IsChecking}"
+                               Color="{StaticResource Primary }"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="End"
+                               VerticalOptions="Center" />
+            <Image Grid.Column="0"
+                   Source="{StaticResource ConnectionIcon}"
+                   IsVisible="{Binding ConnectedIconVisible}"
+                   WidthRequest="24"
+                   HeightRequest="24"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center" />
+            <Image Grid.Column="0"
+                   Source="{StaticResource NoConnectionIcon}"
+                   IsVisible="{Binding NotConnectedIconVisible}"
+                   WidthRequest="24"
+                   HeightRequest="24"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center" />
+            <Label Grid.Column="1" 
+                   Text="{Binding ConnectionStatus}"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center"
+                   Margin="10,0,10,0"/>
+        </Grid>
+    </Shell.TitleView>
 
 
     <Border Grid.Row="0" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
@@ -34,56 +72,18 @@
 
                 <!-- Bug Report Section -->
                 <Grid RowSpacing="20" ColumnSpacing="20" RowDefinitions="Auto, Auto, Auto,Auto,Auto,Auto,Auto,Auto,Auto, Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
-
-
-                    <Label Text="Date/Time:" Grid.Row="0" Grid.Column="0" VerticalOptions="Center" />
-                    <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto, *">
-                        <DatePicker Grid.Column="0" Date="{Binding ReportDate}" VerticalOptions="Center" />
-                        <TimePicker Grid.Column="1"  Time="{Binding ReportTime, Mode=TwoWay}" VerticalOptions="Center" Margin="10, 0" />
-                    </Grid>
-
-                    <Label Text="Severity:" Grid.Row="0" Grid.Column="2" TextColor="{Binding SeverityTextColor}" />
-                    <Picker ItemsSource="{Binding Severities}" SelectedItem="{Binding Severity}" Grid.Row="0" Grid.Column="3" />
-
-                    <Label Text="Name of developer:" Grid.Row="1" Grid.Column="0" VerticalOptions="Center" />
-                    <Entry Placeholder="Enter name" PlaceholderColor="{Binding DeveloperNamePlaceholderColor}" Text="{Binding DeveloperName}" Grid.Row="1" Grid.Column="1" />
-
-                    <Label Text="Name of workstation:" Grid.Row="1" Grid.Column="2" VerticalOptions="Center" />
-                    <Entry Placeholder="Enter workstation" Text="{Binding WorkstationName}" Grid.Row="1" Grid.Column="3" />
-
-                    <Label Text="Situation:" Grid.Row="2" Grid.Column="0" />
-                    <Editor Placeholder="Describe the situation" Text="{Binding Situation}" Grid.Row="2" Grid.Column="1" MaxLength="500" HeightRequest="100" />
-
-                    <Label Text="Observation:" Grid.Row="2" Grid.Column="2" />
-                    <Editor Placeholder="What was observed" Text="{Binding Observation}" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="1"  MaxLength="500" HeightRequest="100" />
-
-                    <Label Text="Expectation:" Grid.Row="3" Grid.Column="0" Grid.RowSpan="2" />
-                    <Editor Placeholder="What was expected" Text="{Binding Expectation}" Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" HeightRequest="100" />
-
-                    <Label Text="Tag:" Grid.Row="3" Grid.Column="2" VerticalOptions="Center" />
-                    <Entry Placeholder="Tag" Text="{Binding Tag}" Grid.Row="3" Grid.Column="3" HeightRequest="50" VerticalOptions="Start" />
-
-                    <Label Text="Build:" Grid.Row="4" Grid.Column="2" VerticalOptions="Center" />
-                    <Entry Placeholder="Build identifier" Text="{Binding Build}" Grid.Row="4" Grid.Column="3" VerticalOptions="End" Grid.ColumnSpan="1" />
-
-                    <!-- Analysis Secition -->
+                    
                     <Label Text="Analysis:" Grid.Row="5" Grid.Column="0" />
                     <Editor Placeholder="Describe the analysis" PlaceholderColor="{Binding AnalysisPlaceholderColor}" Text="{Binding Analysis}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" HeightRequest="100" />
 
                     <Label Text="Possible solutions:" Grid.Row="6" Grid.Column="0"  />
                     <Editor Placeholder="Possible solutions" Text="{Binding PossibleSolutions}" Grid.Row="6" Grid.Column="1"  HeightRequest="100" />
 
-                    <Label Text="What to test:" Grid.Row="6" Grid.Column="2" />
-                    <Editor Placeholder="Test cases to consider" Text="{Binding WhatToTest}" Grid.Row="6" Grid.Column="3" HeightRequest="100" />
-
-                    <Label Text="Effort (in hours):" Grid.Row="7" Grid.Column="0" VerticalOptions="Center" />
-                    <Picker ItemsSource="{Binding Efforts}" SelectedItem="{Binding Effort}" Grid.Row="7" Grid.Column="1" />
-
                     <Label Text="Risk:" Grid.Row="7" Grid.Column="2" VerticalOptions="Center" />
                     <Editor Placeholder="Risk assessment" Text="{Binding Risk}" Grid.Row="7" Grid.Column="3" />
 
-                    <Label Text="Workaround:" Grid.Row="8" Grid.Column="0" />
-                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Workaround}" Grid.Row="8" Grid.Column="1" HeightRequest="100" />
+                    <Label Text="Impact:" Grid.Row="8" Grid.Column="0" />
+                    <Editor Placeholder="Describe any potential workarounds" Text="{Binding Impact}" Grid.Row="8" Grid.Column="1" HeightRequest="100" />
 
                     <Label Text="Recommendation:" Grid.Row="8" Grid.Column="2" />
                     <Editor Placeholder="Final recommendation" PlaceholderColor="{Binding RecommendationPlaceholderColor}" Text="{Binding Recommendation}" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" HeightRequest="100" />

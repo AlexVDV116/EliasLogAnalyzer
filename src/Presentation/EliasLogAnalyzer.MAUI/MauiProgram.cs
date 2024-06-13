@@ -32,10 +32,7 @@ namespace EliasLogAnalyzer.MAUI
             builder.Services.AddTransient<StatisticsViewModel>();
             builder.Services.AddTransient<ReportPage>();
             builder.Services.AddTransient<ReportViewModel>();
-            builder.Services.AddTransient<DatabasePage>();
-            builder.Services.AddTransient<DatabaseViewModel>();
-            builder.Services.AddTransient<SettingsPage>();
-            builder.Services.AddTransient<SettingsViewModel>();
+
 
             // Shared service across multiple components
             builder.Services.AddSingleton<AppShellViewModel>();

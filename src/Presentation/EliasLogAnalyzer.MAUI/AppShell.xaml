@@ -54,14 +54,6 @@
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.Summarize}"
                          Color="Black" Size="40"  />
-        <FontImageSource x:Key="DatabaseIcon" 
-                         FontFamily="MaterialSymbols"
-                         Glyph="{x:Static resources:IconFont.Database}"
-                         Color="Black" Size="40"  />
-        <FontImageSource x:Key="SettingsIcon" 
-                         FontFamily="MaterialSymbols"
-                         Glyph="{x:Static resources:IconFont.Settings}"
-                         Color="Black" Size="40" />
         <FontImageSource x:Key="LeftPanelOpenIcon" 
                          FontFamily="MaterialSymbols"
                          Glyph="{x:Static resources:IconFont.LeftPanelOpen}"
@@ -120,25 +112,7 @@
             />
         </Tab>
     </FlyoutItem>
-
-    <FlyoutItem Title="Database" Icon="{StaticResource DatabaseIcon}">
-        <Tab>
-            <ShellContent ContentTemplate="{DataTemplate pages:DatabasePage}"
-            Style="{StaticResource ShellStyle}"
-            Route="SettingsPage"
-            />
-        </Tab>
-    </FlyoutItem>
-
-    <FlyoutItem Title="Settings" Icon="{StaticResource SettingsIcon}">
-        <Tab>
-            <ShellContent ContentTemplate="{DataTemplate pages:SettingsPage}"
-            Style="{StaticResource ShellStyle}"
-            Route="SettingsPage"
-            />
-        </Tab>
-    </FlyoutItem>
-
+    
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
             <Grid ColumnDefinitions="Auto, 90" Padding="12, 7, 0 , 0">

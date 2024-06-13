@@ -99,7 +99,7 @@ public class ApiServiceTests
     public async Task AddBugReportAsync_ReturnsOk_WhenSuccessStatusCode()
     {
         // Arrange
-        var bugReport = new BugReport { DeveloperName = "Test Developer" };
+        var bugReport = new BugReport { Analysis = "Unit Test Analysis" };
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -122,7 +122,7 @@ public class ApiServiceTests
     public async Task AddBugReportAsync_ReturnsFail_WhenNotSuccessStatusCode()
     {
         // Arrange
-        var bugReport = new BugReport { DeveloperName = "Test Developer" };
+        var bugReport = new BugReport { Analysis = "Unit Test Analysis" };
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -147,7 +147,7 @@ public class ApiServiceTests
     public async Task AddBugReportAsync_ReturnsFail_WhenHttpRequestExceptionThrown()
     {
         // Arrange
-        var bugReport = new BugReport { DeveloperName = "Test Developer" };
+        var bugReport = new BugReport { Analysis = "Unit Test Analysis" };
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(

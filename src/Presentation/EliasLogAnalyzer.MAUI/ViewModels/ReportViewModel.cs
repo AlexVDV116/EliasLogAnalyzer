@@ -12,31 +12,30 @@ public partial class ReportViewModel : ObservableObject
     private readonly ILogDataSharingService _logDataSharingService;
     private readonly IDialogService _dialogService;
     private readonly IApiService _apiService;
+    
 
-    [ObservableProperty] private string _developerName = string.Empty;
-    [ObservableProperty] private string _workstationName = string.Empty;
+
+    [ObservableProperty] private bool _isConnected;
+    [ObservableProperty] private bool _isChecking;
+    [ObservableProperty] private bool _connectedIconVisible;
+    [ObservableProperty] private bool _notConnectedIconVisible;
+    [ObservableProperty] private string _connectionStatus = "Checking connection...";
+    
     [ObservableProperty] private DateTime _reportDate = DateTime.Now;
     [ObservableProperty] private TimeSpan _reportTime = DateTime.Now.TimeOfDay;
-    [ObservableProperty] private string _situation = string.Empty;
-    [ObservableProperty] private string _observation = string.Empty;
-    [ObservableProperty] private string _expectation = string.Empty;
-    [ObservableProperty] private string _tag = string.Empty;
-    [ObservableProperty] private string _build = string.Empty;
-    [ObservableProperty] private string _severity = string.Empty;
     [ObservableProperty] private string _analysis = string.Empty;
     [ObservableProperty] private string _possibleSolutions = string.Empty;
-    [ObservableProperty] private string _whatToTest = string.Empty;
-    [ObservableProperty] private double _effort;
     [ObservableProperty] private string _risk = string.Empty;
-    [ObservableProperty] private string _workaround = string.Empty;
+    [ObservableProperty] private string _impact = string.Empty;
     [ObservableProperty] private string _recommendation = string.Empty;
     [ObservableProperty] private string _pinnedLogEntriesText = string.Empty;
     [ObservableProperty] private bool _showPinImage;
-
-    [ObservableProperty] private Color _developerNamePlaceholderColor = Colors.LightGray;
+    
     [ObservableProperty] private Color _analysisPlaceholderColor = Colors.LightGray;
     [ObservableProperty] private Color _recommendationPlaceholderColor = Colors.LightGray;
-    [ObservableProperty] private Color _severityTextColor = Colors.LightGray;
+
+    
+    public IAsyncRelayCommand CheckConnectionCommand { get; }
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
     private ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
@@ -54,6 +53,8 @@ public partial class ReportViewModel : ObservableObject
         _logDataSharingService = logDataSharingService;
         _dialogService = dialogService;
         _apiService = apiService;
+        
+        CheckConnectionCommand = new AsyncRelayCommand(CheckDatabaseConnectionAsync);
 
         PinnedLogEntries.CollectionChanged += OnPinnedLogEntriesChanged;
         UpdatePinnedEntriesText();
@@ -83,6 +84,33 @@ public partial class ReportViewModel : ObservableObject
                 break;
         }
     }
+    
+    private void UpdateConnectionStatus(ApiResult result)
+    {
+        if (result.Success)
+        {
+            IsConnected = true;
+            NotConnectedIconVisible = false;
+            ConnectedIconVisible = true;
+            ConnectionStatus = "Connected";
+        }
+        else
+        {
+            IsConnected = false;
+            ConnectedIconVisible = false;
+            NotConnectedIconVisible = true;
+            ConnectionStatus = string.IsNullOrEmpty(result.ErrorMessage) ? "Not connected" : result.ErrorMessage;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CheckDatabaseConnectionAsync()
+    {
+        IsChecking = true;
+        var result = await _apiService.CheckDatabaseConnectionAsync();
+        UpdateConnectionStatus(result);
+        IsChecking = false;
+    }
 
     [RelayCommand]
     private async Task CopyToClipboardAsync()
@@ -99,13 +127,9 @@ public partial class ReportViewModel : ObservableObject
 
         var reportDetails = $"Elias LogAnalyzer Report Details:\n" +
                             $"Date and Time: {CombinedDateTime}\n" +
-                            $"Developer: {DeveloperName}\n" +
-                            $"Workstation: {WorkstationName}\n" +
-                            $"Severity: {Severity}\n" +
-                            $"Situation: {Situation}\n" +
-                            $"Observation: {Observation}\n" +
-                            $"Expectation: {Expectation}\n" +
                             $"Analysis: {Analysis}\n" +
+                            $"Possible Solution: {PossibleSolutions}\n" +
+                            $"Risk: {Risk}\n" +
                             $"Recommendation: {Recommendation}\n\n" +
                             $"Pinned log entries:\n{pinnedLogEntriesDetails}";
 
@@ -122,21 +146,9 @@ public partial class ReportViewModel : ObservableObject
         {
             var bugReport = new BugReport
             {
-                DeveloperName = DeveloperName.Trim(),
-                WorkstationName = WorkstationName.Trim(),
-                ReportDateTime = CombinedDateTime,
-                Situation = Situation.Trim(),
-                Observation = Observation.Trim(),
-                Expectation = Expectation.Trim(),
-                Tag = Tag.Trim(),
-                Build = Build.Trim(),
-                Severity = Severity,
                 Analysis = Analysis.Trim(),
                 PossibleSolutions = PossibleSolutions.Trim(),
-                WhatToTest = WhatToTest.Trim(),
-                Effort = Effort,
                 Risk = Risk.Trim(),
-                Workaround = Workaround.Trim(),
                 Recommendation = Recommendation.Trim(),
                 PinnedLogEntries = _logDataSharingService.PinnedLogEntries.ToList()
             };
@@ -159,8 +171,6 @@ public partial class ReportViewModel : ObservableObject
 
     private void ValidateForm()
     {
-        DeveloperNamePlaceholderColor = string.IsNullOrWhiteSpace(DeveloperName) ? Colors.Red : Colors.LightGray;
-        SeverityTextColor = string.IsNullOrWhiteSpace(Severity) ? Colors.Red : Colors.Black;
         AnalysisPlaceholderColor = string.IsNullOrWhiteSpace(Analysis) ? Colors.Red : Colors.LightGray;
         RecommendationPlaceholderColor = string.IsNullOrWhiteSpace(Recommendation) ? Colors.Red : Colors.LightGray;
 
@@ -168,9 +178,6 @@ public partial class ReportViewModel : ObservableObject
 
     private bool IsFormValid()
     {
-        return !string.IsNullOrWhiteSpace(DeveloperName)
-               && !string.IsNullOrWhiteSpace(Severity)
-               && !string.IsNullOrWhiteSpace(Analysis)
-               && !string.IsNullOrWhiteSpace(Recommendation);
+        return !string.IsNullOrWhiteSpace(Analysis) && !string.IsNullOrWhiteSpace(Recommendation);
     }
 }

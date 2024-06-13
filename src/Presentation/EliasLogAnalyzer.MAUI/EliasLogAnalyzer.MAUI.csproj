@@ -85,12 +85,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiXaml Update="Pages\DatabasePage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Pages\SettingsPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
 		<MauiXaml Update="Pages\ReportPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>

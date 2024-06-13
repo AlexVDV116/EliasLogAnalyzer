@@ -43,9 +43,7 @@ public class ReportViewModelTests
         // Arrange
         var pinnedLogEntries = new ObservableCollection<LogEntry> { new LogEntry { Description = "Test log" } };
         _logDataSharingService.PinnedLogEntries = pinnedLogEntries;
-
-        _viewModel.DeveloperName = "John Doe";
-        _viewModel.Severity = "High";
+        
         _viewModel.Analysis = "Detailed analysis";
         _viewModel.Recommendation = "Follow-up needed";
 
@@ -63,8 +61,6 @@ public class ReportViewModelTests
     public async Task SubmitCommand_ShouldNot_Invoke_ApiService_When_Form_Is_Invalid()
     {
         // Arrange - setting up an invalid state for the form
-        _viewModel.DeveloperName = ""; 
-        _viewModel.Severity = "";
         _viewModel.Analysis = "";
         _viewModel.Recommendation = "";
 
@@ -73,5 +69,26 @@ public class ReportViewModelTests
 
         // Assert
         _apiServiceMock.Verify(api => api.AddBugReportAsync(It.IsAny<BugReport>()), Times.Never);
+    }
+    
+    [Fact]
+    public async Task CheckConnectionCommand_Should_UpdateViewModel()
+    {
+        // Act
+        await _viewModel.CheckConnectionCommand.ExecuteAsync(null);
+
+        // Assert
+        if (_viewModel.IsConnected)
+        {
+            Assert.True(_viewModel.ConnectedIconVisible);
+            Assert.False(_viewModel.NotConnectedIconVisible);
+            Assert.Equal("Connected", _viewModel.ConnectionStatus);
+        }
+        else
+        {
+            Assert.False(_viewModel.ConnectedIconVisible);
+            Assert.True(_viewModel.NotConnectedIconVisible);
+            Assert.NotEqual("Connected", _viewModel.ConnectionStatus);
+        }
     }
 }
