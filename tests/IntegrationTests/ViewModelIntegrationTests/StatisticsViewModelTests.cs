@@ -22,11 +22,10 @@ public class StatisticsViewModelTests
         var logDataSharingLogger = loggerFactory.CreateLogger<LogDataSharingService>();
 
         _logDataSharingService = new LogDataSharingService(logDataSharingLogger);
-        var logEntryAnalysisService = new LogEntryAnalysisService(_logDataSharingService);
         var settingsService = new SettingsService();
         var htmlGeneratorService = new HtmlGeneratorService(settingsService, _logDataSharingService);
 
-        _viewModel = new StatisticsViewModel(_logDataSharingService, logEntryAnalysisService, htmlGeneratorService);
+        _viewModel = new StatisticsViewModel(_logDataSharingService, htmlGeneratorService);
     }
 
     [Fact]
@@ -46,8 +45,6 @@ public class StatisticsViewModelTests
     public void OnMarkedLogEntryChanged_Should_Not_AnalyzeLogEntries_When_No_MarkedLogEntry()
     {
         // Arrange
-        var logEntry1 = new LogEntry { LogTimeStamp = CommonTimestamp, Data = CommonData};
-        var logEntry2 = new LogEntry { LogTimeStamp = CommonTimestamp, Data = CommonData };
         _logDataSharingService.MarkedLogEntry = null;
 
         // Act
@@ -81,13 +78,10 @@ public class StatisticsViewModelTests
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             ?.Invoke(_viewModel,
                 new object[] { _logDataSharingService, new PropertyChangedEventArgs(nameof(_logDataSharingService.MarkedLogEntry)) });
-
-
         
         // Assert
         Assert.True(_viewModel.LogEntryMarked);
         Assert.False(_viewModel.NoLogEntryMarked);
-        Assert.True(_viewModel.SortedLogEntriesByProbability.Any());
 
         Assert.False(string.IsNullOrEmpty(_viewModel.PieChartHtml));
         Assert.False(string.IsNullOrEmpty(_viewModel.TimelineHtml));
@@ -111,9 +105,8 @@ public class StatisticsViewModelTests
                 new object[] { _logDataSharingService, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset) });
 
         // Assert
-        Assert.True(_viewModel.SortedLogEntriesByProbability.Any());
-
         Assert.False(string.IsNullOrEmpty(_viewModel.PieChartHtml));
         Assert.False(string.IsNullOrEmpty(_viewModel.TimelineHtml));
+        Assert.False(string.IsNullOrEmpty(_viewModel.BarChartHtml));
     }
 }

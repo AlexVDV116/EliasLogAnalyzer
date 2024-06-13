@@ -16,25 +16,23 @@ namespace IntegrationTests.ViewModelIntegrationTests;
 public class ReportViewModelTests
 {
     private readonly LogDataSharingService _logDataSharingService;
-    private readonly DialogService _dialogService;
     private readonly Mock<IApiService> _apiServiceMock;
     private readonly ReportViewModel _viewModel;
 
     public ReportViewModelTests()
     {
-        var httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7028/") };
         var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddDebug();  // or builder.AddConsole() depending on what is available
         });
-        var apiLogger = loggerFactory.CreateLogger<ApiService>();
+        loggerFactory.CreateLogger<ApiService>();
         var logDataSharingLogger = loggerFactory.CreateLogger<LogDataSharingService>();
 
         _logDataSharingService = new LogDataSharingService(logDataSharingLogger);
-        _dialogService = new DialogService();
+        var dialogService = new DialogService();
         _apiServiceMock = new Mock<IApiService>();
 
-        _viewModel = new ReportViewModel(_logDataSharingService, _dialogService, _apiServiceMock.Object);
+        _viewModel = new ReportViewModel(_logDataSharingService, dialogService, _apiServiceMock.Object);
     }
 
     [Fact]
@@ -74,6 +72,10 @@ public class ReportViewModelTests
     [Fact]
     public async Task CheckConnectionCommand_Should_UpdateViewModel()
     {
+        // Arrange
+        _apiServiceMock.Setup(x => x.CheckDatabaseConnectionAsync())
+            .ReturnsAsync(ApiResult.Ok());
+
         // Act
         await _viewModel.CheckConnectionCommand.ExecuteAsync(null);
 

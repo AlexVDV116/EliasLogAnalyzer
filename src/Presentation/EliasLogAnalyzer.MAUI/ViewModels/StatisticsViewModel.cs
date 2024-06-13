@@ -12,7 +12,6 @@ namespace EliasLogAnalyzer.MAUI.ViewModels;
 public partial class StatisticsViewModel : ObservableObject
 {
     private readonly ILogDataSharingService _logDataSharingService;
-    private readonly ILogEntryAnalysisService _logEntryAnalysisService;
     private readonly IHtmlGeneratorService _htmlGeneratorService;
 
     [ObservableProperty] private ObservableCollection<LogEntry> _sortedLogEntriesByProbability = [];
@@ -30,11 +29,9 @@ public partial class StatisticsViewModel : ObservableObject
 
     public StatisticsViewModel(
         ILogDataSharingService logDataSharingService,
-        ILogEntryAnalysisService logEntryAnalysisService,
         IHtmlGeneratorService htmlGeneratorService)
     {
         _logDataSharingService = logDataSharingService;
-        _logEntryAnalysisService = logEntryAnalysisService;
         _htmlGeneratorService = htmlGeneratorService;
 
         InitializeBindings();
