@@ -24,10 +24,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\src\Domain\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
-		<ProjectReference Include="..\src\Persistence\EliasLogAnalyzer.Persistence\EliasLogAnalyzer.Persistence.csproj" />
-		<ProjectReference Include="..\src\Presentation\EliasLogAnalyzer.API\EliasLogAnalyzer.API.csproj" />
-		<ProjectReference Include="..\src\Presentation\EliasLogAnalyzer.MAUI\EliasLogAnalyzer.MAUI.csproj" />
+		<ProjectReference Include="..\..\src\Domain\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
+		<ProjectReference Include="..\..\src\Persistence\EliasLogAnalyzer.Persistence\EliasLogAnalyzer.Persistence.csproj" />
+		<ProjectReference Include="..\..\src\Presentation\EliasLogAnalyzer.API\EliasLogAnalyzer.API.csproj" />
+		<ProjectReference Include="..\..\src\Presentation\EliasLogAnalyzer.MAUI\EliasLogAnalyzer.MAUI.csproj" />
 	</ItemGroup>
 
 </Project>

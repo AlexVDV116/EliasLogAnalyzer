@@ -27,8 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\src\Domain\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
-		<ProjectReference Include="..\src\Presentation\EliasLogAnalyzer.MAUI\EliasLogAnalyzer.MAUI.csproj" />
+		<ProjectReference Include="..\..\src\Domain\EliasLogAnalyzer.Domain\EliasLogAnalyzer.Domain.csproj" />
+		<ProjectReference Include="..\..\src\Presentation\EliasLogAnalyzer.MAUI\EliasLogAnalyzer.MAUI.csproj" />
 	</ItemGroup>
 
 </Project>
