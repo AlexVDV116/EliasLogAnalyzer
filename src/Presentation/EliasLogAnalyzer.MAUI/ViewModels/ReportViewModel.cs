@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
@@ -27,22 +28,18 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty] private string _recommendation = string.Empty;
     [ObservableProperty] private string _emptyCollectionViewText = "Pin LogEntries to add them to the report.";
     [ObservableProperty] private bool _showPinImage;
-
-
+    
     [ObservableProperty] private Color _analysisPlaceholderColor = Colors.LightGray;
     [ObservableProperty] private Color _recommendationPlaceholderColor = Colors.LightGray;
 
-
-    public IAsyncRelayCommand CheckConnectionCommand { get; }
+    [ObservableProperty] private ObservableCollection<LogEntry> _logEntriesToInclude = [];
 
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
-    public ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
-
+    private ObservableCollection<LogEntry> LogEntries => _logDataSharingService.LogEntries;
+    
+    public IAsyncRelayCommand CheckConnectionCommand { get; }
     private DateTime CombinedDateTime => ReportDate.Date + ReportTime;
-    public List<string> Severities { get; } = ["Critical", "High", "Medium", "Low"];
-    public List<double> Efforts { get; } = [1, 2, 3, 4, 5, 6, 8, 12, 16, 24];
-
-
+    
     public ReportViewModel(
         ILogDataSharingService logDataSharingService,
         IDialogService dialogService,
@@ -53,7 +50,23 @@ public partial class ReportViewModel : ObservableObject
         _apiService = apiService;
 
         CheckConnectionCommand = new AsyncRelayCommand(CheckDatabaseConnectionAsync);
+        
+        LogEntries.CollectionChanged += UpdateLogEntriesToInclude;
+    }
+    
+    private void UpdateLogEntriesToInclude(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        var filteredAndSortedEntries = _logDataSharingService.LogEntries
+            .Where(le => le.IsPinned || le.IsMarked)
+            .OrderByDescending(le => le.IsMarked)
+            .ThenBy(le => le.LogTimeStamp)
+            .ToList();
 
+        LogEntriesToInclude.Clear();
+        foreach (var entry in filteredAndSortedEntries)
+        {
+            LogEntriesToInclude.Add(entry);
+        }
     }
 
     private void UpdateConnectionStatus(ApiResult result)
@@ -87,7 +100,7 @@ public partial class ReportViewModel : ObservableObject
     private async Task CopyToClipboardAsync()
     {
         // Generate a string for each pinned log entry, displaying critical information
-        var pinnedLogEntriesDetails = string.Join("\n\n", PinnedLogEntries.Select(entry =>
+        var pinnedLogEntriesDetails = string.Join("\n\n", LogEntriesToInclude.Select(entry =>
             $"DateTime: {entry.LogTimeStamp.DateTime} (Ticks: {entry.LogTimeStamp.Ticks}), " +
             $"Type: {entry.LogType}, " +
             $"Source: {entry.Source}, " +
@@ -121,7 +134,7 @@ public partial class ReportViewModel : ObservableObject
                 PossibleSolutions = PossibleSolutions.Trim(),
                 Risk = Risk.Trim(),
                 Recommendation = Recommendation.Trim(),
-                PinnedLogEntries = _logDataSharingService.PinnedLogEntries.ToList()
+                LogEntriesToInclude = LogEntriesToInclude.ToList()
             };
 
             var result = await _apiService.AddBugReportAsync(bugReport);

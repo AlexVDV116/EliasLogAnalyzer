@@ -9,7 +9,7 @@ public class BugReport
     public string PossibleSolutions { get; init; } = string.Empty;
     public string Risk { get; init; } = string.Empty;
     public string Recommendation { get; init; } = string.Empty;
-    public List<LogEntry> PinnedLogEntries { get; set; } = [];
+    public List<LogEntry> LogEntriesToInclude { get; set; } = [];
     public List<BugReportLogEntry> BugReportLogEntries { get; } = [];
 
 }

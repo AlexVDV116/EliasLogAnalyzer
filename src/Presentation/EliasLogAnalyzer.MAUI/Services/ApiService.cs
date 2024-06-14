@@ -11,7 +11,7 @@ public class ApiService(HttpClient httpClient, ILogger<ApiService> logger) : IAp
     {
         try
         {
-            HttpResponseMessage response = await httpClient.GetAsync("api/Database/CheckConnection").ConfigureAwait(false);
+            var response = await httpClient.GetAsync("api/Database/CheckConnection").ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 return ApiResult.Ok();
@@ -39,7 +39,7 @@ public class ApiService(HttpClient httpClient, ILogger<ApiService> logger) : IAp
     {
         try
         {
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/BugReport", bugReport).ConfigureAwait(false);
+            var response = await httpClient.PostAsJsonAsync("api/BugReport", bugReport).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {

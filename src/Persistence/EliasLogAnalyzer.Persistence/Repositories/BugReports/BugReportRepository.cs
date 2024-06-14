@@ -29,7 +29,7 @@ public class BugReportRepository(
             // List to hold processed log entries
             List<LogEntry> processedLogEntries = [];
 
-            foreach (var logEntry in bugReport.PinnedLogEntries)
+            foreach (var logEntry in bugReport.LogEntriesToInclude)
             {
 
                 // Handle the LogFile to ensure it's not duplicated
@@ -63,7 +63,7 @@ public class BugReportRepository(
             }
 
             // Replace the list with processed entries
-            bugReport.PinnedLogEntries = processedLogEntries;
+            bugReport.LogEntriesToInclude = processedLogEntries;
 
             foreach (var entry in processedLogEntries)
             {

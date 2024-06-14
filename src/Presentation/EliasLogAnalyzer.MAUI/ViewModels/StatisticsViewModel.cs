@@ -73,12 +73,10 @@ public partial class StatisticsViewModel : ObservableObject
 
     private void OnMarkedLogEntryChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MarkedLogEntry))
-        {
-            UpdatePageState();
-            GenerateCharts();
-            InitializeSortedCollection();
-        }
+        if (e.PropertyName != nameof(MarkedLogEntry)) return;
+        UpdatePageState();
+        GenerateCharts();
+        InitializeSortedCollection();
     }
 
     private void UpdatePageState()

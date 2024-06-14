@@ -1,32 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:EliasLogAnalyzer.MAUI.Resources.Controls;assembly=EliasLogAnalyzer.MAUI"
              x:Class="EliasLogAnalyzer.MAUI.Pages.StatisticsPage"
-             xmlns:resources="clr-namespace:EliasLogAnalyzer.MAUI.Resources"             
              xmlns:viewModels="clr-namespace:EliasLogAnalyzer.MAUI.ViewModels"
-             xmlns:entities="clr-namespace:EliasLogAnalyzer.Domain.Entities;assembly=EliasLogAnalyzer.Domain"
-             xmlns:converters="clr-namespace:EliasLogAnalyzer.MAUI.Converters"   
              x:DataType="viewModels:StatisticsViewModel"
              Title="StatisticsPage">
 
     <Shell.TitleView>
         <Label Text="" />
     </Shell.TitleView>
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <converters:LogTypeToColorConverter x:Key="LogTypeToColorConverter" />
-            <converters:BoolToPinTextConverter x:Key="BoolToPinTextConverter" />
-            <converters:BoolToMarkedTextConverter x:Key="BoolToMarkedTextConverter" />
-        </ResourceDictionary>
-
-        <FontImageSource x:Key="InfoIcon" 
-                         FontFamily="MaterialSymbols"
-                         Glyph="{x:Static resources:IconFont.Info}"
-                         Color="Blue"
-                         Size="20"/>
-    </ContentPage.Resources>
 
     <Grid RowDefinitions="*, *">
         <Grid Grid.Row="0" ColumnDefinitions="3*, 2*">

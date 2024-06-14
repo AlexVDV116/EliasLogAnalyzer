@@ -14,7 +14,7 @@ public class EliasLogAnalyzerDbContext(DbContextOptions<EliasLogAnalyzerDbContex
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<BugReport>()
-            .HasMany(b => b.PinnedLogEntries)
+            .HasMany(b => b.LogEntriesToInclude)
             .WithMany(l => l.BugReports)
             .UsingEntity<BugReportLogEntry>(
         j => j
