@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace EliasLogAnalyzer.API.Migrations
+namespace EliasLogAnalyzer.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -17,21 +17,10 @@ namespace EliasLogAnalyzer.API.Migrations
                 {
                     BugReportId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DeveloperName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WorkstationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReportDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Situation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Observation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Expectation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Tag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Build = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Severity = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Analysis = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PossibleSolutions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WhatToTest = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Effort = table.Column<double>(type: "float", nullable: false),
                     Risk = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Workaround = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Recommendation = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

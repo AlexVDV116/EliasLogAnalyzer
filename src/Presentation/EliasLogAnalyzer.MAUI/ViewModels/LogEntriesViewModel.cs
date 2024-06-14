@@ -216,6 +216,14 @@ public partial class LogEntriesViewModel(
     }
 
     [RelayCommand]
+    private void RemoveLogEntry(LogEntry logEntry)
+    {
+        logDataSharingService.RemoveLogEntry(logEntry);
+        logEntryAnalysisService.AnalyzeLogEntries();
+    }
+
+
+    [RelayCommand]
     private void MarkLogEntry(LogEntry logEntry)
     {
         logDataSharingService.MarkLogEntry(logEntry);

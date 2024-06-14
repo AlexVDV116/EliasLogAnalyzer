@@ -19,4 +19,5 @@ public interface ILogDataSharingService
     void MarkLogEntry(LogEntry entry);
     void SortByProperty(string propertyName, bool ascending = false);
     void ClearAllLogs();
+    void RemoveLogEntry(LogEntry entry);
 }

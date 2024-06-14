@@ -36,14 +36,19 @@ public class LogEntryAnalysisService(ILogDataSharingService logDataSharingServic
 
     public void AnalyzeLogEntries()
     {
-        if (MarkedLogEntry == null) return;
-
-        foreach (var entry in LogEntries)
+        if (MarkedLogEntry == null)
         {
-            if (entry != MarkedLogEntry)
+            foreach (var entry in LogEntries) entry.Probability = null;
+        }
+        else
+        {
+            foreach (var entry in LogEntries)
             {
-                double probability = CalculateProbability(MarkedLogEntry, entry);
-                entry.Probability = (int)Math.Clamp(probability, 0, 100);
+                if (entry != MarkedLogEntry)
+                {
+                    var probability = CalculateProbability(MarkedLogEntry, entry);
+                    entry.Probability = (int)Math.Clamp(probability, 0, 100);
+                }
             }
         }
     }

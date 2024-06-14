@@ -28,18 +28,16 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty] private string _recommendation = string.Empty;
     [ObservableProperty] private string _emptyCollectionViewText = "Pin LogEntries to add them to the report.";
     [ObservableProperty] private bool _showPinImage;
-    
+
     [ObservableProperty] private Color _analysisPlaceholderColor = Colors.LightGray;
     [ObservableProperty] private Color _recommendationPlaceholderColor = Colors.LightGray;
 
-    [ObservableProperty] private ObservableCollection<LogEntry> _logEntriesToInclude = [];
-
     // Properties directly bound to the LogDataSharingService which acts as the single source of truth for collections
-    private ObservableCollection<LogEntry> LogEntries => _logDataSharingService.LogEntries;
-    
+    public ObservableCollection<LogEntry> PinnedLogEntries => _logDataSharingService.PinnedLogEntries;
+
     public IAsyncRelayCommand CheckConnectionCommand { get; }
     private DateTime CombinedDateTime => ReportDate.Date + ReportTime;
-    
+
     public ReportViewModel(
         ILogDataSharingService logDataSharingService,
         IDialogService dialogService,
@@ -50,24 +48,8 @@ public partial class ReportViewModel : ObservableObject
         _apiService = apiService;
 
         CheckConnectionCommand = new AsyncRelayCommand(CheckDatabaseConnectionAsync);
-        
-        LogEntries.CollectionChanged += UpdateLogEntriesToInclude;
     }
-    
-    private void UpdateLogEntriesToInclude(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        var filteredAndSortedEntries = _logDataSharingService.LogEntries
-            .Where(le => le.IsPinned || le.IsMarked)
-            .OrderByDescending(le => le.IsMarked)
-            .ThenBy(le => le.LogTimeStamp)
-            .ToList();
 
-        LogEntriesToInclude.Clear();
-        foreach (var entry in filteredAndSortedEntries)
-        {
-            LogEntriesToInclude.Add(entry);
-        }
-    }
 
     private void UpdateConnectionStatus(ApiResult result)
     {
@@ -100,7 +82,7 @@ public partial class ReportViewModel : ObservableObject
     private async Task CopyToClipboardAsync()
     {
         // Generate a string for each pinned log entry, displaying critical information
-        var pinnedLogEntriesDetails = string.Join("\n\n", LogEntriesToInclude.Select(entry =>
+        var pinnedLogEntriesDetails = string.Join("\n\n", PinnedLogEntries.Select(entry =>
             $"DateTime: {entry.LogTimeStamp.DateTime} (Ticks: {entry.LogTimeStamp.Ticks}), " +
             $"Type: {entry.LogType}, " +
             $"Source: {entry.Source}, " +
@@ -134,7 +116,7 @@ public partial class ReportViewModel : ObservableObject
                 PossibleSolutions = PossibleSolutions.Trim(),
                 Risk = Risk.Trim(),
                 Recommendation = Recommendation.Trim(),
-                LogEntriesToInclude = LogEntriesToInclude.ToList()
+                LogEntriesToInclude = PinnedLogEntries.ToList()
             };
 
             var result = await _apiService.AddBugReportAsync(bugReport);

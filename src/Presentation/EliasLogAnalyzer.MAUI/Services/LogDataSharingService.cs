@@ -129,12 +129,14 @@ public partial class LogDataSharingService(ILogger<LogDataSharingService> logger
         {
             // Unmark the previous marked entry
             MarkedLogEntry.IsMarked = false;
+            MarkedLogEntry.IsPinned = false;
         }
 
         // Toggle the mark state if it's the same entry being toggled
         if (logEntry == MarkedLogEntry)
         {
             logEntry.IsMarked = !logEntry.IsMarked;
+            PinLogEntry(logEntry);
             MarkedLogEntry = logEntry.IsMarked ? logEntry : null;
             ResetDiffTicks();
         }
@@ -142,6 +144,7 @@ public partial class LogDataSharingService(ILogger<LogDataSharingService> logger
         {
             // Mark the new entry
             logEntry.IsMarked = true;
+            PinLogEntry(logEntry);
             MarkedLogEntry = logEntry;
         }
 
@@ -151,6 +154,30 @@ public partial class LogDataSharingService(ILogger<LogDataSharingService> logger
         {
             SelectedLogEntries.Add(MarkedLogEntry);
         }
+    }
+
+    public void RemoveLogEntry(LogEntry entry)
+    {
+        if (PinnedLogEntries.Contains(entry))
+        {
+            entry.IsPinned = !entry.IsPinned;
+            PinnedLogEntries.Remove(entry);
+        }
+
+        if (MarkedLogEntry == entry)
+        {
+            entry.IsMarked = !entry.IsMarked;
+            MarkedLogEntry = null;
+            ResetDiffTicks();
+        }
+
+        if (SelectedLogEntries.Contains(entry))
+            SelectedLogEntries.Remove(entry);
+
+        LogEntries.Remove(entry);
+        FilteredLogEntries.Remove(entry);
+        _loadedLogEntryIdentifiers.Remove(entry.Hash);
+
     }
 
     private void ResetDiffTicks()

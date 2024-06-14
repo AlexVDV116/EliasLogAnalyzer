@@ -3,8 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EliasLogAnalyzer.Persistence.Data;
 
-public class EliasLogAnalyzerDbContext(DbContextOptions<EliasLogAnalyzerDbContext> options) : DbContext(options)
+public class EliasLogAnalyzerDbContext : DbContext
 {
+    public EliasLogAnalyzerDbContext(DbContextOptions<EliasLogAnalyzerDbContext> options) : base(options)
+    {
+    }
+
     public DbSet<LogFile> LogFiles { get; init; }
     public DbSet<LogEntry> LogEntries { get; init; }
     public DbSet<BugReport> BugReports { get; init; }
@@ -27,8 +31,8 @@ public class EliasLogAnalyzerDbContext(DbContextOptions<EliasLogAnalyzerDbContex
             .HasForeignKey(ble => ble.BugReportId),
         j =>
         {
-            j.ToTable("BugReportLogEntries"); // Explicitly naming the join table
-            j.HasKey(ble => new { ble.BugReportId, ble.LogEntryId }); // Setting the composite key
+            j.ToTable("BugReportLogEntries");
+            j.HasKey(ble => new { ble.BugReportId, ble.LogEntryId }); // Composite key
         });
 
         modelBuilder.Entity<LogEntry>()

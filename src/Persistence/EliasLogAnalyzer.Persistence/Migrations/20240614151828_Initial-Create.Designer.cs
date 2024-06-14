@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace EliasLogAnalyzer.API.Migrations
+namespace EliasLogAnalyzer.Persistence.Migrations
 {
     [DbContext(typeof(EliasLogAnalyzerDbContext))]
-    [Migration("20240608193012_Initial Create")]
+    [Migration("20240614151828_Initial-Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -37,25 +37,6 @@ namespace EliasLogAnalyzer.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Build")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeveloperName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Effort")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Expectation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PossibleSolutions")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -68,30 +49,6 @@ namespace EliasLogAnalyzer.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Risk")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Situation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WhatToTest")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Workaround")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WorkstationName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

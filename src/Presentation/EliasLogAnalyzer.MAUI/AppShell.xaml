@@ -41,6 +41,27 @@
             <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
             <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource OffBlack}, Dark={StaticResource OffWhite}}" />
         </Style>
+
+        <FontImageSource x:Key="DataTableIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.DataTable}"
+                         Color="Black" Size="40"  />
+        <FontImageSource x:Key="InsightsIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Insights}"
+                         Color="Black" Size="40"  />
+        <FontImageSource x:Key="SummarizeIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.Summarize}"
+                         Color="Black" Size="40"  />
+        <FontImageSource x:Key="LeftPanelOpenIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.LeftPanelOpen}"
+                         Color="Black" Size="40" />
+        <FontImageSource x:Key="LeftPanelCloseIcon" 
+                         FontFamily="MaterialSymbols"
+                         Glyph="{x:Static resources:IconFont.LeftPanelClose}"
+                         Color="Black" Size="40" />
     </Shell.Resources>
 
     <Shell.FlyoutHeaderTemplate>
@@ -91,7 +112,7 @@
             />
         </Tab>
     </FlyoutItem>
-    
+
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="local:AppShell">
             <Grid ColumnDefinitions="Auto, 90" Padding="12, 7, 0 , 0">

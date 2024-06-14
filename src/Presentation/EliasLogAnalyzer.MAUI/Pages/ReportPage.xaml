@@ -109,7 +109,7 @@
         </Border>
 
         <Border Grid.Column="1" Margin="10, 0, 10, 10" Padding="10" Stroke="Lightgray">
-            <CollectionView ItemsSource="{Binding LogEntriesToInclude}" SelectionMode="None" >
+            <CollectionView ItemsSource="{Binding PinnedLogEntries}" SelectionMode="None" >
 
                 <CollectionView.EmptyView>
                     <HorizontalStackLayout Padding="5, 50">
@@ -119,13 +119,12 @@
                 </CollectionView.EmptyView>
 
                 <CollectionView.Header>
-                    <Grid
-                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
-                               Padding="10" ColumnSpacing="10" Margin="10, 0"
-                                 ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
+                    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource OffBlack}}"
+                          Padding="10" ColumnSpacing="10" Margin="10, 0"
+                          ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
                         <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" />
                         <Label Grid.Column="1" Text="📌" />
-                        <Label Grid.Column="2" Text="% ▲" FontAttributes="Bold"/>
+                        <Label Grid.Column="2" Text="%" FontAttributes="Bold"/>
                         <Label Grid.Column="3" Text="DateTime" FontAttributes="Bold"/>
                         <Label Grid.Column="4" Text="Ticks" FontAttributes="Bold"/>
                         <Label Grid.Column="5" Text="LogType" FontAttributes="Bold"/>
@@ -140,8 +139,8 @@
                     <DataTemplate x:DataType="entities:LogEntry">
                         <VerticalStackLayout>
                             <Grid Padding="10" ColumnSpacing="10" Margin="10, 0, 10, 0"
-                                          BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
-                                          ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
+                                  BackgroundColor="{Binding LogType, Converter={StaticResource LogTypeToColorConverter}}"
+                                  ColumnDefinitions="40, 40, 50, 80, 80, 80, 150, 150, 150">
                                 <Label Grid.Column="0" FontFamily="Segoe UI Emoji" Text="⭐" IsVisible="{Binding IsMarked}" />
                                 <Label Grid.Column="1" Text="📌" IsVisible="{Binding IsPinned}" />
                                 <Label Grid.Column="2" Text="{Binding Probability}" FontAttributes="Bold" FontSize="12" />
