@@ -169,16 +169,21 @@ public partial class LogEntriesViewModel(
         ErrorLogTypeText = SelectedLogTypes.Contains(LogType.Error) ? "✓ Error" : "Error";
     }
 
+    private void ClearLogEntryDataHtml()
+    {
+        FirstLogEntryDataHtml = string.Empty;
+        SecondLogEntryDataHtml = string.Empty;
+        ThirdLogEntryDataHtml = string.Empty;
+        IsFirstLogEntrySelected = false;
+        IsSecondLogEntrySelected = false;
+        IsThirdLogEntrySelected = false;
+    }
+
     private void UpdateSelectedEntryData()
     {
         if (SelectedLogEntries.Count == 0)
         {
-            FirstLogEntryDataHtml = string.Empty;
-            SecondLogEntryDataHtml = string.Empty;
-            ThirdLogEntryDataHtml = string.Empty;
-            IsFirstLogEntrySelected = false;
-            IsSecondLogEntrySelected = false;
-            IsThirdLogEntrySelected = false;
+            ClearLogEntryDataHtml();
         }
         else
         {
@@ -309,6 +314,7 @@ public partial class LogEntriesViewModel(
         if (confirm)
         {
             logDataSharingService.ClearAllLogs();
+            ClearLogEntryDataHtml();
             RefreshViewStateAfterDeletion();
         }
     }

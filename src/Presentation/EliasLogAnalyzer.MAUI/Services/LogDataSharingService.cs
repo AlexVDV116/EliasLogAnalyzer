@@ -230,6 +230,7 @@ public partial class LogDataSharingService(ILogger<LogDataSharingService> logger
         LogFiles.Clear();
         LogEntries.Clear();
         SelectedLogEntries.Clear();
+        PinnedLogEntries.Clear();
         FilteredLogEntries.Clear();
         MarkedLogEntry = null;
     }
