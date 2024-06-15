@@ -8,13 +8,13 @@ namespace EliasLogAnalyzer.API.Controllers;
 [ApiController]
 public class LogEntryController : ControllerBase
 {
-    private readonly ILogEntryRepository logEntryRepository;
-    private readonly ILogger<LogEntryController> logger;
+    private readonly ILogEntryRepository _logEntryRepository;
+    private readonly ILogger<LogEntryController> _logger;
 
     public LogEntryController(ILogEntryRepository logEntryRepository, ILogger<LogEntryController> logger)
     {
-        this.logEntryRepository = logEntryRepository;
-        this.logger = logger;
+        _logEntryRepository = logEntryRepository;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -22,12 +22,12 @@ public class LogEntryController : ControllerBase
     {
         try
         {
-            var entries = await logEntryRepository.GetLogEntries();
+            var entries = await _logEntryRepository.GetLogEntries();
             return Ok(entries);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to retrieve log entries.");
+            _logger.LogError(ex, "Failed to retrieve log entries.");
             return StatusCode(500, "An error occurred while retrieving log entries.");
         }
     }
@@ -37,7 +37,7 @@ public class LogEntryController : ControllerBase
     {
         try
         {
-            var logEntry = await logEntryRepository.GetLogEntryById(id);
+            var logEntry = await _logEntryRepository.GetLogEntryById(id);
             if (logEntry == null)
             {
                 return NotFound();
@@ -46,7 +46,7 @@ public class LogEntryController : ControllerBase
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to retrieve log entry by ID: {LogEntryId}", id);
+            _logger.LogError(ex, "Failed to retrieve log entry by ID: {LogEntryId}", id);
             return StatusCode(500, "An error occurred while retrieving the log entry.");
         }
     }
@@ -56,12 +56,12 @@ public class LogEntryController : ControllerBase
     {
         try
         {
-            var addedEntry = await logEntryRepository.AddOrUpdateLogEntry(logEntry);
+            var addedEntry = await _logEntryRepository.AddOrUpdateLogEntry(logEntry);
             return CreatedAtAction(nameof(GetLogEntryById), new { id = addedEntry.LogEntryId }, addedEntry);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to add log entry.");
+            _logger.LogError(ex, "Failed to add log entry.");
             return StatusCode(500, "An error occurred while adding the log entry.");
         }
     }
@@ -71,7 +71,7 @@ public class LogEntryController : ControllerBase
     {
         try
         {
-            bool result = await logEntryRepository.DeleteLogEntry(id);
+            bool result = await _logEntryRepository.DeleteLogEntry(id);
             if (!result)
             {
                 return NotFound();
@@ -80,7 +80,7 @@ public class LogEntryController : ControllerBase
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to delete log entry with ID: {LogEntryId}", id);
+            _logger.LogError(ex, "Failed to delete log entry with ID: {LogEntryId}", id);
             return StatusCode(500, "An error occurred while deleting the log entry.");
         }
     }

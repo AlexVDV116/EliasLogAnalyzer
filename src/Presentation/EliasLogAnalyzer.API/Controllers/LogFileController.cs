@@ -8,13 +8,13 @@ namespace EliasLogAnalyzer.API.Controllers;
 [ApiController]
 public class LogFileController : ControllerBase
 {
-    private readonly ILogFileRepository logFileRepository;
-    private readonly ILogger<LogFileController> logger;
+    private readonly ILogFileRepository _logFileRepository;
+    private readonly ILogger<LogFileController> _logger;
 
     public LogFileController(ILogFileRepository logFileRepository, ILogger<LogFileController> logger)
     {
-        this.logFileRepository = logFileRepository;
-        this.logger = logger;
+        _logFileRepository = logFileRepository;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -22,12 +22,12 @@ public class LogFileController : ControllerBase
     {
         try
         {
-            var files = await logFileRepository.GetAllLogFiles();
+            var files = await _logFileRepository.GetAllLogFiles();
             return Ok(files);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to get all log files.");
+            _logger.LogError(ex, "Failed to get all log files.");
             return StatusCode(500, "An error occurred while retrieving log files.");
         }
     }
@@ -37,7 +37,7 @@ public class LogFileController : ControllerBase
     {
         try
         {
-            var file = await logFileRepository.GetLogFileById(id);
+            var file = await _logFileRepository.GetLogFileById(id);
             if (file == null)
             {
                 return NotFound();
@@ -46,7 +46,7 @@ public class LogFileController : ControllerBase
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to get log file by ID: {LogFileId}", id);
+            _logger.LogError(ex, "Failed to get log file by ID: {LogFileId}", id);
             return StatusCode(500, "An error occurred while retrieving the log file.");
         }
     }
@@ -56,12 +56,12 @@ public class LogFileController : ControllerBase
     {
         try
         {
-            var newFile = await logFileRepository.AddLogFile(logFile);
+            var newFile = await _logFileRepository.AddLogFile(logFile);
             return CreatedAtAction(nameof(GetLogFileById), new { id = newFile.LogFileId }, newFile);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to add log file.");
+            _logger.LogError(ex, "Failed to add log file.");
             return StatusCode(500, "An error occurred while adding the log file.");
         }
     }
@@ -71,7 +71,7 @@ public class LogFileController : ControllerBase
     {
         try
         {
-            bool result = await logFileRepository.DeleteLogFile(id);
+            bool result = await _logFileRepository.DeleteLogFile(id);
             if (!result)
             {
                 return NotFound();
@@ -80,7 +80,7 @@ public class LogFileController : ControllerBase
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to delete log file with ID: {LogFileId}", id);
+            _logger.LogError(ex, "Failed to delete log file with ID: {LogFileId}", id);
             return StatusCode(500, "An error occurred while deleting the log file.");
         }
     }

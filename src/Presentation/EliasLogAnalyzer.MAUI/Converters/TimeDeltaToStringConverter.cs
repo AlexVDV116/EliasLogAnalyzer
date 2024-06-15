@@ -11,35 +11,39 @@ namespace EliasLogAnalyzer.MAUI.Converters
                 return string.Empty;
             }
 
-            int timeDelta = (int)value;
+            var timeDelta = (int)value;
 
             if (timeDelta == 0)
             {
                 return "0 ms";
             }
 
-            bool isPositive = timeDelta >= 0;
+            var isPositive = timeDelta >= 0;
 
             timeDelta = Math.Abs(timeDelta);
 
-            if (timeDelta <= 10000)
+            switch (timeDelta)
             {
-                return $"{(isPositive ? "+" : "-")}{timeDelta} ms";
-            }
-            else if (timeDelta < 60000) // Less than 60 seconds
-            {
-                double seconds = timeDelta / 1000.0;
-                return $"{(isPositive ? "+" : "-")}{FormatNumber(seconds)} s";
-            }
-            else if (timeDelta < 3600000) // Less than 60 minutes
-            {
-                double minutes = timeDelta / 60000.0;
-                return $"{(isPositive ? "+" : "-")}{FormatNumber(minutes)} m";
-            }
-            else // 60 minutes or more
-            {
-                double hours = timeDelta / 3600000.0;
-                return $"{(isPositive ? "+" : "-")}{FormatNumber(hours)} h";
+                case <= 10000:
+                    return $"{(isPositive ? "+" : "-")}{timeDelta} ms";
+                // Less than 60 seconds
+                case < 60000:
+                {
+                    var seconds = timeDelta / 1000.0;
+                    return $"{(isPositive ? "+" : "-")}{FormatNumber(seconds)} s";
+                }
+                // Less than 60 minutes
+                case < 3600000:
+                {
+                    var minutes = timeDelta / 60000.0;
+                    return $"{(isPositive ? "+" : "-")}{FormatNumber(minutes)} m";
+                }
+                // 60 minutes or more
+                default:
+                {
+                    var hours = timeDelta / 3600000.0;
+                    return $"{(isPositive ? "+" : "-")}{FormatNumber(hours)} h";
+                }
             }
         }
 
@@ -48,7 +52,7 @@ namespace EliasLogAnalyzer.MAUI.Converters
             throw new NotImplementedException();
         }
 
-        private string FormatNumber(double number)
+        private static string FormatNumber(double number)
         {
             if (number % 1 == 0)
             {

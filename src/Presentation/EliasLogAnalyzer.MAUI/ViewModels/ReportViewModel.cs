@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using EliasLogAnalyzer.Domain.Entities;
 using EliasLogAnalyzer.MAUI.Services.Contracts;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 
 namespace EliasLogAnalyzer.MAUI.ViewModels;
 
