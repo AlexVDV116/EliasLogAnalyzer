@@ -51,7 +51,7 @@ public class StatisticsViewModelTests
         _viewModel.GetType().GetMethod("OnMarkedLogEntryChanged",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             ?.Invoke(_viewModel,
-                new object[] { _logDataSharingService, new PropertyChangedEventArgs(nameof(_logDataSharingService.MarkedLogEntry)) });
+                [_logDataSharingService, new PropertyChangedEventArgs(nameof(_logDataSharingService.MarkedLogEntry))]);
 
         // Assert
         Assert.False(_viewModel.LogEntryMarked);
@@ -77,7 +77,7 @@ public class StatisticsViewModelTests
         _viewModel.GetType().GetMethod("OnMarkedLogEntryChanged",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             ?.Invoke(_viewModel,
-                new object[] { _logDataSharingService, new PropertyChangedEventArgs(nameof(_logDataSharingService.MarkedLogEntry)) });
+                [_logDataSharingService, new PropertyChangedEventArgs(nameof(_logDataSharingService.MarkedLogEntry))]);
         
         // Assert
         Assert.True(_viewModel.LogEntryMarked);
@@ -102,7 +102,7 @@ public class StatisticsViewModelTests
         _viewModel.GetType().GetMethod("OnLogEntriesChanged",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             ?.Invoke(_viewModel,
-                new object[] { _logDataSharingService, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset) });
+                [_logDataSharingService, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)]);
 
         // Assert
         Assert.False(string.IsNullOrEmpty(_viewModel.PieChartHtml));
