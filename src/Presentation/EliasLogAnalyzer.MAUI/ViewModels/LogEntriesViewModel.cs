@@ -106,11 +106,17 @@ public partial class LogEntriesViewModel(
     {
         logDataSharingService.UpdateFilter(string.IsNullOrWhiteSpace(SearchText) ? "" : SearchText);
 
-        // Dynamic text to display the number of filtered entries and EmptyViewText based on search results
+        // Update SearchResultText based on the filtered count vs. total count
         SearchResultText = $"{FilteredLogEntries.Count} / {logDataSharingService.LogEntries.Count} 👁️";
-        EmptyViewText = SearchText.Length > 0 && FilteredLogEntries.Count == 0
-            ? "No results found. Try refining your search terms."
-            : "No log entries found, please load logfiles.";
+
+        EmptyViewText = logDataSharingService.LogEntries.Count switch
+        {
+            // Set EmptyViewText based on conditions
+            0 => "No log entries found, please load logfiles.",
+            > 0 when !string.IsNullOrWhiteSpace(SearchText) && FilteredLogEntries.Count == 0 => "No results found. Try refining your search terms.",
+            > 0 when FilteredLogEntries.Count == 0 => "No results found. There could be a filter applied.",
+            _ => string.Empty
+        };
     }
 
     [RelayCommand]
